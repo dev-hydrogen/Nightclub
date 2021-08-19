@@ -1,0 +1,22 @@
+name: Nightclub
+version: ${project.version}
+main: com.ilm9001.nightclub.Nightclub
+api-version: 1.17
+description: Nightclub plugin based on beatmaps for beat saber.
+
+commands:
+  playbp:
+    description: Load a beatmap and play it
+    usage: /playbp <Beatmap Folder name>
+    permission: nightclub.playbp
+  test:
+    description: testing
+    usage: /test
+    permission: nightclub.test
+
+permissions:
+  nightclub.playbp:
+    description: plays a beatmap
+    default: op
+  nightclub.test:
+    default: op
