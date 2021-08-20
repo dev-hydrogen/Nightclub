@@ -1,17 +1,14 @@
 package com.ilm9001.nightclub.lights;
 
 import com.ilm9001.nightclub.Nightclub;
-import com.ilm9001.nightclub.lights.TopDown.TopDownCircle;
 import com.ilm9001.nightclub.util.LaserWrapper;
-import com.ilm9001.nightclub.util.Util;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class LightAbstract {
     public List<LaserWrapper> lsr;
@@ -22,7 +19,7 @@ public abstract class LightAbstract {
     public double len_max;
     public int off_c;
     public boolean isBlue;
-    public boolean isRunning;
+    public ReentrantLock mutex;
     
     public LightAbstract(Location anchor, int num_lsr) {
         lsr = new ArrayList<>();
@@ -35,74 +32,74 @@ public abstract class LightAbstract {
         len_on = conf.getDouble("length_on");
         len_min = 0.0;
         len_max = conf.getDouble("length_max");
-        isRunning = false;
-    }
-    public void setRunning(boolean bool) {
-        isRunning = bool;
+        mutex = new ReentrantLock();
     }
     
-    public void off() {
-        if(isRunning) {
+    public synchronized void off() {
+        try {
+            mutex.lock();
             for (LaserWrapper lsr : lsr) {
                 lsr.stop();
-                Nightclub.getInstance().getLogger().info("off " + lsr.hashCode());
             }
             len = 0;
             off_c = 0;
+        } finally {
+            mutex.unlock();
         }
     }
-    public void on() {
-        if(isRunning) {
+    public synchronized void on() {
+        try {
+            mutex.lock();
             for (LaserWrapper lsr : lsr) {
                 lsr.start();
-                Nightclub.getInstance().getLogger().info("on " + lsr.hashCode());
             }
             len = len_on;
             off_c = 0;
+        } finally {
+             mutex.unlock();
         }
     }
     public void flash() {
-        if(isRunning) {
-            if (lsr.get(0).isStarted() || len > 0) {
-                if (len < len_on) {
-                    len = len_on;
-                }
-                len += (len_max - len_on) / 7;
-                off_c = 0;
-                for (LaserWrapper lsr : lsr) {
-                    lsr.colorChange();
-                }
-            } else on();
-        }
+        if (lsr.get(0).isStarted() || len > 0) {
+            if (len < len_on) {
+                len = len_on;
+            }
+            len += (len_max - len_on) / 10;
+            off_c = 0;
+            for (LaserWrapper lsr : lsr) {
+                lsr.colorChange();
+            }
+        } else on();
     }
     public void flashOff() {
-        if(isRunning) {
-            flash();
-            off_c = 22;
-        }
+        flash();
+        off_c = 22;
     }
     public void setColor(boolean isBlue) {
-        if(isRunning) {
-            this.isBlue = isBlue;
-        }
+        this.isBlue = isBlue;
     }
+    
+    public abstract void setSpeed(int multiplier);
     
     public abstract class Run extends BukkitRunnable {
         @Override
         public void run() {
-            if (off_c > 0) {
-                off_c -= 1;
-                len -= len_on / 20;
+            if(lsr.get(0).isStarted()) {
+                if (off_c > 0) {
+                    off_c -= 1;
+                    len -= len_on / 20;
+                }
+                if (len > len_max) {
+                    len = len_max;
+                }
+                if (len <= len_min) {
+                    len = len_min;
+                    off_c = 1;
+                    off();
+                }
             }
-            if (len > len_max) {
-                len = len_max;
-            }
-            if (len < len_min || len < 0.9) {
-                len = len_min;
-                off_c = 1;
-                if(isRunning) off();
-            }
-    
+            lights();
         }
+        public abstract void lights();
     }
 }

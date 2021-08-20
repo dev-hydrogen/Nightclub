@@ -11,19 +11,22 @@ public class Circler {
     private int a;
     private boolean isRunning;
     private ScheduledExecutorService sch;
-    private int speed = 1;
+    private int speed = 3;
+    private final int initialSpeed;
     
     public Circler() {
         sch = Executors.newScheduledThreadPool(1);
         sch.schedule(new CirclerRunnable(),0, TimeUnit.MILLISECONDS);
         isRunning = true;
         a = 0;
+        initialSpeed = speed;
     }
     public Circler(int offset) {
         sch = Executors.newScheduledThreadPool(1);
         sch.schedule(new CirclerRunnable(),0, TimeUnit.MILLISECONDS);
         isRunning = true;
         a = offset;
+        initialSpeed = speed;
     }
     public Circler(int offset, int speed) {
         sch = Executors.newScheduledThreadPool(1);
@@ -31,6 +34,7 @@ public class Circler {
         isRunning = true;
         a = offset;
         this.speed = speed;
+        initialSpeed = speed;
     }
     
     public int getDegrees() {
@@ -55,6 +59,11 @@ public class Circler {
     public boolean isRunning() {
         return isRunning;
     }
+    
+    public int getInitialSpeed() {
+        return initialSpeed;
+    }
+    
     class CirclerRunnable implements Runnable {
         @Override
         public void run() {

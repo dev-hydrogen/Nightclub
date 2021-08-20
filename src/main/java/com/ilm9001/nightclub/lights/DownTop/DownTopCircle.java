@@ -1,4 +1,4 @@
-package com.ilm9001.nightclub.lights.TopDown;
+package com.ilm9001.nightclub.lights.DownTop;
 
 import com.ilm9001.nightclub.Nightclub;
 import com.ilm9001.nightclub.lights.Circler;
@@ -6,13 +6,17 @@ import com.ilm9001.nightclub.lights.LightAbstract;
 import com.ilm9001.nightclub.util.LaserWrapper;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.bukkit.Location;
-import org.bukkit.scheduler.BukkitRunnable;
 
-public class TopDownCircle extends LightAbstract {
+/**
+ * Flipped TopDownCircle. disgusting repeated code!
+ *
+ */
+
+public class DownTopCircle extends LightAbstract {
     Circler c;
     double angleSeperation;
     
-    public TopDownCircle(Location anchor, int num_lsr) {
+    public DownTopCircle(Location anchor, int num_lsr) {
         super(anchor,num_lsr);
         c = new Circler(0,3);
         angleSeperation = 360.0/num_lsr;
@@ -30,7 +34,7 @@ public class TopDownCircle extends LightAbstract {
             double a_seperated = c.getDegrees();
             for (LaserWrapper lsr : lsr) {
                 Vector3D v1 = new Vector3D((Nightclub.getDirection().getDivisibleByDegrees() * a_seperated) / 360.0, 0).normalize().scalarMultiply(len/1.5);
-                lsr.setEnd(anchor.clone().add(v1.getX(), v1.getZ() - len, v1.getY()));
+                lsr.setEnd(anchor.clone().add(v1.getX(), v1.getZ() + len, v1.getY()));
                 a_seperated += angleSeperation;
             }
         }
