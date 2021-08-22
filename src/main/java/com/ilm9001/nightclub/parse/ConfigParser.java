@@ -1,6 +1,7 @@
 package com.ilm9001.nightclub.parse;
 
 import com.ilm9001.nightclub.Nightclub;
+import com.ilm9001.nightclub.lights.Ceiling.CeilingCrystals;
 import com.ilm9001.nightclub.lights.DownTop.DownTopCircle;
 import com.ilm9001.nightclub.lights.SideNormal.FrontFacerCircle;
 import com.ilm9001.nightclub.lights.TopDown.TopDownCircle;
@@ -23,7 +24,7 @@ public class ConfigParser {
     private static final List<TopDownLineCircle> TDLCList = new ArrayList<>();
     private static final List<DownTopCircle> DTCList = new ArrayList<>();
     private static final List<FrontFacerCircle> FFList = new ArrayList<>();
-    
+    /*private static final List<CeilingCrystals> CCList = new ArrayList<>();*/
     public static void summonFromConfig() {
         FileConfiguration config = Nightclub.getInstance().getConfig();
         List<?> tdcList = config.getList("TopDownCircle");
@@ -31,8 +32,9 @@ public class ConfigParser {
         List<?> tddcList = config.getList("TopDownDoubleCircle");
         List<?> dtcList = config.getList("DownTopCircle");
         List<?> ffList = config.getList("FrontFacerCircle");
+        /*List<?> ccList = config.getList("CeilingCrystals");*/
         
-        if(tdcList == null || tddcList == null || tdlcList == null || dtcList == null) return;
+        if(tdcList == null || tddcList == null || tdlcList == null || dtcList == null || ffList == null) return;
         int i = 0;
         for(Object lst : tdcList) {
             i++;
@@ -74,25 +76,30 @@ public class ConfigParser {
                     new Location(mainWorld,list.get(0),list.get(1),list.get(2)),
                     list.get(3).intValue(),i%2==0));
         }
+        /*for(Object lst : ccList) {
+            i++;
+            List<Double> list = (List<Double>) lst;
+            World mainWorld = Nightclub.getInstance().getServer().getWorlds().get(0);
+            CCList.add(new CeilingCrystals(
+                    new Location(mainWorld,list.get(0),list.get(1),list.get(2)),
+                    list.get(3).intValue()));
+        }*/
     }
     
     public static List<TopDownCircle> getTopDownCircleList() {
         return TDCList;
     }
-    
     public static List<TopDownDoubleCircle> getTopDownDoubleCircleList() {
         return TDDCList;
     }
-    
     public static List<TopDownLineCircle> getTopDownLineCircleList() {
         return TDLCList;
     }
-    
     public static List<DownTopCircle> getDownTopCircleList() {
         return DTCList;
     }
-    
     public static List<FrontFacerCircle> getFrontFacerList() {
         return FFList;
     }
+    /*public static List<CeilingCrystals> getCCList() { return CCList;}*/
 }

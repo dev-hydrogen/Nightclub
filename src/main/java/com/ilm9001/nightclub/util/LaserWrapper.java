@@ -3,8 +3,6 @@ package com.ilm9001.nightclub.util;
 import com.ilm9001.nightclub.Nightclub;
 import org.bukkit.Location;
 
-import java.util.concurrent.locks.ReentrantLock;
-
 public class LaserWrapper {
     private Laser.GuardianLaser laser;
     private volatile boolean stopped;
@@ -12,15 +10,19 @@ public class LaserWrapper {
     private Location end;
     private int time;
     private int seeDistance;
-    private ReentrantLock mutex;
+    private Laser.LaserType type;
     
     public LaserWrapper(Location start, Location end, int time, int seeDistance) {
+        this(start,end,time,seeDistance, Laser.LaserType.GUARDIAN);
+    }
+    
+    public LaserWrapper(Location start, Location end, int time, int seeDistance, Laser.LaserType type) {
         this.start = start;
         this.end = end;
         this.time = time;
         this.seeDistance = seeDistance;
+        this.type = type;
         stopped = true;
-        mutex = new ReentrantLock();
         try {
             laser = new Laser.GuardianLaser(start,end,time,seeDistance);
         } catch (ReflectiveOperationException e) {
@@ -30,7 +32,6 @@ public class LaserWrapper {
     
     public synchronized boolean start() {
         try {
-            mutex.lock();
             if (stopped) {
                 laser.start(Nightclub.getInstance());
                 laser.callColorChange();
@@ -40,22 +41,15 @@ public class LaserWrapper {
         } catch (ReflectiveOperationException e) {
             e.printStackTrace();
             return false;
-        } finally {
-            mutex.unlock();
         }
     }
     
     public synchronized void stop() {
-        try {
-            mutex.lock();
-            if (stopped) {
-                return;
-            }
-            stopped = true;
-            laser.stop();
-        } finally {
-            mutex.unlock();
+        if (stopped) {
+            return;
         }
+        stopped = true;
+        laser.stop();
     }
     
     public synchronized void setStart(Location start) {
@@ -75,7 +69,7 @@ public class LaserWrapper {
     }
     
     public synchronized void colorChange() {
-        if(!stopped) {
+        if(!stopped &&type == Laser.LaserType.GUARDIAN) {
             try {laser.callColorChange();}
             catch (ReflectiveOperationException e) {e.printStackTrace();}
         }
@@ -85,7 +79,7 @@ public class LaserWrapper {
         return !stopped;
     }
     
-    public Laser.GuardianLaser getLaser() {
+    public Laser getLaser() {
         return laser;
     }
 }

@@ -1,6 +1,7 @@
 package com.ilm9001.nightclub.lights;
 
 import com.ilm9001.nightclub.Nightclub;
+import com.ilm9001.nightclub.util.Laser;
 import com.ilm9001.nightclub.util.LaserWrapper;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -11,6 +12,12 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class LightAbstract {
+    //In the name of "performance".
+    public static final Circler cN = new Circler(0,3,true);
+    public static final Circler cO = new Circler(180,3,true);
+    public static final Circler cNAC = new Circler(0,3,false);
+    public static final Circler cOAC = new Circler(180,3,false);
+    
     public List<LaserWrapper> lsr;
     public Location anchor;
     public double len;
@@ -19,45 +26,39 @@ public abstract class LightAbstract {
     public double len_max;
     public int off_c;
     public boolean isBlue;
-    public ReentrantLock mutex;
     
     public LightAbstract(Location anchor, int num_lsr) {
+        this(anchor,num_lsr, Laser.LaserType.GUARDIAN,0,0,0);
+    }
+    public LightAbstract(Location anchor, int num_lsr, Laser.LaserType type) {
+        this(anchor,num_lsr,type,0,0,0);
+    }
+    public LightAbstract(Location anchor, int num_lsr, Laser.LaserType type,double oX,double oY,double oZ) {
         lsr = new ArrayList<>();
         this.anchor = anchor;
         for(int i=0; i < num_lsr; i++) {
-            lsr.add(new LaserWrapper(anchor, anchor, -1, 128));
+            lsr.add(new LaserWrapper(anchor.clone().add(i*oX,i*oY,i*oZ), anchor, -1, 128,type));
         }
         len = 0;
         FileConfiguration conf = Nightclub.getInstance().getConfig();
         len_on = conf.getDouble("length_on");
         len_min = 0.0;
         len_max = conf.getDouble("length_max");
-        mutex = new ReentrantLock();
     }
     
-    public synchronized void off() {
-        try {
-            mutex.lock();
-            for (LaserWrapper lsr : lsr) {
-                lsr.stop();
-            }
-            len = 0;
-            off_c = 0;
-        } finally {
-            mutex.unlock();
+    public void off() {
+        for (LaserWrapper lsr : lsr) {
+            lsr.stop();
         }
+        len = 0;
+        off_c = 0;
     }
-    public synchronized void on() {
-        try {
-            mutex.lock();
-            for (LaserWrapper lsr : lsr) {
-                lsr.start();
-            }
-            len = len_on;
-            off_c = 0;
-        } finally {
-             mutex.unlock();
+    public void on() {
+        for (LaserWrapper lsr : lsr) {
+            lsr.start();
         }
+        len = len_on;
+        off_c = 0;
     }
     public void flash() {
         if (lsr.get(0).isStarted() || len > 0) {

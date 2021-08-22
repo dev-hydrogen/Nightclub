@@ -22,7 +22,8 @@ public class DownTopCircle extends LightAbstract {
     }
     public DownTopCircle(Location anchor, int num_lsr, boolean rotation) {
         super(anchor,num_lsr);
-        c = new Circler(0,3,rotation);
+        if(rotation) c = LightAbstract.cN;
+        else c = LightAbstract.cNAC;
         angleSeperation = 360.0/num_lsr;
         TDCRun run = new TDCRun();
         run.runTaskTimerAsynchronously(Nightclub.getInstance(),20,2);
