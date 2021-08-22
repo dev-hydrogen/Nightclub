@@ -8,10 +8,8 @@ https://www.youtube.com/watch?v=diX3mdFSsg8
 # KEY CAVEATS
 
 THIS PLUGIN USES A RESOURCE PACK FOR THE SOUND. 
-- There are some issues with the backlights groups coordinates, basically theres a issue of a weird offset when spawning them. 
-- A LOT of the plugin is hardcoded for my specific usecase, if you want to have less or more lasers for example you have to edit the code and compile another plugin at least right now. (Hardcoded to be "facing" east.)
 - Viewing the amount of lasers this plugin produces is probably resource-intensive so this will not run on your grandmas computer from 1998. 
-- A lot of guardian beam packets for movement and such are being practically spammed to the player every 100ms per laser, this may cause ping issues in certain cases but ive tested this with others and it should be fine for a good-average internet connection.
+- A lot of guardian beam packets for movement and stopping/starting are being practically spammed to the player every 100ms per laser (and more often depending on beatmap), this may cause ping issues in certain cases but ive tested this with others and it should be fine for a good-average internet connection.
 
 Might lag your server when running, though doesnt for me. Wont otherwise. 
 
@@ -19,9 +17,6 @@ Might lag your server when running, though doesnt for me. Wont otherwise.
 
 
 IMPORTANT: Server resource packs only support packs up to 100mb in size!! If you want to have a resource pack with more than 100mb of music files, you will have to convince all the players on your server to download and apply a resource pack seperately!
-
-[WIP] but general idea:
-Download the provided resource pack which will include the screen models and textures, due to legal reasons however, i *probably* cant put any actual music files on it and distribute it.
 
 Pick your songs that you want to visualise from bsaber.com and download them to your computer, preferrably into a seperate folder on your desktop or something.
 
@@ -67,7 +62,7 @@ Then make folders for all your songs WITH THE EXACT SAME NAMES as in sounds.json
 Place your info.dat file and beatmap file (usually named by difficulty, such as expertplus.dat, expert.dat etc) and rename the beatmap file to the name of your folder (again, barbedwire.dat or whosgotyourlove.dat)
 (also rename your info.dat file to ``info.dat`` specifically if it has any capital letters, not sure if this causes issues or not though)
 
-You are now safe to start your server. If you have the permission to use the command, you can now do /playbeatmap <songname> (<songname>, again, is the same as in your sounds.json or BeatMapVisualiser folder) and watch the show!
+You are now safe to start your server. If you have the permission to use the command, you can now do /playbp <songname> (<songname>, again, is the same as in your sounds.json or Nightclub data folder) and watch the show!
 
 # Troubleshooting
 
