@@ -15,6 +15,11 @@ import java.io.IOException;
 
 import static org.bukkit.Bukkit.getServer;
 
+/**
+ * What do you mean i have absolutely no idea of proper OOP?
+ *
+ */
+
 public class Play {
     public static void play(String bfile, Show show) {
         // get specified path

@@ -16,6 +16,7 @@ import java.util.List;
 
 /**
  * Probably should be implemented some other way. I dont care though, it Works.
+ * What do you mean i have absolutely no idea of proper OOP?
  *
  */
 public class ConfigParser {
