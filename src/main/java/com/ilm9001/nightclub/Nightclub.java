@@ -2,6 +2,7 @@ package com.ilm9001.nightclub;
 
 import com.ilm9001.nightclub.commands.PlayCommand;
 import com.ilm9001.nightclub.commands.PlayCommandTabComplete;
+import com.ilm9001.nightclub.commands.TestCommand;
 import com.ilm9001.nightclub.lights.Directions;
 import com.ilm9001.nightclub.parse.ConfigParser;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -20,6 +21,7 @@ public final class Nightclub extends JavaPlugin {
         this.saveDefaultConfig();
         this.getCommand("playbp").setExecutor(new PlayCommand());
         this.getCommand("playbp").setTabCompleter(new PlayCommandTabComplete());
+        this.getCommand("test").setExecutor(new TestCommand());
         
         direction = Directions.valueOf(getConfig().getString("FacingTowards"));
     }

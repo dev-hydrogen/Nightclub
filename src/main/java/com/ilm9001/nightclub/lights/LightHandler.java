@@ -1,6 +1,7 @@
 package com.ilm9001.nightclub.lights;
 
 import com.ilm9001.nightclub.lights.DownTop.DownTopCircle;
+import com.ilm9001.nightclub.lights.SideNormal.FrontFacerCircle;
 import com.ilm9001.nightclub.lights.TopDown.TopDownCircle;
 import com.ilm9001.nightclub.lights.TopDown.TopDownDoubleCircle;
 import com.ilm9001.nightclub.lights.TopDown.TopDownLineCircle;
@@ -136,19 +137,32 @@ public class LightHandler {
     public static class CenterLights {
         
         public static void on(boolean isBlue) {
-        
+            for (FrontFacerCircle ff : ConfigParser.getFrontFacerList()) {
+                ff.on();
+            }
         }
         
         public static void off() {
-        
+            for (FrontFacerCircle ff : ConfigParser.getFrontFacerList()) {
+                ff.off();
+            }
         }
         
         public static void flash(boolean isBlue) {
-        
+            for (FrontFacerCircle ff : ConfigParser.getFrontFacerList()) {
+                ff.flash();
+            }
         }
         
         public static void flashOff(boolean isBlue) {
-        
+            for (FrontFacerCircle ff : ConfigParser.getFrontFacerList()) {
+                ff.flashOff();
+            }
+        }
+        public static void setSpeed(int multiplier) {
+            for (FrontFacerCircle ff : ConfigParser.getFrontFacerList()) {
+                ff.setSpeed(multiplier);
+            }
         }
     }
 }

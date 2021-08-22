@@ -17,7 +17,14 @@ public class Show {
         is_running = false;
     }
     
-    
+    /**
+     * Handles an event and launches the proper light events associated with it.
+     * Very messy (You could 100% condense this code if you cared)
+     * and the LightHandler class could very well be integrated here, but I think this looks nicer.
+     *
+     * @param ty Type of event.
+     * @param va Value of the event.
+     */
     private void ev_handle(int ty, int va) {
         switch (ty) {
             //Back Lasers
@@ -176,6 +183,7 @@ public class Show {
                 LightHandler.BackLasers.setSpeed(va);
                 LightHandler.RingLights.setSpeed(va);
                 LightHandler.LeftLasers.setSpeed(va);
+                LightHandler.CenterLights.setSpeed(va);
                 break;
     
             // Rotation speed, right lasers, va is multiplier.
@@ -183,6 +191,7 @@ public class Show {
                 LightHandler.BackLasers.setSpeed(va);
                 LightHandler.RingLights.setSpeed(va);
                 LightHandler.RightLasers.setSpeed(va);
+                LightHandler.CenterLights.setSpeed(va);
                 break;
             default:
         }
@@ -237,7 +246,9 @@ public class Show {
                 // fire the event, after possible delay
                 ev_handle(ev.type, ev.value);
             }
-            //stg.Stop();
+            for (int i = 0; i < 4; i++) {
+                ev_handle(i,0);
+            } // Stop everything.
             is_running = false;
         }
     }

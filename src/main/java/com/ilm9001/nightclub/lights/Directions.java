@@ -11,7 +11,7 @@ public enum Directions {
         divisible = facing;
     }
     
-    public Double getDivisibleByDegrees() {
+    public Double getValue() {
         return divisible;
     }
 }

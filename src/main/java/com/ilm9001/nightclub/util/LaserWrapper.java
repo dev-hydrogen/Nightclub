@@ -1,16 +1,12 @@
 package com.ilm9001.nightclub.util;
 
-import com.google.common.util.concurrent.Monitor;
 import com.ilm9001.nightclub.Nightclub;
 import org.bukkit.Location;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class LaserWrapper {
-    private volatile Laser laser;
+    private Laser.GuardianLaser laser;
     private volatile boolean stopped;
     private Location start;
     private Location end;
@@ -25,37 +21,38 @@ public class LaserWrapper {
         this.seeDistance = seeDistance;
         stopped = true;
         mutex = new ReentrantLock();
+        try {
+            laser = new Laser.GuardianLaser(start,end,time,seeDistance);
+        } catch (ReflectiveOperationException e) {
+            e.printStackTrace();
+        }
     }
     
     public synchronized boolean start() {
         try {
             mutex.lock();
-            if (stopped && laser == null) {
-                try {
-                    laser = new Laser(start, end, time, seeDistance); // The same laser can not be stopped and restarted.
-                    // Trust me, I have tried.
-                } catch (ReflectiveOperationException e) {
-                    e.printStackTrace();
-                    return false;
-                }
+            if (stopped) {
+                laser.start(Nightclub.getInstance());
+                laser.callColorChange();
+                stopped = false;
+                return true;
             } else return false;
-            stopped = false;
-            laser.start(Nightclub.getInstance());
+        } catch (ReflectiveOperationException e) {
+            e.printStackTrace();
+            return false;
         } finally {
             mutex.unlock();
         }
-        return true;
     }
     
     public synchronized void stop() {
         try {
             mutex.lock();
-            if (stopped && laser == null) {
+            if (stopped) {
                 return;
             }
             stopped = true;
             laser.stop();
-            laser = null;
         } finally {
             mutex.unlock();
         }
@@ -88,7 +85,7 @@ public class LaserWrapper {
         return !stopped;
     }
     
-    public Laser getLaser() {
+    public Laser.GuardianLaser getLaser() {
         return laser;
     }
 }

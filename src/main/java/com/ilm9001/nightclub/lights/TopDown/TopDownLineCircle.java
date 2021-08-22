@@ -13,9 +13,12 @@ public class TopDownLineCircle extends LightAbstract {
     double angleSeperation;
     
     public TopDownLineCircle(Location anchor, int num_lsr) {
+        this(anchor,num_lsr,true);
+    }
+    public TopDownLineCircle(Location anchor, int num_lsr, boolean rotation) {
         super(anchor,num_lsr);
-        c = new Circler(0,2);
-        c2 = new Circler(18,4);
+        c = new Circler(0,2,rotation);
+        c2 = new Circler(18,4,rotation);
         angleSeperation = 360.0/num_lsr;
         TDDCRun run = new TDDCRun();
         run.runTaskTimerAsynchronously(Nightclub.getInstance(),20,2);
@@ -32,8 +35,8 @@ public class TopDownLineCircle extends LightAbstract {
             double a_seperated = c.getDegrees();
             double b = c2.getDegrees();
             for (LaserWrapper lsr : lsr) {
-                Vector3D v1 = new Vector3D((Nightclub.getDirection().getDivisibleByDegrees() * a_seperated) / 360.0, 0).normalize().scalarMultiply(len/1.3);
-                Vector3D v2 = new Vector3D(0,(2.0 * Math.PI * b) / 360.0).normalize().scalarMultiply(len*1.08);
+                Vector3D v1 = new Vector3D(Nightclub.getDirection().getValue() + Math.toRadians(a_seperated), 0).normalize().scalarMultiply(len/1.3);
+                Vector3D v2 = new Vector3D(0,Nightclub.getDirection().getValue()+ Math.toRadians(b)).normalize().scalarMultiply(len*1.08);
                 Location firstiteration = anchor.clone().add(v2.getX(), 0.0-len, v2.getY());
                 lsr.setEnd(firstiteration.clone().add(v1.getX(), v1.getZ(), v1.getY()));
                 a_seperated += angleSeperation;

@@ -13,6 +13,7 @@ public class Circler {
     private ScheduledExecutorService sch;
     private int speed = 3;
     private final int initialSpeed;
+    private boolean rotateClockWise;
     
     public Circler() {
         sch = Executors.newScheduledThreadPool(1);
@@ -20,6 +21,7 @@ public class Circler {
         isRunning = true;
         a = 0;
         initialSpeed = speed;
+        rotateClockWise = true;
     }
     public Circler(int offset) {
         sch = Executors.newScheduledThreadPool(1);
@@ -27,6 +29,7 @@ public class Circler {
         isRunning = true;
         a = offset;
         initialSpeed = speed;
+        rotateClockWise = true;
     }
     public Circler(int offset, int speed) {
         sch = Executors.newScheduledThreadPool(1);
@@ -35,6 +38,16 @@ public class Circler {
         a = offset;
         this.speed = speed;
         initialSpeed = speed;
+        rotateClockWise = true;
+    }
+    public Circler(int offset, int speed, boolean rotateClockWise) {
+        sch = Executors.newScheduledThreadPool(1);
+        sch.schedule(new CirclerRunnable(),0, TimeUnit.MILLISECONDS);
+        isRunning = true;
+        a = offset;
+        this.speed = speed;
+        initialSpeed = speed;
+        this.rotateClockWise = rotateClockWise;
     }
     
     public int getDegrees() {
@@ -59,16 +72,25 @@ public class Circler {
     public boolean isRunning() {
         return isRunning;
     }
-    
     public int getInitialSpeed() {
         return initialSpeed;
+    }
+    public void setRotateClockWise(boolean tf) {
+        rotateClockWise = tf;
+    }
+    public void flipDirection() {
+        rotateClockWise = !rotateClockWise;
     }
     
     class CirclerRunnable implements Runnable {
         @Override
         public void run() {
             while(isRunning) {
-                a = a % 360 + speed;
+                if (!rotateClockWise) {
+                    a = a % -360 - speed;
+                } else {
+                    a = a % 360 + speed;
+                }
                 Util.safe_sleep(100);
             }
         }

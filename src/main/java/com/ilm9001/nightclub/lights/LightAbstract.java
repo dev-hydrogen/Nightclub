@@ -65,7 +65,7 @@ public abstract class LightAbstract {
                 len = len_on;
             }
             len += (len_max - len_on) / 10;
-            off_c = 0;
+            off_c = 1;
             for (LaserWrapper lsr : lsr) {
                 lsr.colorChange();
             }
@@ -73,7 +73,7 @@ public abstract class LightAbstract {
     }
     public void flashOff() {
         flash();
-        off_c = 22;
+        off_c = 32;
     }
     public void setColor(boolean isBlue) {
         this.isBlue = isBlue;
@@ -87,7 +87,7 @@ public abstract class LightAbstract {
             if(lsr.get(0).isStarted()) {
                 if (off_c > 0) {
                     off_c -= 1;
-                    len -= len_on / 20;
+                    len -= len_on / 30;
                 }
                 if (len > len_max) {
                     len = len_max;
