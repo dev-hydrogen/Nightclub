@@ -97,6 +97,7 @@ public abstract class LightAbstract {
                     len = len_min;
                     off_c = 1;
                     off();
+                    len = len_on;
                 }
             }
             lights();
