@@ -1,49 +1,31 @@
 package com.ilm9001.nightclub.lights;
 
-import com.ilm9001.nightclub.util.Util;
+import com.ilm9001.nightclub.Nightclub;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
+import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class Circler {
     private int a;
-    private boolean isRunning;
     private ScheduledExecutorService sch;
     private int speed = 3;
     private final int initialSpeed;
     private boolean rotateClockWise;
+    private CirclerRunnable runnable;
     
     public Circler() {
-        sch = Executors.newScheduledThreadPool(1);
-        sch.schedule(new CirclerRunnable(),0, TimeUnit.MILLISECONDS);
-        isRunning = true;
-        a = 0;
-        initialSpeed = speed;
-        rotateClockWise = true;
+        this(0,3,true);
     }
     public Circler(int offset) {
-        sch = Executors.newScheduledThreadPool(1);
-        sch.schedule(new CirclerRunnable(),0, TimeUnit.MILLISECONDS);
-        isRunning = true;
-        a = offset;
-        initialSpeed = speed;
-        rotateClockWise = true;
+        this(offset,3,true);
     }
     public Circler(int offset, int speed) {
-        sch = Executors.newScheduledThreadPool(1);
-        sch.schedule(new CirclerRunnable(),0, TimeUnit.MILLISECONDS);
-        isRunning = true;
-        a = offset;
-        this.speed = speed;
-        initialSpeed = speed;
-        rotateClockWise = true;
+        this(offset,speed,true);
     }
     public Circler(int offset, int speed, boolean rotateClockWise) {
-        sch = Executors.newScheduledThreadPool(1);
-        sch.schedule(new CirclerRunnable(),0, TimeUnit.MILLISECONDS);
-        isRunning = true;
+        runnable = new CirclerRunnable();
+        runnable.runTaskTimerAsynchronously(Nightclub.getInstance(),0,2);
         a = offset;
         this.speed = speed;
         initialSpeed = speed;
@@ -53,15 +35,18 @@ public class Circler {
     public int getDegrees() {
         return a;
     }
-    public double getPied() {
-        return (2.0 * Math.PI * a) / 360.0;
+    public double getRadians() {
+        return Math.toRadians(a);
     }
     public Vector3D getVector(double length) {
-        return new Vector3D(getPied(),0).normalize().scalarMultiply(length);
+        return new Vector3D(getRadians(),0).normalize().scalarMultiply(length);
     }
-    public void setRunning(boolean b) {
-        if(b && !isRunning) sch.schedule(new CirclerRunnable(),0, TimeUnit.MILLISECONDS);
-        isRunning = b;
+    public void setRunning(boolean bool) {
+        if(bool && runnable.isCancelled()) {
+            runnable.runTaskTimerAsynchronously(Nightclub.getInstance(),0,2);
+        } else if (!bool && !runnable.isCancelled()) {
+            runnable.cancel();
+        }
     }
     public int getSpeed() {
         return speed;
@@ -70,28 +55,25 @@ public class Circler {
         this.speed = speed;
     }
     public boolean isRunning() {
-        return isRunning;
+        return !runnable.isCancelled();
     }
     public int getInitialSpeed() {
         return initialSpeed;
     }
-    public void setRotateClockWise(boolean tf) {
-        rotateClockWise = tf;
+    public void setRotateClockWise(boolean bool) {
+        rotateClockWise = bool;
     }
     public void flipDirection() {
         rotateClockWise = !rotateClockWise;
     }
     
-    class CirclerRunnable implements Runnable {
+    class CirclerRunnable extends BukkitRunnable {
         @Override
         public void run() {
-            while(isRunning) {
-                if (!rotateClockWise) {
-                    a = a % -360 - speed;
-                } else {
-                    a = a % 360 + speed;
-                }
-                Util.safe_sleep(100);
+            if (!rotateClockWise) {
+                a = a % -360 - speed;
+            } else {
+                a = a % 360 + speed;
             }
         }
     }

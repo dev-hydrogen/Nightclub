@@ -8,4 +8,8 @@ TopDownLineCircle: [[-606.0,78.0,345.5, 6.0],[-606.0, 78.0, 359.5, 6.0]]
 DownTopCircle: [[-610.5, 71.0, 333.5, 4.0],[-601.5, 71.0, 333.5, 4.0]]
 FrontFacerCircle: [[-596.5, 72.5, 329.5, 3.0],[-615.5, 72.5, 329.5, 3.0]]
 
+Rings: [-605.5,73.0,369.5]
+RingCount: 8
+RingSize: 10
+
 FacingTowards: SOUTH # MUST BE ALL UPPER-CASE: NORTH,SOUTH,EAST,WEST are all valid.

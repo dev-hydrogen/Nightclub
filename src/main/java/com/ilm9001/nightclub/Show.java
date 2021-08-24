@@ -1,9 +1,11 @@
 package com.ilm9001.nightclub;
 
 import com.ilm9001.nightclub.lights.LightHandler;
+import com.ilm9001.nightclub.parse.ConfigParser;
 import com.ilm9001.nightclub.parse.LE;
 import com.ilm9001.nightclub.parse.LE_list;
 
+import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -30,154 +32,71 @@ public class Show {
             //Back Lasers
             case 0:
                 switch (va) {
-                    case 0:
-                        LightHandler.BackLasers.off();
-                        break;
-                    case 1:
-                        LightHandler.BackLasers.on(true);
-                        break;
-                    case 5:
-                        LightHandler.BackLasers.on(false);
-                        break;
-                    case 2:
-                        LightHandler.BackLasers.flash(true);
-                        break;
-                    case 6:
-                        LightHandler.BackLasers.flash(false);
-                        break;
-                    case 3:
-                        LightHandler.BackLasers.flashOff(true);
-                        break;
-                    case 7:
-                        LightHandler.BackLasers.flashOff(false);
-                        break;
-                    default:
-                        break;
+                    case 0 -> LightHandler.BackLasers.off();
+                    case 1 -> LightHandler.BackLasers.on(true);
+                    case 5 -> LightHandler.BackLasers.on(false);
+                    case 2 -> LightHandler.BackLasers.flash(true);
+                    case 6 -> LightHandler.BackLasers.flash(false);
+                    case 3 -> LightHandler.BackLasers.flashOff(true);
+                    case 7 -> LightHandler.BackLasers.flashOff(false);
                 }
                 break;
-                
             // Ring Lights
             case 1:
                 switch (va) {
-                    case 0:
-                        LightHandler.RingLights.off();
-                        break;
-                    case 1:
-                        LightHandler.RingLights.on(true);
-                        break;
-                    case 5:
-                        LightHandler.RingLights.on(false);
-                        break;
-                    case 2:
-                        LightHandler.RingLights.flash(true);
-                        break;
-                    case 6:
-                        LightHandler.RingLights.flash(false);
-                        break;
-                    case 3:
-                        LightHandler.RingLights.flashOff(true);
-                        break;
-                    case 7:
-                        LightHandler.RingLights.flashOff(false);
-                        break;
-                    default:
-                        break;
+                    case 0 -> LightHandler.RingLights.off();
+                    case 1 -> LightHandler.RingLights.on(true);
+                    case 5 -> LightHandler.RingLights.on(false);
+                    case 2 -> LightHandler.RingLights.flash(true);
+                    case 6 -> LightHandler.RingLights.flash(false);
+                    case 3 -> LightHandler.RingLights.flashOff(true);
+                    case 7 -> LightHandler.RingLights.flashOff(false);
                 }
                 break;
-                
             // Left Rotating Lasers
             case 2:
                 switch (va) {
-                    case 0:
-                        LightHandler.LeftLasers.off();
-                        break;
-                    case 1:
-                        LightHandler.LeftLasers.on(true);
-                        break;
-                    case 5:
-                        LightHandler.LeftLasers.on(false);
-                        break;
-                    case 2:
-                        LightHandler.LeftLasers.flash(true);
-                        break;
-                    case 6:
-                        LightHandler.LeftLasers.flash(false);
-                        break;
-                    case 3:
-                        LightHandler.LeftLasers.flashOff(true);
-                        break;
-                    case 7:
-                        LightHandler.LeftLasers.flashOff(false);
-                        break;
-                    default:
-                        break;
+                    case 0 -> LightHandler.LeftLasers.off();
+                    case 1 -> LightHandler.LeftLasers.on(true);
+                    case 5 -> LightHandler.LeftLasers.on(false);
+                    case 2 -> LightHandler.LeftLasers.flash(true);
+                    case 6 -> LightHandler.LeftLasers.flash(false);
+                    case 3 -> LightHandler.LeftLasers.flashOff(true);
+                    case 7 -> LightHandler.LeftLasers.flashOff(false);
                 }
                 break;
-                
             // Right Rotating Lasers
             case 3:
                 switch (va) {
-                    case 0:
-                        LightHandler.RightLasers.off();
-                        break;
-                    case 1:
-                        LightHandler.RightLasers.on(true);
-                        break;
-                    case 5:
-                        LightHandler.RightLasers.on(false);
-                        break;
-                    case 2:
-                        LightHandler.RightLasers.flash(true);
-                        break;
-                    case 6:
-                        LightHandler.RightLasers.flash(false);
-                        break;
-                    case 3:
-                        LightHandler.RightLasers.flashOff(true);
-                        break;
-                    case 7:
-                        LightHandler.RightLasers.flashOff(false);
-                        break;
-                    default:
-                        break;
+                    case 0 -> LightHandler.RightLasers.off();
+                    case 1 -> LightHandler.RightLasers.on(true);
+                    case 5 -> LightHandler.RightLasers.on(false);
+                    case 2 -> LightHandler.RightLasers.flash(true);
+                    case 6 -> LightHandler.RightLasers.flash(false);
+                    case 3 -> LightHandler.RightLasers.flashOff(true);
+                    case 7 -> LightHandler.RightLasers.flashOff(false);
                 }
                 break;
             //Center Lights
             case 4:
                 switch (va) {
-                    case 0:
-                        LightHandler.CenterLights.off();
-                        break;
-                    case 1:
-                        LightHandler.CenterLights.on(true);
-                        break;
-                    case 5:
-                        LightHandler.CenterLights.on(false);
-                        break;
-                    case 2:
-                        LightHandler.CenterLights.flash(true);
-                        break;
-                    case 6:
-                        LightHandler.CenterLights.flash(false);
-                        break;
-                    case 3:
-                        LightHandler.CenterLights.flashOff(true);
-                        break;
-                    case 7:
-                        LightHandler.CenterLights.flashOff(false);
-                        break;
-                    default:
-                        break;
+                    case 0 -> LightHandler.CenterLights.off();
+                    case 1 -> LightHandler.CenterLights.on(true);
+                    case 5 -> LightHandler.CenterLights.on(false);
+                    case 2 -> LightHandler.CenterLights.flash(true);
+                    case 6 -> LightHandler.CenterLights.flash(false);
+                    case 3 -> LightHandler.CenterLights.flashOff(true);
+                    case 7 -> LightHandler.CenterLights.flashOff(false);
                 }
                 break;
-                
             // Ring spin
             case 8:
+                ConfigParser.getRings().spin();
                 break;
             // Toggle zoom, no value.
             case 9:
+                ConfigParser.getRings().zoom();
                 break;
-                
             // Rotation speed, left lasers, va is multiplier.
             case 12:
                 LightHandler.BackLasers.setSpeed(va);
@@ -193,7 +112,6 @@ public class Show {
                 LightHandler.RightLasers.setSpeed(va);
                 LightHandler.CenterLights.setSpeed(va);
                 break;
-            default:
         }
     }
     
@@ -220,6 +138,7 @@ public class Show {
         @Override
         public void run() {
             //stg.Run();
+            ConfigParser.getRings().on();
             long t_start = System.currentTimeMillis();
             for (int i=0; i < le_size; ++i) {
                 LE ev = ev_list.get(i);
@@ -249,6 +168,7 @@ public class Show {
             for (int i = 0; i < 4; i++) {
                 ev_handle(i,0);
             } // Stop everything.
+            ConfigParser.getRings().off();
             is_running = false;
         }
     }
