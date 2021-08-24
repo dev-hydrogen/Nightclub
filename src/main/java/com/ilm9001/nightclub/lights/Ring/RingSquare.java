@@ -20,7 +20,7 @@ public class RingSquare {
     public RingSquare(double size, Location center) {
         this.size = size;
         runnable = new RotationRunnable();
-        runnable.runTaskTimerAsynchronously(Nightclub.getInstance(),0,2);
+        runnable.runTaskTimerAsynchronously(Nightclub.getInstance(),0,2); // What the fuck is wrong with me?
         this.center = center;
         r=45;
     }
@@ -43,14 +43,17 @@ public class RingSquare {
     }
     public void rotate(double degrees) {
         c += degrees;
+        if(c > 660) {
+            c = 660;
+        }
     }
     
     class RotationRunnable extends BukkitRunnable {
         @Override
         public void run() {
             if(c > 0) {
-                r += 1+c/10;
-                c -= 2+c/10;
+                r += 1+c/20;
+                c -= 1+c/20;
             }
         }
     }

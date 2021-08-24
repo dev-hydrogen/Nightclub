@@ -83,11 +83,12 @@ public class ConfigParser {
         }
         int ringCount = Nightclub.getInstance().getConfig().getInt("RingCount");
         double ringSize = Nightclub.getInstance().getConfig().getDouble("RingSize");
+        double ringSeperation = Nightclub.getInstance().getConfig().getDouble("RingSeperation");
         
         rings = new Rings(
                 new Location(Nightclub.getInstance().getServer().getWorlds().get(0),
                         ringCoords.get(0),ringCoords.get(1),ringCoords.get(2)),
-        ringCount,ringSize);
+        ringCount,ringSize,ringSeperation);
         /*for(Object lst : ccList) {
             i++;
             List<Double> list = (List<Double>) lst;

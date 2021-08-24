@@ -16,17 +16,19 @@ public class Rings {
     private List<LaserWrapper> lasers;
     private Location anchor;
     private ShowRunnable runnable;
+    private double ringSeperation;
     private boolean running;
     private boolean zoom;
     
-    public Rings(Location anchor, int ringCount, double ringSize) {
+    public Rings(Location anchor, int ringCount, double ringSize, double ringSeperation) {
         ringLinker = new HashMap<>();
         rings = new ArrayList<>();
         lasers = new ArrayList<>();
         this.anchor = anchor;
+        this.ringSeperation = ringSeperation;
         zoom = false;
         for (int i = ringCount; i > 0; i--) {
-            rings.add(new RingSquare(ringSize-i/10.0,anchor.clone().subtract(Nightclub.getDirection().getX()*5*i,0,Nightclub.getDirection().getZ()*5*i)));
+            rings.add(new RingSquare(ringSize-i/10.0,anchor.clone().subtract(Nightclub.getDirection().getX()*ringSeperation*i,0,Nightclub.getDirection().getZ()*ringSeperation*i)));
         }
         for(RingSquare ring : rings) {
             List<LaserWrapper> ringlasers = new ArrayList<>();
@@ -52,11 +54,11 @@ public class Rings {
     public void zoom() {
         if(!zoom) {
             for (RingSquare ring : rings) {
-                ring.setCenter(ring.getCenter().subtract(Nightclub.getDirection().getX() * 5, 0, Nightclub.getDirection().getZ() * 5));
+                ring.setCenter(ring.getCenter().subtract(Nightclub.getDirection().getX() * ringSeperation, 0, Nightclub.getDirection().getZ() * ringSeperation));
             }
         } else {
             for (RingSquare ring : rings) {
-                ring.setCenter(ring.getCenter().add(Nightclub.getDirection().getX() * 5, 0, Nightclub.getDirection().getZ() * 5));
+                ring.setCenter(ring.getCenter().add(Nightclub.getDirection().getX() * ringSeperation, 0, Nightclub.getDirection().getZ() * ringSeperation));
             }
         }
         zoom = !zoom;
