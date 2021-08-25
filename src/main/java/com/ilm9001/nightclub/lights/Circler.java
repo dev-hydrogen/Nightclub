@@ -52,6 +52,9 @@ public class Circler {
         return speed;
     }
     public void setSpeed(int speed) {
+        if(this.speed == speed) {
+            a+=360/20; // perform "laser reset" if the speed is the same as before
+        }
         this.speed = speed;
     }
     public boolean isRunning() {
