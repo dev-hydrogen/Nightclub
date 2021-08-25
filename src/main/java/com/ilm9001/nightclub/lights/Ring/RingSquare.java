@@ -16,13 +16,23 @@ public class RingSquare {
     private double size;
     private double r; // rotation
     private double c; // counter
+    private boolean running;
     
     public RingSquare(double size, Location center) {
         this.size = size;
         runnable = new RotationRunnable();
-        runnable.runTaskTimerAsynchronously(Nightclub.getInstance(),0,2); // What the fuck is wrong with me?
+        running = false;
         this.center = center;
         r=45;
+    }
+    
+    public void on() {
+        if(!running) runnable.runTaskTimerAsynchronously(Nightclub.getInstance(),0,2); // What the fuck is wrong with me?
+        running = true;
+    }
+    public void off() {
+        if(running) runnable.cancel();
+        running = false;
     }
     
     public void setCenter(Location center) {this.center = center;}
@@ -32,7 +42,7 @@ public class RingSquare {
         List<Location> list = new ArrayList<>();
     
         for (int i = 0; i <= 5; i++) {
-            Vector3D v1 = new Vector3D(0,Math.toRadians(r+i*90)).normalize().scalarMultiply(size);
+            Vector3D v1 = new Vector3D(Nightclub.getDirection().getValue()+Math.toRadians(90),Math.toRadians(r+i*90)).normalize().scalarMultiply(size);
             list.add(center.clone().add(v1.getX(),v1.getZ(),v1.getY()));
         }
         return list;
@@ -43,8 +53,8 @@ public class RingSquare {
     }
     public void rotate(double degrees) {
         c += degrees;
-        if(c > 660) {
-            c = 660;
+        if(c > 115) {
+            c = 115;
         }
     }
     
@@ -52,7 +62,7 @@ public class RingSquare {
         @Override
         public void run() {
             if(c > 0) {
-                r += 1+c/20;
+                r = r + (c/1.3) % 360;
                 c -= 1+c/20;
             }
         }

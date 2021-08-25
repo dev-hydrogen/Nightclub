@@ -41,13 +41,13 @@ public class Rings {
             }
             ringLinker.put(ring,ringlasers);
         }
-        runnable = new ShowRunnable();
+        runnable = null;
         running = false;
     }
     
     public void spin() {
         for (int i = 0; i <= rings.size()-1; i++) {
-            rings.get(i).rotate(i*3+12);
+            rings.get(i).rotate(i*1.2+7);
         }
     }
     
@@ -65,17 +65,31 @@ public class Rings {
     }
     
     public void on() {
-        for(LaserWrapper lsr : lasers) {
-            if(!lsr.isStarted()) lsr.start();
+        if(!running) {
+            for (LaserWrapper lsr : lasers) {
+                if (!lsr.isStarted()) lsr.start();
+            }
+            for(RingSquare ring : rings) {
+                ring.on();
+            }
+            if(runnable == null) {
+                runnable = new ShowRunnable();
+                runnable.runTaskTimerAsynchronously(Nightclub.getInstance(), 0, 2);
+            } else Nightclub.getInstance().getLogger().info("Something has gone wrong! A new runnable is being started even though it is not null!");
         }
-        if(!running) runnable.runTaskTimerAsynchronously(Nightclub.getInstance(),0,2);
         running = true;
     }
     public void off() {
-        for(LaserWrapper lsr : lasers) {
-            if(lsr.isStarted()) lsr.stop();
+        if(running) {
+            for (LaserWrapper lsr : lasers) {
+                if (lsr.isStarted()) lsr.stop();
+            }
+            for(RingSquare ring : rings) {
+                ring.off();
+            }
+            runnable.cancel();
+            runnable = null;
         }
-        if(running) runnable.cancel();
         running = false;
     }
     class ShowRunnable extends BukkitRunnable {

@@ -17,7 +17,7 @@ public class PlayCommandTabComplete implements TabCompleter {
     @Nullable
     @Override
     public List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
-        if(commandSender.hasPermission("beatmapvisualiser.playbeatmap")) {
+        if(commandSender.hasPermission("nightclub.playbp")) {
             String df = Nightclub.getInstance().getDataFolder().getAbsolutePath();
             File[] directories = new File(df).listFiles(File::isDirectory); //adds all subdirectories in plugin datafolder path to a File array
             List<String> list = new ArrayList<>();

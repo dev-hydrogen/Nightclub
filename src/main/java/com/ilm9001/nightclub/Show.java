@@ -15,7 +15,7 @@ public class Show {
     private boolean is_running;
     
     public Show() {
-        sch = Executors.newScheduledThreadPool(1);
+        sch = Executors.newScheduledThreadPool(3);
         is_running = false;
     }
     
@@ -138,7 +138,7 @@ public class Show {
         @Override
         public void run() {
             //stg.Run();
-            ConfigParser.getRings().on();
+            sch.schedule(new onRunnable(),0,TimeUnit.MILLISECONDS);
             long t_start = System.currentTimeMillis();
             for (int i=0; i < le_size; ++i) {
                 LE ev = ev_list.get(i);
@@ -165,11 +165,25 @@ public class Show {
                 // fire the event, after possible delay
                 ev_handle(ev.type, ev.value);
             }
+            sch.schedule(new offRunnable(),2000,TimeUnit.MILLISECONDS);
+            is_running = false;
+        }
+    }
+    class onRunnable implements Runnable {
+        
+        @Override
+        public void run() {
+            ConfigParser.getRings().on();
+        }
+    }
+    class offRunnable implements Runnable {
+    
+        @Override
+        public void run() {
             for (int i = 0; i < 4; i++) {
                 ev_handle(i,0);
             } // Stop everything.
             ConfigParser.getRings().off();
-            is_running = false;
         }
     }
 }
