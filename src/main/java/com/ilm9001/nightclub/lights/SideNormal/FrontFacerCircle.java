@@ -33,7 +33,7 @@ public class FrontFacerCircle extends LightAbstract {
             double a_seperated = c.getDegrees();
             for (LaserWrapper lsr : lsr) {
                 Vector3D v1 = new Vector3D(Math.toRadians(90), Math.toRadians(a_seperated)).normalize().scalarMultiply(len/2.6);
-                Vector3D v2 = new Vector3D(Nightclub.getDirection().getValue(),0).normalize().scalarMultiply(len*2.7);
+                Vector3D v2 = new Vector3D(Nightclub.getDirection().getValue()+Math.toRadians(90),0).normalize().scalarMultiply(len*2.7);
                 lsr.setEnd(anchor.clone().add(v2.getX(), v2.getZ(), v2.getY()).add(v1.getX(),v1.getZ(),v1.getY()));
                 a_seperated += angleSeperation;
             }
