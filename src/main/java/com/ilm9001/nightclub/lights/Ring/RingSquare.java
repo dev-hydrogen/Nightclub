@@ -42,7 +42,7 @@ public class RingSquare {
         List<Location> list = new ArrayList<>();
     
         for (int i = 0; i <= 5; i++) {
-            Vector3D v1 = new Vector3D(Nightclub.getDirection().getValue()+Math.toRadians(90),Math.toRadians(r+i*90)).normalize().scalarMultiply(size);
+            Vector3D v1 = new Vector3D(Nightclub.getDirection().getValue(),Math.toRadians(r+i*90)).normalize().scalarMultiply(size);
             list.add(center.clone().add(v1.getX(),v1.getZ(),v1.getY()));
         }
         return list;

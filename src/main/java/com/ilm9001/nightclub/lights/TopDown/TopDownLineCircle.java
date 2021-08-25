@@ -38,7 +38,7 @@ public class TopDownLineCircle extends LightAbstract {
             double b = c2.getDegrees();
             for (LaserWrapper lsr : lsr) {
                 Vector3D v1 = new Vector3D(Math.toRadians(a_seperated), 0).normalize().scalarMultiply(len/1.3);
-                Vector3D v2 = new Vector3D(Nightclub.getDirection().getValue()+Math.toRadians(90),Math.toRadians(b)).normalize().scalarMultiply(len*1.08);
+                Vector3D v2 = new Vector3D(Nightclub.getDirection().getValue(),Math.toRadians(b)).normalize().scalarMultiply(len*1.08);
                 Location firstiteration = anchor.clone().add(v2.getX(), 0.0-len, v2.getY());
                 lsr.setEnd(firstiteration.clone().add(v1.getX(), v1.getZ(), v1.getY()));
                 a_seperated += angleSeperation;
