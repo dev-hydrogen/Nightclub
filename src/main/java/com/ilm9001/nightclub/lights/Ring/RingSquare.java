@@ -20,18 +20,24 @@ public class RingSquare {
     
     public RingSquare(double size, Location center) {
         this.size = size;
-        runnable = new RotationRunnable();
+        runnable = null;
         running = false;
         this.center = center;
         r=45;
     }
     
     public void on() {
-        if(!running) runnable.runTaskTimerAsynchronously(Nightclub.getInstance(),0,2); // What the fuck is wrong with me?
+        if(!running) {
+            runnable = new RotationRunnable();
+            runnable.runTaskTimerAsynchronously(Nightclub.getInstance(),0,2); // What the fuck is wrong with me?
+        }
         running = true;
     }
     public void off() {
-        if(running) runnable.cancel();
+        if(running) {
+            runnable.cancel();
+            runnable = null;
+        }
         running = false;
     }
     
