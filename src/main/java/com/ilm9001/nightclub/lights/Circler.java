@@ -7,7 +7,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.concurrent.ScheduledExecutorService;
 
 public class Circler {
-    private int a;
+    private double a;
     private ScheduledExecutorService sch;
     private int speed = 3;
     private final int initialSpeed;
@@ -32,7 +32,7 @@ public class Circler {
         this.rotateClockWise = rotateClockWise;
     }
     
-    public int getDegrees() {
+    public double getDegrees() {
         return a;
     }
     public double getRadians() {
@@ -54,9 +54,9 @@ public class Circler {
     public void setSpeed(int speed) {
         if(this.speed == speed) {
             if(!rotateClockWise) {
-                a-=speed*3; // perform "laser reset" if the speed is the same as before
+                a-=speed*1.5; // perform "laser reset" if the speed is the same as before
             } else {
-                a+=speed*3;
+                a+=speed*1.5;
             }
         }
         this.speed = speed;

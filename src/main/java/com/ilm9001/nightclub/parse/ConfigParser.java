@@ -8,6 +8,7 @@ import com.ilm9001.nightclub.lights.SideNormal.FrontFacerCircle;
 import com.ilm9001.nightclub.lights.TopDown.TopDownCircle;
 import com.ilm9001.nightclub.lights.TopDown.TopDownDoubleCircle;
 import com.ilm9001.nightclub.lights.TopDown.TopDownLineCircle;
+import com.ilm9001.nightclub.util.Util;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -37,6 +38,7 @@ public class ConfigParser {
         List<?> dtcList = config.getList("DownTopCircle");
         List<?> ffList = config.getList("FrontFacerCircle");
         List<Double> ringCoords = config.getDoubleList("Rings");
+        World mainWorld = Util.getMainWorld();
         /*List<?> ccList = config.getList("CeilingCrystals");*/
         
         if(tdcList == null || tddcList == null || tdlcList == null || dtcList == null || ffList == null) return;
@@ -44,7 +46,6 @@ public class ConfigParser {
         for(Object lst : tdcList) {
             i++;
             List<Double> list = (List<Double>) lst;
-            World mainWorld = Nightclub.getInstance().getServer().getWorlds().get(0);
             TDCList.add(new TopDownCircle(
                     new Location(mainWorld,list.get(0),list.get(1),list.get(2)),
                     list.get(3).intValue(),i%2==0));
@@ -52,7 +53,6 @@ public class ConfigParser {
         for(Object lst : tddcList) {
             i++;
             List<Double> list = (List<Double>) lst;
-            World mainWorld = Nightclub.getInstance().getServer().getWorlds().get(0);
             TDDCList.add(new TopDownDoubleCircle(
                     new Location(mainWorld,list.get(0),list.get(1), list.get(2)),
                     list.get(3).intValue(),i%2==0));
@@ -60,7 +60,6 @@ public class ConfigParser {
         for(Object lst : tdlcList) {
             i++;
             List<Double> list = (List<Double>) lst;
-            World mainWorld = Nightclub.getInstance().getServer().getWorlds().get(0);
             TDLCList.add(new TopDownLineCircle(
                     new Location(mainWorld,list.get(0),list.get(1),list.get(2)),
                     list.get(3).intValue(),i%2==0));
@@ -68,7 +67,6 @@ public class ConfigParser {
         for(Object lst : dtcList) {
             i++;
             List<Double> list = (List<Double>) lst;
-            World mainWorld = Nightclub.getInstance().getServer().getWorlds().get(0);
             DTCList.add(new DownTopCircle(
                     new Location(mainWorld,list.get(0),list.get(1),list.get(2)),
                     list.get(3).intValue(),i%2==0));
@@ -76,7 +74,6 @@ public class ConfigParser {
         for(Object lst : ffList) {
             i++;
             List<Double> list = (List<Double>) lst;
-            World mainWorld = Nightclub.getInstance().getServer().getWorlds().get(0);
             FFList.add(new FrontFacerCircle(
                     new Location(mainWorld,list.get(0),list.get(1),list.get(2)),
                     list.get(3).intValue(),i%2==0));
@@ -86,7 +83,7 @@ public class ConfigParser {
         double ringSeperation = Nightclub.getInstance().getConfig().getDouble("RingSeperation");
         
         rings = new Rings(
-                new Location(Nightclub.getInstance().getServer().getWorlds().get(0),
+                new Location(Util.getMainWorld(),
                         ringCoords.get(0),ringCoords.get(1),ringCoords.get(2)),
         ringCount,ringSize,ringSeperation);
         /*for(Object lst : ccList) {

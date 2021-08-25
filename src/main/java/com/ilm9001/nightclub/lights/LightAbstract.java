@@ -12,12 +12,6 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class LightAbstract {
-    //In the name of "performance".
-    public static final Circler cN = new Circler(0,3,true);
-    public static final Circler cO = new Circler(180,3,true);
-    public static final Circler cNAC = new Circler(0,3,false);
-    public static final Circler cOAC = new Circler(180,3,false);
-    
     public List<LaserWrapper> lsr;
     public Location anchor;
     public double len;

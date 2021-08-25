@@ -13,7 +13,7 @@ import java.util.List;
 public class RingSquare {
     private Location center;
     private RotationRunnable runnable;
-    private double size;
+    private final double size;
     private double r; // rotation
     private double c; // counter
     private boolean running;
@@ -59,8 +59,8 @@ public class RingSquare {
     }
     public void rotate(double degrees) {
         c += degrees;
-        if(c > 115) {
-            c = 115;
+        if(c > 75) {
+            c = 75;
         }
     }
     
@@ -69,7 +69,7 @@ public class RingSquare {
         public void run() {
             if(c > 0) {
                 r = r + (c/1.3) % 360;
-                c -= 1+c/20;
+                c -= 1+c/12;
             }
         }
     }

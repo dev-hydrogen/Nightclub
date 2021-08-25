@@ -17,10 +17,8 @@ public class TopDownLineCircle extends LightAbstract {
     }
     public TopDownLineCircle(Location anchor, int num_lsr, boolean rotation) {
         super(anchor,num_lsr);
-        if(rotation) c = LightAbstract.cN;
-        else c = LightAbstract.cNAC;
-        if(rotation) c2 = LightAbstract.cO;
-        else c2 = LightAbstract.cOAC;
+        c = new Circler(0,3,rotation);
+        c2 = new Circler(180,3,!rotation);
         angleSeperation = 360.0/num_lsr;
         TDDCRun run = new TDDCRun();
         run.runTaskTimerAsynchronously(Nightclub.getInstance(),20,2);

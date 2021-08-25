@@ -146,13 +146,6 @@ public class Show {
                 long delay = ev.time_ms - from_start;
                 if (delay < 0) {
                     // Negative delay, we are late!
-                    if (delay < -1) {
-                        Nightclub.getInstance().getLogger().info(String.format("Can't keep up at %.1fs delay=%d",
-                                ev.time_ms/1000.0, delay));
-                    }
-                }
-                else if (0 < delay && delay < 20) {
-                    Nightclub.getInstance().getLogger().info(String.format("Quite busy at %.1f", ev.time_ms/1000.0));
                 }
                 else if (delay > 1) {
                     // Now sleeping for "delay" milliseconds for exact timing of event
@@ -180,7 +173,7 @@ public class Show {
     
         @Override
         public void run() {
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i <= 4; i++) {
                 ev_handle(i,0);
             } // Stop everything.
             ConfigParser.getRings().off();
