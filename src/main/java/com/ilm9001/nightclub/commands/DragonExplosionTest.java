@@ -1,6 +1,6 @@
 package com.ilm9001.nightclub.commands;
 
-import com.comphenix.protocol.PacketType;
+/*import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
 import com.ilm9001.nightclub.Nightclub;
 import org.bukkit.command.Command;
@@ -77,3 +77,4 @@ public class DragonExplosionTest implements CommandExecutor {
         }
     }
 }
+ */
