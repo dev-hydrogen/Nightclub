@@ -36,8 +36,8 @@ public class TopDownDoubleCircle extends LightAbstract {
             double a_seperated = c.getDegrees();
             double b_seperated = c2.getDegrees();
             for (LaserWrapper lsr : lsr) {
-                Vector3D v1 = new Vector3D((Directions.SOUTH.getValue() * a_seperated) / 360.0, 0).normalize().scalarMultiply(len/1.3);
-                Vector3D v2 = new Vector3D((Directions.SOUTH.getValue() * b_seperated) / 360.0,0).normalize().scalarMultiply(len/4.8);
+                Vector3D v1 = new Vector3D(Math.toRadians(a_seperated), 0).normalize().scalarMultiply(len/1.3);
+                Vector3D v2 = new Vector3D(Math.toRadians(b_seperated),0).normalize().scalarMultiply(len/4.8);
                 Location firstiteration = anchor.clone().add(v1.getX(), v1.getZ() - len, v1.getY());
                 lsr.setEnd(firstiteration.clone().add(v2.getX(), v2.getZ(), v2.getY()));
                 a_seperated += angleSeperation;

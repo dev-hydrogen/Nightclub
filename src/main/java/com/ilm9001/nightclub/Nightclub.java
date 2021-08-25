@@ -1,5 +1,8 @@
 package com.ilm9001.nightclub;
 
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
+import com.ilm9001.nightclub.commands.DragonExplosionTest;
 import com.ilm9001.nightclub.commands.PlayCommand;
 import com.ilm9001.nightclub.commands.PlayCommandTabComplete;
 import com.ilm9001.nightclub.lights.Directions;
@@ -11,13 +14,15 @@ public final class Nightclub extends JavaPlugin {
     private static Nightclub instance;
     private static Show show;
     private static Directions direction;
+    private static ProtocolManager protocolManager;
     
     @Override
     public void onEnable() {
+        this.saveDefaultConfig();
         direction = Directions.valueOf(getConfig().getString("FacingTowards"));
         instance = this;
         show = new Show();
-        this.saveDefaultConfig();
+        protocolManager = ProtocolLibrary.getProtocolManager();
     
         int pluginId = 12300;
         Metrics metrics = new Metrics(this, pluginId);
@@ -25,6 +30,7 @@ public final class Nightclub extends JavaPlugin {
         ConfigParser.summonFromConfig();
         this.getCommand("playbp").setExecutor(new PlayCommand());
         this.getCommand("playbp").setTabCompleter(new PlayCommandTabComplete());
+        this.getCommand("test").setExecutor(new DragonExplosionTest());
     }
     
     @Override
@@ -40,4 +46,8 @@ public final class Nightclub extends JavaPlugin {
     }
  
     public static Directions getDirection() { return direction; }
+    
+    public static ProtocolManager getProtocolManager() {
+        return protocolManager;
+    }
 }

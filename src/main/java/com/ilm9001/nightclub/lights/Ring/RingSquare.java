@@ -1,9 +1,7 @@
 package com.ilm9001.nightclub.lights.Ring;
 
 import com.ilm9001.nightclub.Nightclub;
-import com.ilm9001.nightclub.util.LaserWrapper;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -48,7 +46,7 @@ public class RingSquare {
         List<Location> list = new ArrayList<>();
     
         for (int i = 0; i <= 5; i++) {
-            Vector3D v1 = new Vector3D(Nightclub.getDirection().getValue(),Math.toRadians(r+i*90)).normalize().scalarMultiply(size);
+            Vector3D v1 = new Vector3D(Nightclub.getDirection().getRadians(),Math.toRadians(r+i*90)).normalize().scalarMultiply(size);
             list.add(center.clone().add(v1.getX(),v1.getZ(),v1.getY()));
         }
         return list;
@@ -59,8 +57,8 @@ public class RingSquare {
     }
     public void rotate(double degrees) {
         c += degrees;
-        if(c > 75) {
-            c = 75;
+        if(c > 95) {
+            c = 95;
         }
     }
     

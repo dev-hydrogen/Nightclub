@@ -37,7 +37,7 @@ public class DownTopCircle extends LightAbstract {
         public void lights() {
             double a_seperated = c.getDegrees();
             for (LaserWrapper lsr : lsr) {
-                Vector3D v1 = new Vector3D((Directions.SOUTH.getValue() * a_seperated) / 360.0, 0).normalize().scalarMultiply(len/1.5);
+                Vector3D v1 = new Vector3D(Math.toRadians(a_seperated), 0).normalize().scalarMultiply(len/1.5);
                 lsr.setEnd(anchor.clone().add(v1.getX(), v1.getZ() + len, v1.getY()));
                 a_seperated += angleSeperation;
             }

@@ -28,7 +28,7 @@ public class CeilingCrystals extends LightAbstract {
     class TDCRun extends Run {
         public void lights() {
             for (LaserWrapper lsr : lsr) {
-                Vector3D v1 = new Vector3D(Nightclub.getDirection().getValue()+Math.toRadians(90), 0).normalize().scalarMultiply(len*6);
+                Vector3D v1 = new Vector3D(Nightclub.getDirection().getRadians()+Math.toRadians(90), 0).normalize().scalarMultiply(len*6);
                 lsr.setEnd(anchor.clone().add(v1.getX(), v1.getZ(), v1.getY()));
             }
         }

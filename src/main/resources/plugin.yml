@@ -3,6 +3,7 @@ version: ${project.version}
 main: com.ilm9001.nightclub.Nightclub
 api-version: 1.17
 description: Nightclub plugin based on beatmaps for beat saber.
+depend: [ProtocolLib]
 
 commands:
   playbp:

@@ -1,8 +1,7 @@
 package com.ilm9001.nightclub.lights;
 
-import com.ilm9001.nightclub.lights.Ceiling.CeilingCrystals;
 import com.ilm9001.nightclub.lights.DownTop.DownTopCircle;
-import com.ilm9001.nightclub.lights.SideNormal.FrontFacerCircle;
+import com.ilm9001.nightclub.lights.Side.FrontFacerCircle;
 import com.ilm9001.nightclub.lights.TopDown.TopDownCircle;
 import com.ilm9001.nightclub.lights.TopDown.TopDownDoubleCircle;
 import com.ilm9001.nightclub.lights.TopDown.TopDownLineCircle;

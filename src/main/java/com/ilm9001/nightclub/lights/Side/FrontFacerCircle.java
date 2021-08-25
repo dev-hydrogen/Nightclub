@@ -1,4 +1,4 @@
-package com.ilm9001.nightclub.lights.SideNormal;
+package com.ilm9001.nightclub.lights.Side;
 
 import com.ilm9001.nightclub.Nightclub;
 import com.ilm9001.nightclub.lights.Circler;
@@ -31,8 +31,8 @@ public class FrontFacerCircle extends LightAbstract {
         public void lights() {
             double a_seperated = c.getDegrees();
             for (LaserWrapper lsr : lsr) {
-                Vector3D v1 = new Vector3D(0, Math.toRadians(a_seperated)).normalize().scalarMultiply(len/2.6);
-                Vector3D v2 = new Vector3D(Nightclub.getDirection().getValue()+Math.toRadians(90),0).normalize().scalarMultiply(len*2.7);
+                Vector3D v1 = new Vector3D(Nightclub.getDirection().getRadians(), Math.toRadians(a_seperated)).normalize().scalarMultiply(len/2.6);
+                Vector3D v2 = new Vector3D(Nightclub.getDirection().getRadians()+Math.toRadians(90),0).normalize().scalarMultiply(len*2.7);
                 lsr.setEnd(anchor.clone().add(v2.getX(), v2.getZ(), v2.getY()).add(v1.getX(),v1.getZ(),v1.getY()));
                 a_seperated += angleSeperation;
             }
