@@ -56,9 +56,9 @@ Then, assuming you havent hit the 100mb limit, you can zip up the resource pack 
 
 After thats done, move on to the server side. First i recommend stopping the server, putting the plugin in the plugins folder, starting the server and letting it generate the config, then stopping the server.
 
-Now move the coordinates in the config to your desired locations (this is a process of trial and error, but the default locations should give you a indication of the correct spacings between "show elements")
+Now you can add as many or as little of the light types in your config to a list of locations, the format for locations is [x,y,z,number of lasers] and all the numbers must be floating point numbers (any number must have a decimal at the end, aka "19.0" instead of "19")
 
-Then make folders for all your songs WITH THE EXACT SAME NAMES as in sounds.json such as \plugins\BeatMapVisualiser\barbedwire\ or \plugins\BeatMapVisualiser\whosgotyourlove\
+Then make folders for all your songs WITH THE EXACT SAME NAMES as in sounds.json such as \plugins\Nightclub\barbedwire\ or \plugins\Nightclub\whosgotyourlove\
 Place your info.dat file and beatmap file (usually named by difficulty, such as expertplus.dat, expert.dat etc) and rename the beatmap file to the name of your folder (again, barbedwire.dat or whosgotyourlove.dat)
 (also rename your info.dat file to ``info.dat`` specifically if it has any capital letters, not sure if this causes issues or not though)
 
