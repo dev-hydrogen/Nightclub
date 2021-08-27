@@ -47,7 +47,7 @@ public class Rings {
     
     public void spin() {
         for (int i = 0; i <= rings.size()-1; i++) {
-            rings.get(i).rotate(i*1.2+7);
+            rings.get(i).rotate((i*0.95)+6);
         }
     }
     

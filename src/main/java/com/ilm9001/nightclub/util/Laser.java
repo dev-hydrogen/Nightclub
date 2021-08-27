@@ -240,7 +240,7 @@ public abstract class Laser {
         
         private final Object createGuardianPacket;
         private final Object createSquidPacket;
-        private final Object teamCreatePacket;
+        //private final Object teamCreatePacket;
         private final Object[] destroyPackets;
         private final Object metadataPacketGuardian;
         private final Object metadataPacketSquid;
@@ -290,7 +290,7 @@ public abstract class Laser {
             guardianUUID = (UUID) Packets.getField(createGuardianPacket, "b");
             metadataPacketGuardian = Packets.createPacketMetadata(guardianID, fakeGuardianDataWatcher);
             
-            teamCreatePacket = Packets.createPacketTeamCreate("noclip" + teamID++, squidUUID, guardianUUID);
+            //teamCreatePacket = Packets.createPacketTeamCreate("noclip" + teamID++, squidUUID, guardianUUID);
             destroyPackets = Packets.createPacketsRemoveEntities(squidID, guardianID);
         }
         
@@ -305,7 +305,7 @@ public abstract class Laser {
             if (Packets.version > 14) {
                 Packets.sendPackets(p, metadataPacketSquid, metadataPacketGuardian);
             }
-            Packets.sendPackets(p, teamCreatePacket);
+            //Packets.sendPackets(p, teamCreatePacket);
         }
         
         @Override

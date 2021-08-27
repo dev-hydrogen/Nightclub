@@ -57,8 +57,8 @@ public class RingSquare {
     }
     public void rotate(double degrees) {
         c += degrees;
-        if(c > 95) {
-            c = 95;
+        if(c > 85) {
+            c = 85;
         }
     }
     
