@@ -3,7 +3,8 @@
 Music visualiser *plugin* for minecraft which uses beat saber beatmaps for various visuals as well as a resource pack for streaming music for players
 
 Showcase videos: 
-https://www.youtube.com/watch?v=diX3mdFSsg8
+![RIOT - Overkill](https://www.youtube.com/watch?v=V5SocflntTI)
+![Bad Computer - 2U](https://www.youtube.com/watch?v=diX3mdFSsg8)
 
 # KEY CAVEATS
 
