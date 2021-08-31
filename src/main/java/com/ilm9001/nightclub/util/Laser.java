@@ -1,5 +1,20 @@
 package com.ilm9001.nightclub.util;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Supplier;
+
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -8,26 +23,16 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Supplier;
-
 /**
  * A whole class to create Guardian Lasers and Ender Crystal Beams using packets and reflection.</br>
  * Inspired by the API <a href="https://www.spigotmc.org/resources/guardianbeamapi.18329">GuardianBeamAPI</a></br>
  * <b>1.9 -> 1.17.1</b>
  *
  * @see <a href="https://github.com/SkytAsul/GuardianBeam">GitHub page</a>
- * @version 2.0.0
+ * @version 2.0.1
  * @author SkytAsul
  */
 public abstract class Laser {
-    private static int teamID = ThreadLocalRandom.current().nextInt(0, Integer.MAX_VALUE);
     
     protected final int distanceSquared;
     protected final int duration;
@@ -39,6 +44,7 @@ public abstract class Laser {
     protected BukkitRunnable main;
     protected BukkitTask startMove, endMove;
     protected Set<Player> show = ConcurrentHashMap.newKeySet();
+    private Set<Player> seen = new HashSet<>();
     
     private List<Runnable> executeEnd = new ArrayList<>(1);
     
@@ -92,7 +98,7 @@ public abstract class Laser {
                         for (Player p : start.getWorld().getPlayers()) {
                             if (isCloseEnough(p.getLocation())) {
                                 if (show.add(p)) {
-                                    sendStartPackets(p);
+                                    sendStartPackets(p, !seen.add(p));
                                 }
                             }else if (show.remove(p)) {
                                 sendDestroyPackets(p);
@@ -221,7 +227,7 @@ public abstract class Laser {
         }
     }
     
-    protected abstract void sendStartPackets(Player p) throws ReflectiveOperationException;
+    protected abstract void sendStartPackets(Player p, boolean hasSeen) throws ReflectiveOperationException;
     
     protected abstract void sendDestroyPackets(Player p) throws ReflectiveOperationException;
     
@@ -232,10 +238,11 @@ public abstract class Laser {
     }
     
     public static class GuardianLaser extends Laser {
+        private static int teamID = ThreadLocalRandom.current().nextInt(0, Integer.MAX_VALUE);
         
         private final Object createGuardianPacket;
         private final Object createSquidPacket;
-        //private final Object teamCreatePacket;
+        private final Object teamCreatePacket;
         private final Object[] destroyPackets;
         private final Object metadataPacketGuardian;
         private final Object metadataPacketSquid;
@@ -253,7 +260,7 @@ public abstract class Laser {
          * @param start Location where laser will starts
          * @param end Location where laser will ends
          * @param duration Duration of laser in seconds (<i>-1 if infinite</i>)
-         * @param distance Distance where laser will be visible (<i>-1 is infinite</i>)
+         * @param distance Distance where laser will be visible (<i>-1 if infinite</i>)
          * @see {@link Laser#durationInTicks} to make the duration in ticks
          * @see {@link Laser#executeEnd} to add {@link Runnable}s to execute when the laser will stop
          */
@@ -285,7 +292,7 @@ public abstract class Laser {
             guardianUUID = (UUID) Packets.getField(createGuardianPacket, "b");
             metadataPacketGuardian = Packets.createPacketMetadata(guardianID, fakeGuardianDataWatcher);
             
-            //teamCreatePacket = Packets.createPacketTeamCreate("noclip" + teamID++, squidUUID, guardianUUID);
+            teamCreatePacket = Packets.createPacketTeamCreate("noclip" + teamID++, squidUUID, guardianUUID);
             destroyPackets = Packets.createPacketsRemoveEntities(squidID, guardianID);
         }
         
@@ -295,12 +302,10 @@ public abstract class Laser {
         }
         
         @Override
-        protected void sendStartPackets(Player p) throws ReflectiveOperationException {
+        protected void sendStartPackets(Player p, boolean hasSeen) throws ReflectiveOperationException {
             Packets.sendPackets(p, createSquidPacket, createGuardianPacket);
-            if (Packets.version > 14) {
-                Packets.sendPackets(p, metadataPacketSquid, metadataPacketGuardian);
-            }
-            //Packets.sendPackets(p, teamCreatePacket);
+            Packets.sendPackets(p, metadataPacketSquid, metadataPacketGuardian);
+            if (!hasSeen) Packets.sendPackets(p, teamCreatePacket);
         }
         
         @Override
@@ -347,7 +352,7 @@ public abstract class Laser {
          * @param start Location where laser will starts. The Crystal laser do not handle decimal number, it will be rounded to blocks.
          * @param end Location where laser will ends. The Crystal laser do not handle decimal number, it will be rounded to blocks.
          * @param duration Duration of laser in seconds (<i>-1 if infinite</i>)
-         * @param distance Distance where laser will be visible (<i>-1 is infinite</i>)
+         * @param distance Distance where laser will be visible (<i>-1 if infinite</i>)
          * @see {@link Laser#durationInTicks} to make the duration in ticks
          * @see {@link Laser#executeEnd} to add {@link Runnable}s to execute when the laser will stop
          */
@@ -375,11 +380,9 @@ public abstract class Laser {
         }
         
         @Override
-        protected void sendStartPackets(Player p) throws ReflectiveOperationException {
+        protected void sendStartPackets(Player p, boolean hasSeen) throws ReflectiveOperationException {
             Packets.sendPackets(p, createCrystalPacket);
-            if (Packets.version > 14) {
-                Packets.sendPackets(p, metadataPacketCrystal);
-            }
+            Packets.sendPackets(p, metadataPacketCrystal);
         }
         
         @Override
