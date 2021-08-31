@@ -4,7 +4,7 @@ import com.ilm9001.nightclub.Nightclub;
 import org.bukkit.Location;
 
 public class LaserWrapper {
-    private Laser.GuardianLaser laser;
+    private Laser laser;
     private volatile boolean stopped;
     private Location start;
     private Location end;
@@ -24,7 +24,7 @@ public class LaserWrapper {
         this.type = type;
         stopped = true;
         try {
-            laser = new Laser.GuardianLaser(start,end,time,seeDistance);
+            laser = type.create(start,end,time,seeDistance);
         } catch (ReflectiveOperationException e) {
             e.printStackTrace();
         }
@@ -34,7 +34,7 @@ public class LaserWrapper {
         try {
             if (stopped) {
                 laser.start(Nightclub.getInstance());
-                laser.callColorChange();
+                if(type == Laser.LaserType.GUARDIAN) {((Laser.GuardianLaser)laser).callColorChange();}
                 stopped = false;
                 return true;
             } else return false;
@@ -77,8 +77,8 @@ public class LaserWrapper {
     }
     
     public synchronized void colorChange() {
-        if(!stopped &&type == Laser.LaserType.GUARDIAN) {
-            try {laser.callColorChange();}
+        if(!stopped && type == Laser.LaserType.GUARDIAN) {
+            try {((Laser.GuardianLaser)laser).callColorChange();}
             catch (ReflectiveOperationException e) {e.printStackTrace();}
         }
     }
