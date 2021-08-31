@@ -2,7 +2,6 @@ package com.ilm9001.nightclub.parse;
 
 import com.ilm9001.nightclub.Nightclub;
 import com.ilm9001.nightclub.Show;
-import com.ilm9001.nightclub.parse.LE_list;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.json.simple.JSONArray;

@@ -68,6 +68,14 @@ public class LaserWrapper {
         }
     }
     
+    public Location getStart() {
+        return start;
+    }
+    
+    public Location getEnd() {
+        return end;
+    }
+    
     public synchronized void colorChange() {
         if(!stopped &&type == Laser.LaserType.GUARDIAN) {
             try {laser.callColorChange();}

@@ -11,9 +11,10 @@ import java.util.List;
 public class RingSquare {
     private Location center;
     private RotationRunnable runnable;
-    private final double size;
+    private double size;
     private double r; // rotation
     private double c; // counter
+    private double speed;
     private boolean running;
     
     public RingSquare(double size, Location center) {
@@ -39,14 +40,22 @@ public class RingSquare {
         running = false;
     }
     
+    public void setSize(double size) {
+        this.size = size;
+    }
+    
     public void setCenter(Location center) {this.center = center;}
     public Location getCenter() {return center.clone();}
     
+    
     public List<Location> getPoints() {
+        return getPoints(0);
+    }
+    public List<Location> getPoints(double rotation) {
         List<Location> list = new ArrayList<>();
     
         for (int i = 0; i <= 5; i++) {
-            Vector3D v1 = new Vector3D(Nightclub.getDirection().getRadians(),Math.toRadians(r+i*90)).normalize().scalarMultiply(size);
+            Vector3D v1 = new Vector3D(Nightclub.getDirection().getRadians()+rotation,Math.toRadians(r+i*90)).normalize().scalarMultiply(size);
             list.add(center.clone().add(v1.getX(),v1.getZ(),v1.getY()));
         }
         return list;
@@ -61,12 +70,15 @@ public class RingSquare {
             c = 85;
         }
     }
+    public void setSpeed(double speed) {
+        this.speed = speed;
+    }
     
     class RotationRunnable extends BukkitRunnable {
         @Override
         public void run() {
-            if(c > 0) {
-                r = r + (c/1.3) % 360;
+            if(c > 0 || speed > 0) {
+                r = r + (c/1.3) + speed % 360;
                 c -= 1+c/12;
             }
         }

@@ -6,7 +6,7 @@
 
     <groupId>com.ilm9001</groupId>
     <artifactId>nightclub</artifactId>
-    <version>1.0</version>
+    <version>1.2</version>
     <packaging>jar</packaging>
 
     <name>Nightclub</name>

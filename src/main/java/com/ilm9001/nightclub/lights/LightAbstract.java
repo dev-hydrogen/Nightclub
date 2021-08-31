@@ -9,7 +9,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class LightAbstract {
     public List<LaserWrapper> lsr;

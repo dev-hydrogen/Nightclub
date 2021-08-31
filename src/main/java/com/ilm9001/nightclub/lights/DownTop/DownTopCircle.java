@@ -2,7 +2,6 @@ package com.ilm9001.nightclub.lights.DownTop;
 
 import com.ilm9001.nightclub.Nightclub;
 import com.ilm9001.nightclub.lights.Circler;
-import com.ilm9001.nightclub.lights.Directions;
 import com.ilm9001.nightclub.lights.LightAbstract;
 import com.ilm9001.nightclub.util.LaserWrapper;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;

@@ -17,6 +17,7 @@ public class TopDownLineCircle extends LightAbstract {
     }
     public TopDownLineCircle(Location anchor, int num_lsr, boolean rotation) {
         super(anchor,num_lsr);
+        lsr.forEach((LaserWrapper lsr) -> lsr.setEnd(anchor));
         c = new Circler(0,3,rotation);
         c2 = new Circler(180,3,rotation);
         angleSeperation = 360.0/num_lsr;
@@ -38,7 +39,7 @@ public class TopDownLineCircle extends LightAbstract {
                 Vector3D v1 = new Vector3D(Math.toRadians(a_seperated), 0).normalize().scalarMultiply(len/1.3);
                 Vector3D v2 = new Vector3D(Nightclub.getDirection().getRadians(),Math.toRadians(b)).normalize().scalarMultiply(len*1.08);
                 Location firstiteration = anchor.clone().add(v2.getX(), 0.0-len, v2.getY());
-                lsr.setEnd(firstiteration.clone().add(v1.getX(), v1.getZ(), v1.getY()));
+                lsr.setStart(firstiteration.clone().add(v1.getX(), v1.getZ(), v1.getY()));
                 a_seperated += angleSeperation;
             }
         }

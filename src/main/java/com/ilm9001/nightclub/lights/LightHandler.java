@@ -46,29 +46,34 @@ public class LightHandler {
             for(TopDownLineCircle tdlc : ConfigParser.getTopDownLineCircleList()) {
                 tdlc.on();
             }
+            //ConfigParser.getCube().on();
         }
         
         public static void off() {
             for(TopDownLineCircle tdlc : ConfigParser.getTopDownLineCircleList()) {
                 tdlc.off();
             }
+            //ConfigParser.getCube().off();
         }
         
         public static void flash(boolean isBlue) {
             for(TopDownLineCircle tdlc : ConfigParser.getTopDownLineCircleList()) {
                 tdlc.flash();
             }
+            //ConfigParser.getCube().flash();
         }
         
         public static void flashOff(boolean isBlue) {
             for(TopDownLineCircle tdlc : ConfigParser.getTopDownLineCircleList()) {
                 tdlc.flashOff();
             }
+            //ConfigParser.getCube().flashOff();
         }
         public static void setSpeed(int multiplier) {
             for(TopDownLineCircle tdlc : ConfigParser.getTopDownLineCircleList()) {
                 tdlc.setSpeed(multiplier);
             }
+            //ConfigParser.getCube().setSpeed(multiplier);
         }
     }
     public static class LeftLasers {

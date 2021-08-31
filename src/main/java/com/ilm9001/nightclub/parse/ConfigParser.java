@@ -26,6 +26,7 @@ public class ConfigParser {
     private static final List<TopDownLineCircle> TDLCList = new ArrayList<>();
     private static final List<DownTopCircle> DTCList = new ArrayList<>();
     private static final List<FrontFacerCircle> FFList = new ArrayList<>();
+    //private static Cube cube = null;
     /*private static final List<CeilingCrystals> CCList = new ArrayList<>();*/
     private static Rings rings = null;
     
@@ -36,7 +37,6 @@ public class ConfigParser {
         List<?> tddcList = config.getList("TopDownDoubleCircle");
         List<?> dtcList = config.getList("DownTopCircle");
         List<?> ffList = config.getList("FrontFacerCircle");
-        List<Double> ringCoords = config.getDoubleList("Rings");
         World mainWorld = Util.getMainWorld();
         /*List<?> ccList = config.getList("CeilingCrystals");*/
         
@@ -80,10 +80,12 @@ public class ConfigParser {
         int ringCount = Nightclub.getInstance().getConfig().getInt("RingCount");
         double ringSize = Nightclub.getInstance().getConfig().getDouble("RingSize");
         double ringSeperation = Nightclub.getInstance().getConfig().getDouble("RingSeperation");
+        double cubeSize = Nightclub.getInstance().getConfig().getDouble("CubeSize");
         
-        rings = new Rings(
-                new Location(Util.getMainWorld(),
-                        ringCoords.get(0),ringCoords.get(1),ringCoords.get(2)),
+        
+        //cube = new Cube(Util.getLocFromConf("Cube"),cubeSize);
+        
+        rings = new Rings(Util.getLocFromConf("Rings"),
         ringCount,ringSize,ringSeperation);
         /*for(Object lst : ccList) {
             i++;
@@ -110,9 +112,7 @@ public class ConfigParser {
     public static List<FrontFacerCircle> getFrontFacerList() {
         return FFList;
     }
-    
-    public static Rings getRings() {
-        return rings;
-    }
+    public static Rings getRings() {return rings;}
+    /*public static Cube getCube() {return cube;}*/
     /*public static List<CeilingCrystals> getCCList() { return CCList;}*/
 }
