@@ -80,7 +80,7 @@ public class ConfigParser {
         int ringCount = Nightclub.getInstance().getConfig().getInt("RingCount");
         double ringSize = Nightclub.getInstance().getConfig().getDouble("RingSize");
         double ringSeperation = Nightclub.getInstance().getConfig().getDouble("RingSeperation");
-        double cubeSize = Nightclub.getInstance().getConfig().getDouble("CubeSize");
+        //double cubeSize = Nightclub.getInstance().getConfig().getDouble("CubeSize");
         
         
         //cube = new Cube(Util.getLocFromConf("Cube"),cubeSize);
