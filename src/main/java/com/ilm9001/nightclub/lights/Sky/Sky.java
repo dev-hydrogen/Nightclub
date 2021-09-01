@@ -16,11 +16,16 @@ import net.minecraft.world.level.levelgen.WorldGenStage;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
 
+import java.awt.*;
+
 public class Sky {
     private int color;
     private String colorName;
     private int id;
     
+    public Sky(int r, int g, int b) {
+        this(new Color(r,g,b).getRGB());
+    }
     public Sky(int color) {
         this.color = color;
         colorName = ""+color;

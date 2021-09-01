@@ -8,6 +8,8 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.ilm9001.nightclub.Nightclub;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
+
 public class PacketListener {
     
     public PacketListener(Nightclub instance, ProtocolManager manager) {
@@ -15,10 +17,11 @@ public class PacketListener {
             @Override
             public void onPacketSending(PacketEvent event) {
                 PacketContainer packet = event.getPacket();
-                Player player = event.getPlayer();
                 
                 int[] biomes = packet.getIntegerArrays().read(0);
-                // int biomeToUse =
+                int biomeToUse = Nightclub.getSkies().getFromRGB(SkyHandler.getR(),SkyHandler.getG(),SkyHandler.getB()).getId();
+                Arrays.fill(biomes,biomeToUse);
+                packet.getIntegerArrays().write(0,biomes);
             }
         });
     }
