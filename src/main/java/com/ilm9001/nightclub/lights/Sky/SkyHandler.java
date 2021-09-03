@@ -25,7 +25,7 @@ public class SkyHandler {
     private static boolean on = false;
     
     public static void setSkyForAllPlayers(int r, int g, int b) {setSkyForAllPlayers(new Color(r,g,b).getRGB());}
-    public static void setSkyForAllPlayers(int RGB) {
+    public static synchronized void setSkyForAllPlayers(int RGB) {
         Color clr = new Color(RGB);
         r=clr.getRed();
         g=clr.getGreen();
@@ -38,7 +38,7 @@ public class SkyHandler {
         }
     }
     
-    public static void off() {
+    public static synchronized void off() {
         //if(!task.isCancelled()) {task.cancel();}
         if(on) {
             setSkyForAllPlayers(0x000000);
@@ -46,7 +46,7 @@ public class SkyHandler {
         }
     }
     public static void on(int r, int g, int b) {on(new Color(r,g,b).getRGB());}
-    public static void on(int rgb) {
+    public static synchronized void on(int rgb) {
         //if(!task.isCancelled()) {task.cancel();}
         if(!on) {
             setSkyForAllPlayers(rgb);
