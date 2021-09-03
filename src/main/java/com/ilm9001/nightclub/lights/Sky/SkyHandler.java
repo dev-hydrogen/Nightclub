@@ -40,14 +40,18 @@ public class SkyHandler {
     
     public static void off() {
         //if(!task.isCancelled()) {task.cancel();}
-        setSkyForAllPlayers(0x000000);
-        on = false;
+        if(on) {
+            setSkyForAllPlayers(0x000000);
+            on = false;
+        }
     }
     public static void on(int r, int g, int b) {on(new Color(r,g,b).getRGB());}
     public static void on(int rgb) {
         //if(!task.isCancelled()) {task.cancel();}
-        setSkyForAllPlayers(rgb);
-        on = true;
+        if(!on) {
+            setSkyForAllPlayers(rgb);
+            on = true;
+        }
     }
     public static void flash(int r, int g, int b) {flash(new Color(r,g,b).getRGB());}
     public static void flash(int rgb) {
