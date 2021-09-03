@@ -21,12 +21,14 @@ public class SkyHandler {
     private static int r=0;
     private static int g=0;
     private static int b=0;
+    private static int rgbInt=0;
     private static BukkitTask task;
     private static boolean on = false;
     
     public static void setSkyForAllPlayers(int r, int g, int b) {setSkyForAllPlayers(new Color(r,g,b).getRGB());}
     public static synchronized void setSkyForAllPlayers(int RGB) {
         Color clr = new Color(RGB);
+        rgbInt=RGB;
         r=clr.getRed();
         g=clr.getGreen();
         b=clr.getBlue();
@@ -48,14 +50,14 @@ public class SkyHandler {
     public static void on(int r, int g, int b) {on(new Color(r,g,b).getRGB());}
     public static synchronized void on(int rgb) {
         //if(!task.isCancelled()) {task.cancel();}
-        if(!on) {
+        if(!on || rgbInt != rgb) {
             setSkyForAllPlayers(rgb);
             on = true;
         }
     }
     public static void flash(int r, int g, int b) {flash(new Color(r,g,b).getRGB());}
     public static void flash(int rgb) {
-        if(!on) {flashOff(rgb);}
+        if(!on || rgbInt != rgb) {flashOff(rgb);}
         else {/*if(!task.isCancelled()) {task.cancel();}*/ on(rgb);}
     }
     public static void flashOff(int r, int g, int b) {

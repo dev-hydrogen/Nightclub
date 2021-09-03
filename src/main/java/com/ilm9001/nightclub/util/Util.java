@@ -5,7 +5,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -41,5 +47,35 @@ public class Util {
             }
         }
         return chunks;
+    }
+    public static boolean isChromaMap(String infoPath) {
+        JSONParser jsonParser = new JSONParser();
+        JSONObject json_info;
+    
+        try {
+            FileReader inforeader = new FileReader(infoPath);
+            json_info = (JSONObject) jsonParser.parse(inforeader);
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+            return false;
+        }
+        JSONArray sets;
+        JSONArray beatmaps;
+        JSONObject customData;
+        JSONArray requirements;
+        if (json_info.get("_difficultyBeatmapSets") != null) {
+            sets = (JSONArray) json_info.get("_difficultyBeatmapSets");
+        } else return false;
+        if(sets.get(1) != null) {
+            beatmaps = (JSONArray) sets.get(1);
+        } else return false;
+        if(beatmaps.get(5) != null) {
+            customData = (JSONObject) beatmaps.get(5);
+        } else return false;
+        if(customData.get("_requirements") != null) {
+            requirements = (JSONArray) customData.get("_requirements");
+        } else return false;
+        
+        return requirements.contains("Chroma") || requirements.contains("Chroma Lighting Events") || requirements.contains("Chroma Special Events");
     }
 }
