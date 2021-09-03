@@ -26,7 +26,7 @@ public final class Nightclub extends JavaPlugin {
         instance = this;
         show = new Show();
         protocolManager = ProtocolLibrary.getProtocolManager();
-        skies = new SkyFactory(4); // x^3 amount of skies. Add more with caution.
+        skies = new SkyFactory(16); // x^3 amount of skies. Add more with caution.
     
         int pluginId = 12300;
         Metrics metrics = new Metrics(this, pluginId);
