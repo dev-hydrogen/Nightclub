@@ -31,7 +31,7 @@ public class SkyHandler {
         g=clr.getGreen();
         b=clr.getBlue();
         for(Player plr : Nightclub.getInstance().getServer().getOnlinePlayers()) {
-            for(Chunk chunk : Util.getChunkAround(plr.getLocation().getChunk(),8)) {
+            for(Chunk chunk : Util.getChunkAround(plr.getLocation().getChunk(),1)) {
                 net.minecraft.world.level.chunk.Chunk c = ((CraftChunk)chunk).getHandle();
                 ((CraftPlayer) plr).getHandle().b.sendPacket(new PacketPlayOutMapChunk(c));
             }
