@@ -2,6 +2,7 @@ package com.ilm9001.nightclub.lights;
 
 import com.ilm9001.nightclub.lights.DownTop.DownTopCircle;
 import com.ilm9001.nightclub.lights.Side.FrontFacerCircle;
+import com.ilm9001.nightclub.lights.Sky.SkyHandler;
 import com.ilm9001.nightclub.lights.TopDown.TopDownCircle;
 import com.ilm9001.nightclub.lights.TopDown.TopDownDoubleCircle;
 import com.ilm9001.nightclub.lights.TopDown.TopDownLineCircle;
@@ -42,11 +43,12 @@ public class LightHandler {
     }
     public static class RingLights {
     
-        public static void on(boolean isBlue) {
+        public static void on(int clr) {
             for(TopDownLineCircle tdlc : ConfigParser.getTopDownLineCircleList()) {
                 tdlc.on();
             }
             //ConfigParser.getCube().on();
+            SkyHandler.on(clr);
         }
         
         public static void off() {
@@ -54,20 +56,23 @@ public class LightHandler {
                 tdlc.off();
             }
             //ConfigParser.getCube().off();
+            SkyHandler.off();
         }
         
-        public static void flash(boolean isBlue) {
+        public static void flash(int clr) {
             for(TopDownLineCircle tdlc : ConfigParser.getTopDownLineCircleList()) {
                 tdlc.flash();
             }
             //ConfigParser.getCube().flash();
+            SkyHandler.flash(clr);
         }
         
-        public static void flashOff(boolean isBlue) {
+        public static void flashOff(int clr) {
             for(TopDownLineCircle tdlc : ConfigParser.getTopDownLineCircleList()) {
                 tdlc.flashOff();
             }
-            //ConfigParser.getCube().flashOff();
+            //ConfigParser.getCube().flashOff();'
+            SkyHandler.flashOff(clr);
         }
         public static void setSpeed(int multiplier) {
             for(TopDownLineCircle tdlc : ConfigParser.getTopDownLineCircleList()) {

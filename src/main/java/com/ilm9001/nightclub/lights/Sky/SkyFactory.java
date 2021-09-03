@@ -31,8 +31,8 @@ public class SkyFactory {
                 }
             }
         }
-        run = new HueRunnable();
-        run.runTaskTimerAsynchronously(Nightclub.getInstance(),0,4);
+        //run = new HueRunnable();
+        //run.runTaskTimerAsynchronously(Nightclub.getInstance(),0,4);
     }
     
     

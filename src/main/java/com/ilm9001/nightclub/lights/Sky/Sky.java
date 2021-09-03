@@ -44,8 +44,8 @@ public class Sky {
         
         BiomeFog.a foggers = new BiomeFog.a()
                 .a(color) // fog
-                .b(color) // water
-                .c(color) // water fog
+                .b(0xffffff) // water
+                .c(0xffffff) // water fog
                 .d(color); // sky
     
         return new BiomeBase.a()

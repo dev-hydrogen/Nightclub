@@ -44,12 +44,12 @@ public class Show {
             case 1:
                 switch (va) {
                     case 0 -> LightHandler.RingLights.off();
-                    case 1 -> LightHandler.RingLights.on(true);
-                    case 5 -> LightHandler.RingLights.on(false);
-                    case 2 -> LightHandler.RingLights.flash(true);
-                    case 6 -> LightHandler.RingLights.flash(false);
-                    case 3 -> LightHandler.RingLights.flashOff(true);
-                    case 7 -> LightHandler.RingLights.flashOff(false);
+                    case 1 -> LightHandler.RingLights.on(0x0066ff);
+                    case 5 -> LightHandler.RingLights.on(0xff0004);
+                    case 2 -> LightHandler.RingLights.flash(0x0066ff);
+                    case 6 -> LightHandler.RingLights.flash(0xff0004);
+                    case 3 -> LightHandler.RingLights.flashOff(0x0066ff);
+                    case 7 -> LightHandler.RingLights.flashOff(0xff0004);
                 }
                 break;
             // Left Rotating Lasers
