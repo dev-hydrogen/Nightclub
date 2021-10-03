@@ -1,61 +1,63 @@
 package com.ilm9001.nightclub;
 
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
-import com.ilm9001.nightclub.commands.PlayCommand;
-import com.ilm9001.nightclub.commands.PlayCommandTabComplete;
-import com.ilm9001.nightclub.commands.SkyTest;
-import com.ilm9001.nightclub.lights.Directions;
-import com.ilm9001.nightclub.lights.Sky.PacketListener;
-import com.ilm9001.nightclub.lights.Sky.SkyFactory;
-import com.ilm9001.nightclub.parse.ConfigParser;
-import org.bstats.bukkit.Metrics;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.ilm9001.nightclub.json.LightJSONReader;
+import com.ilm9001.nightclub.json.LightJSONWriter;
+import com.ilm9001.nightclub.light.LightUniverse;
+import lombok.Getter;
+import lombok.SneakyThrows;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
+import java.util.logging.Level;
+
 public final class Nightclub extends JavaPlugin {
-    private static Nightclub instance;
-    private static Show show;
-    private static Directions direction;
-    private static ProtocolManager protocolManager;
-    private static SkyFactory skies;
+    @Getter private static Nightclub instance;
+    @Getter private LightJSONReader JSONreader;
+    @Getter private LightJSONWriter JSONwriter;
+    @Getter private Gson GSON;
     
+    public static final String JSON_FILE_NAME = "lights.json";
+    public static File DATA_FOLDER;
+    
+    @SneakyThrows
     @Override
     public void onEnable() {
-        this.saveDefaultConfig();
-        direction = Directions.valueOf(getConfig().getString("FacingTowards"));
+        GSON = new GsonBuilder()
+                .serializeNulls()
+                .setPrettyPrinting()
+                .registerTypeAdapter(LightUniverse.class, new LightUniverse.LightUniverseInstanceCreator())
+                .create();
+        
         instance = this;
-        show = new Show();
-        protocolManager = ProtocolLibrary.getProtocolManager();
-        skies = new SkyFactory(16); // x^3 amount of skies. Add more with caution.
-    
-        int pluginId = 12300;
-        Metrics metrics = new Metrics(this, pluginId);
+        JSONreader = new LightJSONReader(GSON);
+        JSONwriter = new LightJSONWriter(GSON);
         
-        ConfigParser.summonFromConfig();
-        this.getCommand("playbp").setExecutor(new PlayCommand());
-        this.getCommand("playbp").setTabCompleter(new PlayCommandTabComplete());
-        this.getCommand("test").setExecutor(new SkyTest());
+        this.saveDefaultConfig();
         
-        new PacketListener(this,getProtocolManager());
+        DATA_FOLDER = this.getDataFolder();
+        
+        if(!JSONwriter.createLightJSON()) {
+            this.getLogger().log(Level.SEVERE, "Could not create Light JSON file! Disabling");
+            this.getServer().getPluginManager().disablePlugin(this);
+        }
+        
+        JSONwriter.put(new LightUniverse());
+        JSONwriter.put(new LightUniverse());
+        JSONwriter.put(new LightUniverse());
+        
+        this.getLogger().info(""+JSONreader.getLastUniverse());
+        this.getLogger().info(""+JSONreader.getUniverses().get(0).toString());
+        this.getLogger().info(""+JSONreader.getUniverses().get(1).toString());
+        this.getLogger().info(""+JSONreader.getUniverses().get(2).toString());
+        
+        // Plugin startup logic
     }
     
     @Override
     public void onDisable() {
+        // Plugin shutdown logic
     }
     
-    public static Nightclub getInstance() {
-        return instance;
-    }
-    
-    public static Show getShow() {
-        return show;
-    }
- 
-    public static Directions getDirection() { return direction; }
-    
-    public static ProtocolManager getProtocolManager() {
-        return protocolManager;
-    }
-    
-    public static SkyFactory getSkies() { return skies; }
 }
