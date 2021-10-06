@@ -1,9 +1,6 @@
 package com.ilm9001.nightclub.json;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.ilm9001.nightclub.Nightclub;
-import com.ilm9001.nightclub.light.LightUniverse;
 
 import java.io.File;
 import java.io.FileNotFoundException;

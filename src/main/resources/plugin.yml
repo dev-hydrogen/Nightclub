@@ -4,3 +4,9 @@ main: com.ilm9001.nightclub.Nightclub
 api-version: 1.17
 authors: [ ilm9001 ]
 description: Nightclub 2.0
+
+commands:
+  test:
+    description: test
+    usage: /test
+    permission: nightclub.test

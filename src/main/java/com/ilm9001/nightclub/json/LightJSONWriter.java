@@ -37,12 +37,15 @@ public class LightJSONWriter {
         return true;
     }
     public void put(LightUniverse universe) throws IOException {
-        List<LightUniverse> universes = Nightclub.getInstance().getJSONreader().getUniverses();
+        List<LightUniverse> universes = Nightclub.getJSONreader().getUniverses();
         Writer writer = new FileWriter(JSONUtils.LIGHT_JSON);
-        if(universes == null) {
-            universes = new ArrayList<>();
-        }
         universes.add(universe);
+        gson.toJson(universes,writer);
+        writer.close();
+    }
+    
+    public void set(List<LightUniverse> universes) throws IOException {
+        Writer writer = new FileWriter(JSONUtils.LIGHT_JSON);
         gson.toJson(universes,writer);
         writer.close();
     }
