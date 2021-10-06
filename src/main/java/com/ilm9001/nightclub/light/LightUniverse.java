@@ -6,6 +6,8 @@ import com.ilm9001.nightclub.util.Location;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -24,12 +26,13 @@ public class LightUniverse {
         this(
                 new ArrayList<>(),
                 UUID.randomUUID(),
-                Nightclub.getInstance().getJSONreader().getLastUniverse().getId()+1,
-                "Unnamed-Universe"
+                Nightclub.getJSONreader().getLastUniverse().getId()+1,
+                "Unnamed-Universe",
+                Bukkit.getWorlds().get(0)
         );
     }
     
-    public LightUniverse(List<Light> lights, UUID uniqueID, int id, String name) {
+    public LightUniverse(List<Light> lights, UUID uniqueID, int id, String name, World world) {
         this.lights = lights;
         this.uniqueID = uniqueID;
         this.id = id;
@@ -57,7 +60,7 @@ public class LightUniverse {
     
     public static class LightUniverseInstanceCreator implements InstanceCreator<LightUniverse> {
         public LightUniverse createInstance(Type type) {
-            return new LightUniverse(new ArrayList<>(),UUID.randomUUID(),0,"LightUniverseInstanceCreator");
+            return new LightUniverse(new ArrayList<>(),UUID.randomUUID(),0,"LightUniverseInstanceCreator",Bukkit.getWorlds().get(0));
         }
     }
 }
