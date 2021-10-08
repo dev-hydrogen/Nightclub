@@ -21,7 +21,7 @@ public class LightCommand extends BaseCommand {
     @Description("Build a new Light!")
     public static void onBuild(Player player, String[] args) {
         light = new Light(UUID.randomUUID(), "Unnamed-Light", Location.getFromBukkitLocation(player.getLocation()),
-                10, 80, 2, 5, 20, 10, true, LightPattern.CIRCLE,
+                2, 70, 2, 5, 20, 10, true, LightPattern.CIRCLE,
                 LightType.GUARDIAN_BEAM, LightChannel.CENTER_LIGHTS);
         light.start();
         light.on();
