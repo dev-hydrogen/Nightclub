@@ -78,7 +78,7 @@ public class Light {
         
         buildLasers();
         
-        if (flipStartAndEnd) {
+        if (flipStartAndEnd || this.type == LightType.END_CRYSTAL_BEAM) {
             lasers.forEach((laser) -> laser.setEnd(location));
         } else {
             lasers.forEach((laser) -> laser.setStart(location));
@@ -95,7 +95,7 @@ public class Light {
                     timeToFade = 0;
                     length = 0;
                 }
-                x = x + multipliedSpeed % 100;
+                x = (x + multipliedSpeed) % 100;
                 length %= 100;
                 for (int i = 0; i < lasers.size(); i++) {
                     LaserWrapper laser = lasers.get(i);
@@ -104,10 +104,10 @@ public class Light {
                     x value that is seperated evenly for each laser.
                      */
                     Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize().scalarMultiply(getMaxLengthPercent());
-                    Vector3D v2 = this.pattern.getPattern().apply(v, x + (100.0 / lasers.size()) * i, this.patternSizeMultiplier).scalarMultiply(this.patternSizeMultiplier);
+                    Vector3D v2 = this.pattern.getPattern().apply(v, x + (100.0 / lasers.size()) * i).scalarMultiply(this.patternSizeMultiplier);
                     Vector3D v3 = v.add(v2);
                     
-                    if (flipStartAndEnd) {
+                    if (flipStartAndEnd || this.type == LightType.END_CRYSTAL_BEAM) {
                         laser.setStart(this.location.clone().add(v3.getX(), v3.getZ(), v3.getY()));
                     } else {
                         laser.setEnd(this.location.clone().add(v3.getX(), v3.getZ(), v3.getY()));
@@ -160,6 +160,7 @@ public class Light {
         if (isOn) {
             on();
             length += onLength / 100.0 * 5;
+            timeToFade = 2;
         } else {
             flash();
         }

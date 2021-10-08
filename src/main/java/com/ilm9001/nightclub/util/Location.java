@@ -3,7 +3,8 @@ package com.ilm9001.nightclub.util;
 import lombok.Data;
 import org.bukkit.Bukkit;
 
-// yet another preparation for minestom support, no real reason to use otherwise
+// yet another preparation for minestom support, not much reason to use otherwise, but this does also translate
+// MINECRAFTS stupid FUCKING pitch AND yaw systems that DO NOT MAKE ANY SENSE!!!!
 @Data
 public class Location implements Cloneable {
     private double x;
