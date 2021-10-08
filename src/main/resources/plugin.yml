@@ -6,7 +6,12 @@ authors: [ ilm9001 ]
 description: Nightclub 2.0
 
 commands:
-  test:
-    description: test
-    usage: /test
-    permission: nightclub.test
+  light:
+    description: light builder + editor
+    usage: /light
+    permission: nightclub.light
+
+permissions:
+  nightclub.light:
+    description: Access to /light which is the builder and editor
+    default: op

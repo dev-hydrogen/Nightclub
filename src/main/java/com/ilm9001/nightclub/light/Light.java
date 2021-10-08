@@ -16,7 +16,6 @@ import java.util.concurrent.TimeUnit;
 
 @Data
 public class Light {
-    private static final transient int FADEOFF_VALUE = 20; // x * 100 ms
     private static final transient ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
     private static final transient int DELAY = 100; // run every x ms
     private UUID uniqueID;
@@ -29,7 +28,7 @@ public class Light {
     private double onLength; // 0 to 100, percentage of maxLength
     private double speed;
     private double patternSizeMultiplier;
-    private int timeToFadeToBlack;
+    private int timeToFadeToBlack; // x * 100 ms
     private int lightCount;
     private boolean flipStartAndEnd; // flipped start and end makes downward pointing beams brighter, upward pointing beams less bright
     @Builder.Default
@@ -40,9 +39,11 @@ public class Light {
     private transient double x = 0; // 0 to 100, usually percentage of 360
     @Builder.Default
     private transient boolean isOn = false;
+    @Builder.Default
     private transient double multipliedSpeed = speed; // speed, but when internally multiplied by events
     private transient int timeToFade; // internal fade off value
     private transient Runnable run;
+    private transient Thread thread;
     
     public Light(Location loc, LightPattern pattern, LightType type, LightChannel channel) {
         this(loc, "Unnamed-Light", pattern, type, channel);
@@ -53,11 +54,11 @@ public class Light {
     }
     
     public Light(Location loc, UUID uniqueID, String name, LightPattern pattern, LightType type, LightChannel channel) {
-        this(uniqueID, name, loc, 0, 0, 0, 0, 0, false, pattern, type, channel);
+        this(uniqueID, name, loc, 0, 0, 0, 0, 0, 0, false, pattern, type, channel);
     }
     
     @Builder
-    public Light(UUID uuid, String name, Location location, double maxLength, double onLength, double speed, int timeToFadeToBlack, int lightCount,
+    public Light(UUID uuid, String name, Location location, double maxLength, double onLength, double speed, double patternSizeMultiplier, int timeToFadeToBlack, int lightCount,
                  boolean flipStartAndEnd, LightPattern pattern, LightType type, LightChannel channel) {
         this.uniqueID = uuid;
         this.name = name;
@@ -71,6 +72,9 @@ public class Light {
         this.type = type;
         this.channel = channel;
         this.flipStartAndEnd = flipStartAndEnd;
+        this.patternSizeMultiplier = patternSizeMultiplier;
+        
+        multipliedSpeed = speed;
         
         buildLasers();
         
@@ -81,43 +85,50 @@ public class Light {
         }
         
         run = () -> {
-            if (timeToFade > 0 && length > 0) {
-                timeToFade--;
-                length -= 100.0 / FADEOFF_VALUE;
-            }
-            if (length < 0) {
-                off();
-                timeToFade = 0;
-                length = 0;
-            }
-            x = x + multipliedSpeed % 100;
-            length %= 100;
-            for (int i = 0; i < lasers.size(); i++) {
-                LaserWrapper laser = lasers.get(i);
-                /*
-                Here we make a ray the size of length from the location of this Light, then we add a 2d plane to it (which is where our pattern is) with a
-                x value that is seperated evenly for each laser.
-                 */
-                Vector3D v = new Vector3D(Math.toRadians(location.getYaw()), Math.toRadians(location.getPitch())).normalize().scalarMultiply(length);
-                Vector3D v2 = pattern.getPattern().apply(v, x + 100.0 / i).scalarMultiply(patternSizeMultiplier);
-                
-                if (flipStartAndEnd) {
-                    laser.setStart(new Location(v2.getX(), v2.getZ(), v2.getY(), 0, 0));
-                } else {
-                    laser.setEnd(new Location(v2.getX(), v2.getZ(), v2.getY(), 0, 0));
+            try {
+                if (timeToFade > 0 && length > 0) {
+                    timeToFade--;
+                    length -= 100.0 / timeToFadeToBlack;
                 }
+                if (length < 0) {
+                    off();
+                    timeToFade = 0;
+                    length = 0;
+                }
+                x = x + multipliedSpeed % 100;
+                length %= 100;
+                for (int i = 0; i < lasers.size(); i++) {
+                    LaserWrapper laser = lasers.get(i);
+                    /*
+                    Here we make a ray the size of length from the location of this Light, then we add a 2d plane to it (which is where our pattern is) with a
+                    x value that is seperated evenly for each laser.
+                     */
+                    Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize().scalarMultiply(getMaxLengthPercent());
+                    Vector3D v2 = this.pattern.getPattern().apply(v, x + (100.0 / lasers.size()) * i, this.patternSizeMultiplier).scalarMultiply(this.patternSizeMultiplier);
+                    Vector3D v3 = v.add(v2);
+                    
+                    if (flipStartAndEnd) {
+                        laser.setStart(this.location.clone().add(v3.getX(), v3.getZ(), v3.getY()));
+                    } else {
+                        laser.setEnd(this.location.clone().add(v3.getX(), v3.getZ(), v3.getY()));
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         };
+        thread = new Thread(run);
     }
     
     public void start() {
-        if (!((Thread) run).isAlive()) {
-            executorService.scheduleAtFixedRate(run, 0, DELAY, TimeUnit.MILLISECONDS);
+        if (!thread.isAlive()) {
+            thread = new Thread(run);
+            executorService.scheduleAtFixedRate(thread, 1, DELAY, TimeUnit.MILLISECONDS);
         }
     }
     public void stop() {
-        if (((Thread) run).isAlive()) {
-            ((Thread) run).interrupt();
+        if (thread.isAlive()) {
+            thread.interrupt();
         }
     }
     
@@ -153,8 +164,16 @@ public class Light {
             flash();
         }
     }
+    public void flashOff() {
+        on();
+        timeToFade = timeToFadeToBlack;
+    }
     
     public void setSpeed(double multiplier) {
         this.multipliedSpeed = speed * multiplier;
+    }
+    
+    private double getMaxLengthPercent() {
+        return maxLength * length / 100.0;
     }
 }
