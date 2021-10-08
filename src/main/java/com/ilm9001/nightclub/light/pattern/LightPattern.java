@@ -7,12 +7,10 @@ import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 public enum LightPattern {
     LINE(new MovementPattern((x) -> new Vector2D(
             Math.sin(Math.toRadians(Util.getDegreesFromPercentage(x))),
-            0.0)
-            .normalize(), 100)),
+            0.0), 100)),
     CIRCLE(new MovementPattern((x) -> new Vector2D(
             Math.sin(Math.toRadians(Util.getDegreesFromPercentage(x))),
-            Math.cos(Math.toRadians(Util.getDegreesFromPercentage(x))))
-            .normalize(), 100)),
+            Math.cos(Math.toRadians(Util.getDegreesFromPercentage(x)))), 100)),
     DOUBLE_CIRCLE(new MovementPattern((x) ->
             CIRCLE.getPattern().getCallable().apply(x).add(CIRCLE.getPattern().getCallable().apply(-x)),
             100)),

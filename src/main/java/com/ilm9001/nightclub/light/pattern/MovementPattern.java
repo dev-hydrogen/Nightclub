@@ -20,9 +20,9 @@ public class MovementPattern {
         this.delay = delay;
     }
     
-    public Vector3D apply(Vector3D v, double x) {
-        Vector2D v2 = callable.apply(x);
+    public Vector3D apply(Vector3D v, double x, double multiplier) {
+        Vector2D v2 = callable.apply(x).scalarMultiply(multiplier);
         Plane plane = new Plane(v, 0.1);
-        return plane.getPointAt(v2, 0);
+        return plane.getPointAt(v2, 5);
     }
 }

@@ -8,11 +8,15 @@ import com.ilm9001.nightclub.json.LightJSONReader;
 import com.ilm9001.nightclub.json.LightJSONWriter;
 import com.ilm9001.nightclub.light.LightUniverse;
 import com.ilm9001.nightclub.light.LightUniverseManager;
+import com.ilm9001.nightclub.light.pattern.LightPattern;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.logging.Level;
 
 public final class Nightclub extends JavaPlugin {
@@ -44,28 +48,25 @@ public final class Nightclub extends JavaPlugin {
         JSONreader = new LightJSONReader(GSON);
         JSONwriter = new LightJSONWriter(GSON);
         
-        this.saveDefaultConfig();
-        
         DATA_FOLDER = this.getDataFolder();
+        
+        saveDefaultConfig();
         
         if (!JSONwriter.createLightJSON()) {
             this.getLogger().log(Level.SEVERE, "Could not create Light JSON file! Disabling");
             this.getServer().getPluginManager().disablePlugin(this);
         }
         
-        JSONwriter.put(new LightUniverse());
-        JSONwriter.put(new LightUniverse());
-        JSONwriter.put(new LightUniverse());
-        
-        this.getLogger().info("" + JSONreader.getLastUniverse());
-        this.getLogger().info("" + JSONreader.getUniverses().get(0).toString());
-        this.getLogger().info("" + JSONreader.getUniverses().get(1).toString());
-        this.getLogger().info("" + JSONreader.getUniverses().get(2).toString());
-        
         lightUniverseManager = new LightUniverseManager();
         
         commandManager = new PaperCommandManager(this);
         
+        commandManager.getCommandCompletions().registerCompletion("pattern", c -> {
+            Collection<LightPattern> collection = new ArrayList<>(Arrays.asList(LightPattern.values()));
+            Collection<String> strings = new ArrayList<>();
+            collection.forEach((pattern) -> strings.add(pattern.toString()));
+            return strings;
+        });
         commandManager.registerCommand(new LightCommand());
     }
     
