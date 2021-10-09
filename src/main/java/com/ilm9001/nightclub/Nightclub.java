@@ -6,6 +6,7 @@ import com.google.gson.GsonBuilder;
 import com.ilm9001.nightclub.commands.LightCommand;
 import com.ilm9001.nightclub.json.LightJSONReader;
 import com.ilm9001.nightclub.json.LightJSONWriter;
+import com.ilm9001.nightclub.light.LightType;
 import com.ilm9001.nightclub.light.LightUniverse;
 import com.ilm9001.nightclub.light.LightUniverseManager;
 import com.ilm9001.nightclub.light.pattern.LightPattern;
@@ -67,6 +68,13 @@ public final class Nightclub extends JavaPlugin {
             collection.forEach((pattern) -> strings.add(pattern.toString()));
             return strings;
         });
+        commandManager.getCommandCompletions().registerCompletion("type", c -> {
+            Collection<LightType> collection = new ArrayList<>(Arrays.asList(LightType.values()));
+            Collection<String> strings = new ArrayList<>();
+            collection.forEach((pattern) -> strings.add(pattern.toString()));
+            return strings;
+        });
+        
         commandManager.registerCommand(new LightCommand());
     }
     
