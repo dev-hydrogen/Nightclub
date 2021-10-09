@@ -5,6 +5,8 @@ import com.ilm9001.nightclub.light.pattern.LightPattern;
 import com.ilm9001.nightclub.util.Location;
 import lombok.Builder;
 import lombok.Data;
+import org.apache.commons.math3.geometry.euclidean.threed.Rotation;
+import org.apache.commons.math3.geometry.euclidean.threed.RotationConvention;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
 import java.util.ArrayList;
@@ -18,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 public class Light {
     private static final transient ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
     private static final transient int DELAY = 100; // run every x ms
-    private UUID uniqueID;
+    private final UUID uniqueID;
     private String name;
     private Location location;
     private LightPattern pattern;
@@ -78,7 +80,7 @@ public class Light {
         
         buildLasers();
         
-        if (flipStartAndEnd || this.type == LightType.END_CRYSTAL_BEAM) {
+        if (flipStartAndEnd) {
             lasers.forEach((laser) -> laser.setEnd(location));
         } else {
             lasers.forEach((laser) -> laser.setStart(location));
@@ -104,10 +106,11 @@ public class Light {
                     x value that is seperated evenly for each laser.
                      */
                     Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize().scalarMultiply(getMaxLengthPercent());
-                    Vector3D v2 = this.pattern.getPattern().apply(v, x + (100.0 / lasers.size()) * i).scalarMultiply(this.patternSizeMultiplier);
+                    Rotation r = new Rotation(v, this.location.getRotation(), RotationConvention.VECTOR_OPERATOR);
+                    Vector3D v2 = this.pattern.getPattern().apply(v, x + (100.0 / lasers.size()) * i, r, this.patternSizeMultiplier);
                     Vector3D v3 = v.add(v2);
                     
-                    if (flipStartAndEnd || this.type == LightType.END_CRYSTAL_BEAM) {
+                    if (flipStartAndEnd) {
                         laser.setStart(this.location.clone().add(v3.getX(), v3.getZ(), v3.getY()));
                     } else {
                         laser.setEnd(this.location.clone().add(v3.getX(), v3.getZ(), v3.getY()));
@@ -136,6 +139,7 @@ public class Light {
         for (LaserWrapper lsr : lasers) {
             lsr.stop();
         }
+        lasers.clear();
         for (int i = 0; i < lightCount; i++) {
             LaserWrapper laser = new LaserWrapper(location, location, -1, 128, type.getType());
             lasers.add(laser);
@@ -144,7 +148,7 @@ public class Light {
     
     public void on() {
         isOn = true;
-        length = onLength;
+        length = onLength / 100 * maxLength;
         for (LaserWrapper lsr : lasers) {
             lsr.start();
         }
@@ -162,7 +166,7 @@ public class Light {
             length += onLength / 100.0 * 5;
             timeToFade = 2;
         } else {
-            flash();
+            flashOff();
         }
     }
     public void flashOff() {

@@ -15,8 +15,7 @@ public enum LightPattern {
         Vector2D v = CIRCLE.getPattern().getCallable().apply(x).scalarMultiply(9);
         Vector2D v2 = CIRCLE.getPattern().getCallable().apply(-x + 50);
         return v.add(v2).scalarMultiply(0.1);
-    }
-    )),
+    })),
     STILL(new MovementPattern((x) -> new Vector2D(0.0, 0.0).scalarMultiply(0.0)));
     
     @Getter
