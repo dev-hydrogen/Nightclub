@@ -6,8 +6,8 @@ import co.aikar.commands.annotation.CommandCompletion;
 import co.aikar.commands.annotation.Description;
 import co.aikar.commands.annotation.Subcommand;
 import com.ilm9001.nightclub.light.Light;
-import com.ilm9001.nightclub.light.LightChannel;
 import com.ilm9001.nightclub.light.LightType;
+import com.ilm9001.nightclub.light.event.LightChannel;
 import com.ilm9001.nightclub.light.pattern.LightPattern;
 import com.ilm9001.nightclub.util.Location;
 import com.ilm9001.nightclub.util.Util;
@@ -15,7 +15,7 @@ import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
-@CommandAlias("li")
+@CommandAlias("light|li")
 public class LightCommand extends BaseCommand {
     private static Light light;
     
@@ -28,7 +28,6 @@ public class LightCommand extends BaseCommand {
                 LightType.GUARDIAN_BEAM, LightChannel.CENTER_LIGHTS);
         light.start();
         light.on();
-        player.sendMessage("wtf? p: " + light.getLocation().getPitch() + " y: " + light.getLocation().getYaw());
     }
     
     @Subcommand("data")
@@ -98,6 +97,14 @@ public class LightCommand extends BaseCommand {
         @Description("Alter rotation")
         public static void onModifyRotation(String[] args) {
             light.getLocation().setRotation(Util.parseNumber(args[0]).doubleValue());
+        }
+        
+        @Subcommand("channel")
+        @CommandAlias("c")
+        @Description("Change a Light's channel")
+        @CommandCompletion("@channels")
+        public static void onModifyChannel(String[] args) {
+            light.setChannel(LightChannel.valueOf(args[0]));
         }
     }
     

@@ -9,8 +9,7 @@ import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import java.util.function.Function;
 
 public class MovementPattern {
-    @Getter
-    private final Function<Double, Vector2D> callable;
+    @Getter private final Function<Double, Vector2D> callable;
     
     public MovementPattern(Function<Double, Vector2D> pattern) {
         callable = pattern;
@@ -18,7 +17,10 @@ public class MovementPattern {
     
     public Vector3D apply(Vector3D v, double x, Rotation r, double multiplier) {
         Vector2D v2 = callable.apply(x).scalarMultiply(multiplier);
-        Plane plane = new Plane(v, 0.1).rotate(v, r);
+        Plane plane = new Plane(v, 0.1);
+        if (r != null) {
+            plane.rotate(v, r);
+        }
         return plane.getPointAt(v2, 0);
     }
 }
