@@ -1,10 +1,10 @@
 package com.ilm9001.nightclub.light;
 
 import com.ilm9001.nightclub.laser.LaserWrapper;
+import com.ilm9001.nightclub.light.event.LightChannel;
 import com.ilm9001.nightclub.light.pattern.LightPattern;
 import com.ilm9001.nightclub.util.Location;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 import org.apache.commons.math3.geometry.euclidean.threed.Rotation;
 import org.apache.commons.math3.geometry.euclidean.threed.RotationConvention;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
@@ -16,35 +16,34 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-@Data
+@ToString
+@EqualsAndHashCode
 public class Light {
     private static final transient ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
     private static final transient int DELAY = 100; // run every x ms
-    private final UUID uniqueID;
-    private String name;
-    private Location location;
-    private LightPattern pattern;
-    private LightType type;
-    private LightChannel channel;
-    private double maxLength;
-    private double onLength; // 0 to 100, percentage of maxLength
-    private double speed;
-    private double patternSizeMultiplier;
-    private int timeToFadeToBlack; // x * 100 ms
-    private int lightCount;
-    private boolean flipStartAndEnd; // flipped start and end makes downward pointing beams brighter, upward pointing beams less bright
-    @Builder.Default
-    private transient List<LaserWrapper> lasers = new ArrayList<>();
-    @Builder.Default
-    private transient double length = 0; // 0 to 100, percentage of maxLength.
-    @Builder.Default
-    private transient double x = 0; // 0 to 100, usually percentage of 360
-    @Builder.Default
-    private transient boolean isOn = false;
-    @Builder.Default
-    private transient double multipliedSpeed = speed; // speed, but when internally multiplied by events
+    // annotations lol
+    @Getter private final UUID uniqueID;
+    @Getter @Setter private String name;
+    @Getter @Setter private Location location;
+    @Getter @Setter private LightPattern pattern;
+    @Getter @Setter private LightType type;
+    @Getter private LightChannel channel;
+    @Getter @Setter private double maxLength;
+    @Getter @Setter private double onLength; // 0 to 100, percentage of maxLength
+    @Getter private double speed;
+    @Getter @Setter private double patternSizeMultiplier;
+    @Getter @Setter private int timeToFadeToBlack; // x * 100 ms
+    @Getter @Setter private int lightCount;
+    @Getter @Setter private boolean flipStartAndEnd; // flipped start and end makes downward pointing beams brighter, upward pointing beams less bright
+    
+    @Builder.Default private final transient List<LaserWrapper> lasers = new ArrayList<>();
+    @Builder.Default private transient double length = 0; // 0 to 100, percentage of maxLength.
+    @Builder.Default private transient double x = 0; // 0 to 100, usually percentage of 360
+    @Builder.Default private transient boolean isOn = false;
+    @Builder.Default private transient double multipliedSpeed = speed; // speed, but when internally multiplied by events
+    
     private transient int timeToFade; // internal fade off value
-    private transient Runnable run;
+    private final transient Runnable run;
     private transient Thread thread;
     
     public Light(Location loc, LightPattern pattern, LightType type, LightChannel channel) {
@@ -75,9 +74,9 @@ public class Light {
         this.channel = channel;
         this.flipStartAndEnd = flipStartAndEnd;
         this.patternSizeMultiplier = patternSizeMultiplier;
+        this.multipliedSpeed = speed;
         
-        multipliedSpeed = speed;
-        
+        this.channel.getHandler().addListener(this);
         buildLasers();
         
         if (flipStartAndEnd) {
@@ -92,10 +91,10 @@ public class Light {
                     timeToFade--;
                     length -= 100.0 / timeToFadeToBlack;
                 }
-                if (length < 0) {
+                if (length <= 0) {
                     off();
                     timeToFade = 0;
-                    length = 0;
+                    length = 0.1;
                 }
                 x = (x + multipliedSpeed) % 100;
                 length %= 100;
@@ -106,7 +105,10 @@ public class Light {
                     x value that is seperated evenly for each laser.
                      */
                     Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize().scalarMultiply(getMaxLengthPercent());
-                    Rotation r = new Rotation(v, this.location.getRotation(), RotationConvention.VECTOR_OPERATOR);
+                    Rotation r = null;
+                    if (v.getNorm() != 0) {
+                        r = new Rotation(v, this.location.getRotation(), RotationConvention.VECTOR_OPERATOR);
+                    }
                     Vector3D v2 = this.pattern.getPattern().apply(v, x + (100.0 / lasers.size()) * i, r, this.patternSizeMultiplier);
                     Vector3D v3 = v.add(v2);
                     
@@ -148,14 +150,14 @@ public class Light {
     
     public void on() {
         isOn = true;
-        length = onLength / 100 * maxLength;
+        length = onLength;
         for (LaserWrapper lsr : lasers) {
             lsr.start();
         }
     }
     public void off() {
         isOn = false;
-        length = 0;
+        length = 0.1;
         for (LaserWrapper lsr : lasers) {
             lsr.stop();
         }
@@ -163,7 +165,7 @@ public class Light {
     public void flash() {
         if (isOn) {
             on();
-            length += onLength / 100.0 * 5;
+            length += onLength / 100.0 * 10;
             timeToFade = 2;
         } else {
             flashOff();
@@ -174,6 +176,11 @@ public class Light {
         timeToFade = timeToFadeToBlack;
     }
     
+    public void setChannel(LightChannel channel) {
+        this.channel.getHandler().removeListener(this);
+        channel.getHandler().addListener(this);
+        this.channel = channel;
+    }
     public void setSpeed(double multiplier) {
         this.multipliedSpeed = speed * multiplier;
     }

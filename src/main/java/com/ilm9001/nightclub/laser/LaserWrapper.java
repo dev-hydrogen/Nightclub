@@ -5,18 +5,12 @@ import com.ilm9001.nightclub.util.Location;
 import lombok.Getter;
 
 public class LaserWrapper {
-    @Getter
-    private Laser laser;
-    @Getter
-    private Location start;
-    @Getter
-    private Location end;
-    @Getter
-    private int duration;
-    @Getter
-    private int distance;
-    @Getter
-    private Laser.LaserType type;
+    @Getter private Laser laser;
+    @Getter private Location start;
+    @Getter private Location end;
+    @Getter private int duration;
+    @Getter private int distance;
+    @Getter private Laser.LaserType type;
     
     
     public LaserWrapper(Location start, Location end, int duration, int distance, Laser.LaserType type) {
