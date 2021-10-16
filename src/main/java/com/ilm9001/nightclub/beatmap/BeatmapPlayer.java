@@ -1,5 +1,6 @@
 package com.ilm9001.nightclub.beatmap;
 
+import com.ilm9001.nightclub.Nightclub;
 import com.ilm9001.nightclub.light.event.LightChannel;
 import com.ilm9001.nightclub.light.event.LightEventHandler;
 import org.bukkit.entity.Player;
@@ -7,38 +8,67 @@ import org.bukkit.entity.Player;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class BeatmapPlayer {
     private final List<LightEvent> events;
     private final InfoData info;
     private final List<TimerTask> tasks;
     private final String name;
+    private final Runnable run;
+    private final ScheduledExecutorService executorService;
     
     public BeatmapPlayer(String name) {
         info = BeatmapParser.getInfoData(name);
         events = BeatmapParser.getEvents(name);
         this.name = name;
         tasks = new ArrayList<>();
+        executorService = Executors.newScheduledThreadPool(1);
+        run = () -> {
+            try {
+                long t_start = System.currentTimeMillis();
+                long tStats = t_start;
+                long countSlow = 0;
+                for (LightEvent event : events) {
+                    long currentTime = System.currentTimeMillis();
+                    if (currentTime - tStats > 5000) {
+                        Nightclub.getInstance().getLogger().info("slow events: " + countSlow);
+                        countSlow = 0;
+                        tStats = currentTime;
+                    }
+                    long from_start = currentTime - t_start;
+                    long delay = event.getTime() - 1 - from_start;
+                    if (delay < 0) {
+                        // Negative delay, we are late!
+                    } else if (delay > 1) {
+                        // Now sleeping for "delay" milliseconds for exact timing of event
+                        try {
+                            Thread.sleep(delay);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    // fire the event, after possible delay
+                    long t1 = System.currentTimeMillis();
+                    handle(event);
+                    long t2 = System.currentTimeMillis();
+                    if (t2 - t1 > 1) {
+                        ++countSlow;
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        };
     }
     
     public void play(List<Player> playTo) {
-        Timer timer = new Timer();
-        
         playTo.forEach((player) -> player.playSound(player.getLocation(), name, 1, 1));
         
-        events.forEach((event) -> {
-            // i cant lambda this :(
-            TimerTask task = new TimerTask() {
-                @Override
-                public void run() {
-                    handle(event);
-                }
-            };
-            tasks.add(task);
-            timer.schedule(task, event.getTime());
-        });
+        executorService.schedule(run, 0, TimeUnit.MILLISECONDS);
     }
     
     public void stop() {

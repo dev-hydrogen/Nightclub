@@ -26,4 +26,9 @@ public class LightUniverseManager {
             e.printStackTrace();
         }
     }
+    
+    public void add(LightUniverse universe) {
+        universes.add(universe);
+        save();
+    }
 }
