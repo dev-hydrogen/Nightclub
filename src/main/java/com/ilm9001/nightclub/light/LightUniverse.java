@@ -2,7 +2,6 @@ package com.ilm9001.nightclub.light;
 
 import com.google.gson.InstanceCreator;
 import com.ilm9001.nightclub.Nightclub;
-import com.ilm9001.nightclub.util.Location;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -16,17 +15,18 @@ import java.util.UUID;
 
 @ToString
 public class LightUniverse {
-    @Getter private UUID uniqueID;
-    @Getter private int id;
+    @Getter private final UUID uniqueID;
+    @Getter private final int id;
     @Getter @Setter private String name;
     @Getter private final List<Light> lights;
+    @Getter @Setter World world;
     
     public LightUniverse() {
         // pain
         this(
                 new ArrayList<>(),
                 UUID.randomUUID(),
-                Nightclub.getJSONreader().getLastUniverse().getId()+1,
+                Nightclub.getJSONreader().getLastUniverse().getId() + 1,
                 "Unnamed-Universe",
                 Bukkit.getWorlds().get(0)
         );
@@ -36,7 +36,10 @@ public class LightUniverse {
         this.lights = lights;
         this.uniqueID = uniqueID;
         this.id = id;
-        if(name.equals("Unnamed-Universe")) { name+="-"+id;}
+        this.world = world;
+        if (name.equals("Unnamed-Universe")) {
+            name += "-" + id;
+        }
         this.name = name;
     }
     
@@ -52,7 +55,9 @@ public class LightUniverse {
         this.lights.add(light);
     }
     
-    public void removeLight(Light light) {this.lights.remove(light);}
+    public void removeLight(Light light) {
+        this.lights.remove(light);
+    }
     
     public void updateLight(Light light) {
     
@@ -60,7 +65,7 @@ public class LightUniverse {
     
     public static class LightUniverseInstanceCreator implements InstanceCreator<LightUniverse> {
         public LightUniverse createInstance(Type type) {
-            return new LightUniverse(new ArrayList<>(),UUID.randomUUID(),0,"LightUniverseInstanceCreator",Bukkit.getWorlds().get(0));
+            return new LightUniverse(new ArrayList<>(), UUID.randomUUID(), 0, "LightUniverseInstanceCreator", Bukkit.getWorlds().get(0));
         }
     }
 }

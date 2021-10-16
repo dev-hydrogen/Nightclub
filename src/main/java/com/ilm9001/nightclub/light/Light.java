@@ -96,6 +96,9 @@ public class Light {
                     timeToFade = 0;
                     length = 0.1;
                 }
+                if (length > 100) {
+                    length = 100.0;
+                }
                 x = (x + multipliedSpeed) % 100;
                 length %= 100;
                 for (int i = 0; i < lasers.size(); i++) {
@@ -109,7 +112,7 @@ public class Light {
                     if (v.getNorm() != 0) {
                         r = new Rotation(v, this.location.getRotation(), RotationConvention.VECTOR_OPERATOR);
                     }
-                    Vector3D v2 = this.pattern.getPattern().apply(v, x + (100.0 / lasers.size()) * i, r, this.patternSizeMultiplier);
+                    Vector3D v2 = this.pattern.getPattern().apply(v, x + (100.0 / lasers.size()) * i, r, this.patternSizeMultiplier * (length / 100));
                     Vector3D v3 = v.add(v2);
                     
                     if (flipStartAndEnd) {
@@ -149,24 +152,25 @@ public class Light {
     }
     
     public void on() {
+        lasers.forEach(LaserWrapper::start);
         isOn = true;
         length = onLength;
-        for (LaserWrapper lsr : lasers) {
-            lsr.start();
-        }
+        timeToFade = 0;
     }
     public void off() {
+        lasers.forEach(LaserWrapper::stop);
         isOn = false;
         length = 0.1;
-        for (LaserWrapper lsr : lasers) {
-            lsr.stop();
-        }
+        timeToFade = 0;
     }
     public void flash() {
         if (isOn) {
-            on();
-            length += onLength / 100.0 * 10;
-            timeToFade = 2;
+            if (length < onLength) {
+                length = onLength;
+            }
+            length += (100 - onLength) / 5;
+            timeToFade = 1;
+            lasers.forEach(LaserWrapper::changeColor);
         } else {
             flashOff();
         }
@@ -181,7 +185,13 @@ public class Light {
         channel.getHandler().addListener(this);
         this.channel = channel;
     }
+    public void setBaseSpeed(double speed) {
+        this.speed = speed;
+    }
     public void setSpeed(double multiplier) {
+        if (this.multipliedSpeed == speed * multiplier) {
+            x += 20;
+        } // laser "reset"
         this.multipliedSpeed = speed * multiplier;
     }
     

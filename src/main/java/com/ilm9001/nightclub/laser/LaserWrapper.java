@@ -11,32 +11,35 @@ public class LaserWrapper {
     @Getter private int duration;
     @Getter private int distance;
     @Getter private Laser.LaserType type;
+    private volatile boolean isStarted;
     
     
     public LaserWrapper(Location start, Location end, int duration, int distance, Laser.LaserType type) {
+        this.start = start;
+        this.end = end;
         try {
-            laser = type.create(start.getBukkitLocation(), end.getBukkitLocation(), duration, distance);
+            laser = type.create(this.start.getBukkitLocation(), this.end.getBukkitLocation(), duration, distance);
         } catch (ReflectiveOperationException e) {
             e.printStackTrace();
             return;
         }
-        this.start = start;
-        this.end = end;
         this.duration = duration;
         this.distance = distance;
         this.type = type;
     }
     
-    public void start() {
-        if (!laser.isStarted()) {
+    public synchronized void start() {
+        if (!isStarted) {
             laser.start(Nightclub.getInstance());
         }
+        isStarted = true;
     }
     
-    public void stop() {
-        if (laser.isStarted()) {
+    public synchronized void stop() {
+        if (isStarted) {
             laser.stop();
         }
+        isStarted = false;
     }
     
     public void setStart(Location start) {
@@ -54,6 +57,15 @@ public class LaserWrapper {
             laser.moveEnd(end.getBukkitLocation());
         } catch (ReflectiveOperationException e) {
             e.printStackTrace();
+        }
+    }
+    public void changeColor() {
+        if (type == Laser.LaserType.GUARDIAN) {
+            try {
+                ((Laser.GuardianLaser) laser).callColorChange();
+            } catch (ReflectiveOperationException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
