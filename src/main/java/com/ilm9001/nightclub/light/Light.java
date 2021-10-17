@@ -86,56 +86,51 @@ public class Light {
         }
         
         run = () -> {
-            try {
-                if (timeToFade > 0 && length > 0) {
-                    timeToFade--;
-                    length -= 100.0 / timeToFadeToBlack;
+            if (timeToFade > 0 && length > 0) {
+                timeToFade--;
+                length -= 100.0 / timeToFadeToBlack;
+            }
+            if (length <= 0) {
+                off();
+                timeToFade = 0;
+                length = 0.1;
+            }
+            if (length > 100) {
+                length = 100.0;
+            }
+            x = (x + multipliedSpeed) % 100;
+            length %= 100;
+            for (int i = 0; i < lasers.size(); i++) {
+                LaserWrapper laser = lasers.get(i);
+                /*
+                Here we make a ray the size of length from the location of this Light, then we add a 2d plane to it (which is where our pattern is) with a
+                x value that is seperated evenly for each laser.
+                 */
+                Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize().scalarMultiply(getMaxLengthPercent());
+                Rotation r = null;
+                if (v.getNorm() != 0) {
+                    r = new Rotation(v, this.location.getRotation(), RotationConvention.VECTOR_OPERATOR);
                 }
-                if (length <= 0) {
-                    off();
-                    timeToFade = 0;
-                    length = 0.1;
+                Vector3D v2 = this.pattern.getPattern().apply(v, x + (100.0 / lasers.size()) * i, r, this.patternSizeMultiplier * (length / 100));
+                Vector3D v3 = v.add(v2);
+                
+                if (flipStartAndEnd) {
+                    laser.setStart(this.location.clone().add(v3.getX(), v3.getZ(), v3.getY()));
+                } else {
+                    laser.setEnd(this.location.clone().add(v3.getX(), v3.getZ(), v3.getY()));
                 }
-                if (length > 100) {
-                    length = 100.0;
-                }
-                x = (x + multipliedSpeed) % 100;
-                length %= 100;
-                for (int i = 0; i < lasers.size(); i++) {
-                    LaserWrapper laser = lasers.get(i);
-                    /*
-                    Here we make a ray the size of length from the location of this Light, then we add a 2d plane to it (which is where our pattern is) with a
-                    x value that is seperated evenly for each laser.
-                     */
-                    Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize().scalarMultiply(getMaxLengthPercent());
-                    Rotation r = null;
-                    if (v.getNorm() != 0) {
-                        r = new Rotation(v, this.location.getRotation(), RotationConvention.VECTOR_OPERATOR);
-                    }
-                    Vector3D v2 = this.pattern.getPattern().apply(v, x + (100.0 / lasers.size()) * i, r, this.patternSizeMultiplier * (length / 100));
-                    Vector3D v3 = v.add(v2);
-                    
-                    if (flipStartAndEnd) {
-                        laser.setStart(this.location.clone().add(v3.getX(), v3.getZ(), v3.getY()));
-                    } else {
-                        laser.setEnd(this.location.clone().add(v3.getX(), v3.getZ(), v3.getY()));
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         };
-        thread = new Thread(run);
     }
     
     public void start() {
-        if (!thread.isAlive()) {
+        if (thread == null || !thread.isAlive()) {
             thread = new Thread(run);
-            executorService.scheduleAtFixedRate(thread, 1, DELAY, TimeUnit.MILLISECONDS);
+            executorService.scheduleAtFixedRate(thread, 0, DELAY, TimeUnit.MILLISECONDS);
         }
     }
     public void stop() {
-        if (thread.isAlive()) {
+        if (thread != null && thread.isAlive()) {
             thread.interrupt();
         }
     }
@@ -145,8 +140,14 @@ public class Light {
             lsr.stop();
         }
         lasers.clear();
+        Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize().scalarMultiply(maxLength * onLength / 100.0);
         for (int i = 0; i < lightCount; i++) {
-            LaserWrapper laser = new LaserWrapper(location, location, -1, 128, type.getType());
+            LaserWrapper laser;
+            if (flipStartAndEnd) {
+                laser = new LaserWrapper(location.clone().add(v.getX(), v.getZ(), v.getY()), location, -1, 128, type.getType());
+            } else {
+                laser = new LaserWrapper(location, location.clone().add(v.getX(), v.getZ(), v.getY()), -1, 128, type.getType());
+            }
             lasers.add(laser);
         }
     }
@@ -190,7 +191,7 @@ public class Light {
     }
     public void setSpeed(double multiplier) {
         if (this.multipliedSpeed == speed * multiplier) {
-            x += 20;
+            x += 12;
         } // laser "reset"
         this.multipliedSpeed = speed * multiplier;
     }

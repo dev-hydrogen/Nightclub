@@ -32,6 +32,6 @@ public class LightEventHandler {
         lights.forEach(Light::flashOff);
     }
     public void setSpeed(double multiplier) {
-        lights.forEach((l) -> l.setSpeed(multiplier));
+        lights.forEach(l -> l.setSpeed(multiplier));
     }
 }
