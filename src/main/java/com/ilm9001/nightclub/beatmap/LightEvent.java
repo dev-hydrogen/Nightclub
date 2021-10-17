@@ -11,6 +11,6 @@ public class LightEvent {
     public LightEvent(JsonObject event, double bpm) {
         this.type = event.get("_type").getAsInt();
         this.value = event.get("_value").getAsInt();
-        time = Math.round(event.get("_time").getAsInt() * 1000.0 * 60.0 / bpm);
+        time = Math.round(event.get("_time").getAsDouble() * 1000.0 * 1000.0 * 60.0 / bpm); // THIS IS MICROSECONDS!
     }
 }
