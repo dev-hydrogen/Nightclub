@@ -13,13 +13,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Stores a List of Lights which can be loaded or unloaded at will.
+ */
 @ToString
 public class LightUniverse {
     @Getter private final UUID uniqueID;
     @Getter private final int id;
     @Getter @Setter private String name;
     @Getter private final List<Light> lights;
-    @Getter @Setter World world;
+    @Getter @Setter private World world;
     
     public LightUniverse() {
         // pain
@@ -57,10 +60,6 @@ public class LightUniverse {
     
     public void removeLight(Light light) {
         this.lights.remove(light);
-    }
-    
-    public void updateLight(Light light) {
-    
     }
     
     public static class LightUniverseInstanceCreator implements InstanceCreator<LightUniverse> {

@@ -1,8 +1,10 @@
 package com.ilm9001.nightclub.laser;
 
 import com.ilm9001.nightclub.Nightclub;
+import com.ilm9001.nightclub.light.LightType;
 import com.ilm9001.nightclub.util.Location;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 public class LaserWrapper {
     @Getter private Laser laser;
@@ -14,18 +16,18 @@ public class LaserWrapper {
     private volatile boolean isStarted;
     
     
-    public LaserWrapper(Location start, Location end, int duration, int distance, Laser.LaserType type) {
+    public LaserWrapper(Location start, Location end, int duration, int distance, LightType type) {
         this.start = start;
         this.end = end;
         try {
-            laser = type.create(this.start.getBukkitLocation(), this.end.getBukkitLocation(), duration, distance);
+            laser = type.getType().create(this.start.getBukkitLocation(), this.end.getBukkitLocation(), duration, distance);
         } catch (ReflectiveOperationException e) {
             e.printStackTrace();
             return;
         }
         this.duration = duration;
         this.distance = distance;
-        this.type = type;
+        this.type = type.getType();
     }
     
     public synchronized void start() {
@@ -42,7 +44,7 @@ public class LaserWrapper {
         isStarted = false;
     }
     
-    public void setStart(Location start) {
+    public void setStart(@NotNull Location start) {
         this.start = start;
         try {
             laser.moveStart(start.getBukkitLocation());
@@ -51,7 +53,7 @@ public class LaserWrapper {
         }
     }
     
-    public void setEnd(Location end) {
+    public void setEnd(@NotNull Location end) {
         this.end = end;
         try {
             laser.moveEnd(end.getBukkitLocation());
@@ -60,12 +62,13 @@ public class LaserWrapper {
         }
     }
     public void changeColor() {
-        if (type == Laser.LaserType.GUARDIAN) {
-            try {
-                ((Laser.GuardianLaser) laser).callColorChange();
-            } catch (ReflectiveOperationException e) {
-                e.printStackTrace();
-            }
+        if (!(laser instanceof Laser.GuardianLaser)) {
+            return;
+        }
+        try {
+            ((Laser.GuardianLaser) laser).callColorChange();
+        } catch (ReflectiveOperationException e) {
+            e.printStackTrace();
         }
     }
 }

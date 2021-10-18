@@ -25,7 +25,7 @@ public class Light {
     @Getter private final UUID uniqueID;
     @Getter @Setter private String name;
     @Getter @Setter private Location location;
-    @Getter @Setter private LightPattern pattern;
+    @Getter private LightPattern pattern;
     @Getter @Setter private LightType type;
     @Getter private LightChannel channel;
     @Getter @Setter private double maxLength;
@@ -36,13 +36,12 @@ public class Light {
     @Getter @Setter private int lightCount;
     @Getter @Setter private boolean flipStartAndEnd; // flipped start and end makes downward pointing beams brighter, upward pointing beams less bright
     
-    @Builder.Default private final transient List<LaserWrapper> lasers = new ArrayList<>();
-    @Builder.Default private transient double length = 0; // 0 to 100, percentage of maxLength.
-    @Builder.Default private transient double x = 0; // 0 to 100, usually percentage of 360
-    @Builder.Default private transient boolean isOn = false;
-    @Builder.Default private transient double multipliedSpeed = speed; // speed, but when internally multiplied by events
-    
-    private transient int timeToFade; // internal fade off value
+    private final transient List<LaserWrapper> lasers = new ArrayList<>();
+    @Getter @Setter private transient double length = 0; // 0 to 100, percentage of maxLength.
+    @Getter @Setter private transient double x = 0; // 0 to 100, usually percentage of 360
+    private transient boolean isOn = false;
+    @Getter @Setter private transient double multipliedSpeed; // speed, but when internally multiplied by events
+    @Getter @Setter private transient int timeToFade; // internal fade off value
     private final transient Runnable run;
     private transient Thread thread;
     
@@ -86,117 +85,173 @@ public class Light {
         }
         
         run = () -> {
-            if (timeToFade > 0 && length > 0) {
-                timeToFade--;
-                length -= 100.0 / timeToFadeToBlack;
-            }
-            if (length <= 0) {
-                off();
-                timeToFade = 0;
-                length = 0.1;
-            }
-            if (length > 100) {
-                length = 100.0;
-            }
-            x = (x + multipliedSpeed) % 100;
-            length %= 100;
-            for (int i = 0; i < lasers.size(); i++) {
-                LaserWrapper laser = lasers.get(i);
-                /*
-                Here we make a ray the size of length from the location of this Light, then we add a 2d plane to it (which is where our pattern is) with a
-                x value that is seperated evenly for each laser.
-                 */
-                Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize().scalarMultiply(getMaxLengthPercent());
-                Rotation r = null;
-                if (v.getNorm() != 0) {
-                    r = new Rotation(v, this.location.getRotation(), RotationConvention.VECTOR_OPERATOR);
+            try {
+                if (timeToFade > 0 && length > 0) {
+                    timeToFade--;
+                    length -= 100.0 / timeToFadeToBlack;
                 }
-                Vector3D v2 = this.pattern.getPattern().apply(v, x + (100.0 / lasers.size()) * i, r, this.patternSizeMultiplier * (length / 100));
-                Vector3D v3 = v.add(v2);
-                
-                if (flipStartAndEnd) {
-                    laser.setStart(this.location.clone().add(v3.getX(), v3.getZ(), v3.getY()));
-                } else {
-                    laser.setEnd(this.location.clone().add(v3.getX(), v3.getZ(), v3.getY()));
+                if (length <= 0) {
+                    off();
+                    timeToFade = 0;
+                    length = 0.1;
                 }
+                if (length > 100) {
+                    length = 100.0;
+                }
+                x = (x + multipliedSpeed) % 100;
+                length %= 100;
+                for (int i = 0; i < lasers.size(); i++) {
+                    LaserWrapper laser = lasers.get(i);
+                    /*
+                    Here we make a ray the size of length from the location of this Light, then we add a 2d plane to it (which is where our pattern is) with a
+                    x value that is seperated evenly for each laser.
+                     */
+                    Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize().scalarMultiply(getMaxLengthPercent());
+                    Rotation r = null;
+                    if (v.getNorm() != 0) {
+                        r = new Rotation(v, this.location.getRotation(), RotationConvention.VECTOR_OPERATOR);
+                    }
+                    Vector3D v2 = this.pattern.getPattern().apply(v, x + (100.0 / lasers.size()) * i, r, this.patternSizeMultiplier * (length / 100));
+                    Vector3D v3 = v.add(v2);
+                    
+                    if (flipStartAndEnd) {
+                        laser.setStart(this.location.clone().add(v3.getX(), v3.getZ(), v3.getY()));
+                    } else {
+                        laser.setEnd(this.location.clone().add(v3.getX(), v3.getZ(), v3.getY()));
+                    }
+                }
+            } catch (Exception e) {
+                // do nothing
             }
         };
     }
-    
+    /**
+     * Starts the movement runnable of this Light. This Light will be completely stationary if it is not started before being turned on.
+     */
     public void start() {
         if (thread == null || !thread.isAlive()) {
             thread = new Thread(run);
-            executorService.scheduleAtFixedRate(thread, 0, DELAY, TimeUnit.MILLISECONDS);
+            executorService.scheduleAtFixedRate(thread, 1, DELAY, TimeUnit.MILLISECONDS);
         }
     }
+    /**
+     * Stops (interrupts) the movement runnable of this Light.
+     */
     public void stop() {
         if (thread != null && thread.isAlive()) {
             thread.interrupt();
         }
     }
     
+    /**
+     * Stops all current LaserWrapper's and (re-)builds them. Use when changing pattern, pitch, yaw, location, LightType, lightCount.
+     * If you want to turn them back on, call start() and on()
+     */
     public void buildLasers() {
         for (LaserWrapper lsr : lasers) {
             lsr.stop();
         }
         lasers.clear();
-        Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize().scalarMultiply(maxLength * onLength / 100.0);
         for (int i = 0; i < lightCount; i++) {
             LaserWrapper laser;
+            Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize().scalarMultiply(maxLength * onLength / 100.0);
+            Rotation r = null;
+            if (v.getNorm() != 0) {
+                r = new Rotation(v, this.location.getRotation(), RotationConvention.VECTOR_OPERATOR);
+            }
+            Vector3D v2 = this.pattern.getPattern().apply(v, x + (100.0 / lightCount) * i, r, this.patternSizeMultiplier * (onLength / 130));
+            Vector3D v3 = v.add(v2);
             if (flipStartAndEnd) {
-                laser = new LaserWrapper(location.clone().add(v.getX(), v.getZ(), v.getY()), location, -1, 128, type.getType());
+                laser = new LaserWrapper(location.clone().add(v3.getX(), v3.getZ(), v3.getY()), location, -1, 256, type);
             } else {
-                laser = new LaserWrapper(location, location.clone().add(v.getX(), v.getZ(), v.getY()), -1, 128, type.getType());
+                laser = new LaserWrapper(location, location.clone().add(v3.getX(), v3.getZ(), v3.getY()), -1, 256, type);
             }
             lasers.add(laser);
         }
     }
-    
+    /**
+     * Turns Light on, sets length to onLength and sets timeToFade to 0
+     */
     public void on() {
         lasers.forEach(LaserWrapper::start);
+        if (!isOn) {
+            x = 0;
+        }
         isOn = true;
         length = onLength;
         timeToFade = 0;
     }
+    /**
+     * Turns Light off, sets length to 0.1 and sets timeToFade to 0
+     */
     public void off() {
         lasers.forEach(LaserWrapper::stop);
         isOn = false;
         length = 0.1;
         timeToFade = 0;
     }
+    /**
+     * Flashes light in a similar way to beat saber, simulating brightness with a longer beam
+     */
     public void flash() {
         if (isOn) {
             if (length < onLength) {
                 length = onLength;
             }
             length += (100 - onLength) / 5;
-            timeToFade = 1;
+            timeToFade += 1;
             lasers.forEach(LaserWrapper::changeColor);
         } else {
             flashOff();
         }
     }
+    /**
+     * Flashes light in a similar way to beat saber, simulating brightness with a longer beam and then fades to black
+     */
     public void flashOff() {
         on();
         timeToFade = timeToFadeToBlack;
     }
-    
+    /**
+     * Set which LightChannel this Light should be listening to.
+     *
+     * @param channel LightChannel to listen to
+     */
     public void setChannel(LightChannel channel) {
         this.channel.getHandler().removeListener(this);
         channel.getHandler().addListener(this);
         this.channel = channel;
     }
+    /**
+     * Set speed before it is internally multiplied by LightEvents.
+     *
+     * @param speed Base Speed before multiplier
+     */
     public void setBaseSpeed(double speed) {
         this.speed = speed;
     }
+    /**
+     * Set speed with LightEvent-specified multiplier
+     */
     public void setSpeed(double multiplier) {
         if (this.multipliedSpeed == speed * multiplier) {
-            x += 12;
+            x = (x + 12) % 100;
         } // laser "reset"
         this.multipliedSpeed = speed * multiplier;
     }
     
     private double getMaxLengthPercent() {
         return maxLength * length / 100.0;
+    }
+    /**
+     * Set new LightPattern to use
+     *
+     * @param pattern LightPattern to use
+     */
+    public void setPattern(LightPattern pattern) {
+        if (pattern != this.pattern) {
+            this.pattern = pattern;
+            buildLasers();
+        }
     }
 }

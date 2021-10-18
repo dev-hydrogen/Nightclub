@@ -5,6 +5,10 @@ import org.bukkit.Bukkit;
 
 // yet another preparation for minestom support, not much reason to use otherwise, but this does also translate
 // MINECRAFTS stupid FUCKING pitch AND yaw systems that DO NOT MAKE ANY SENSE!!!!
+
+/**
+ * A kind of Wrapper class for Minecrafts Location class which has non-standard pitch and yaw
+ */
 @Data
 public class Location implements Cloneable {
     private double x;

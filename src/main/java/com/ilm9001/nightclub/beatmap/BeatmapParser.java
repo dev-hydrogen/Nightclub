@@ -14,7 +14,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BeatmapParser {
-    
+    /**
+     * Get the info.dat file information (bpm, artist, song name, level author)
+     *
+     * @param name Name of the folder the info.dat file is in
+     * @return InfoData which includes bpm, artist, song name and the beatmaps author.
+     * Returns null if no info.dat file can be found.
+     * The info.dat file should be spelled exactly "info.dat" with no uppercase letters.
+     */
     public static @Nullable InfoData getInfoData(String name) {
         File dataFolder = Nightclub.DATA_FOLDER;
         String infoFile = dataFolder + "/" + name + "/info.dat";
@@ -37,7 +44,12 @@ public class BeatmapParser {
                 .mapper(info.get("_levelAuthorName").getAsString())
                 .build();
     }
-    
+    /**
+     * Get a List of LightEvent's from the folder & filename specified
+     *
+     * @param name Folder & File name (/name/name.dat/) of the beatmap
+     * @return List of LightEvent's in the beatmap file.
+     */
     public static @NotNull List<LightEvent> getEvents(String name) {
         File dataFolder = Nightclub.DATA_FOLDER;
         String beatMapFile = dataFolder + "/" + name + "/" + name + ".dat";

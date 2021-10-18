@@ -26,8 +26,13 @@ public class BeatmapPlayer {
         this.name = name;
         playTo = new ArrayList<>();
     }
-    
-    public void play(List<Player> playTo) {
+    /**
+     * Play the Beatmap defined in the constructor.
+     *
+     * @param playTo List of Players that should hear the music, lasers will still be shown normally to anyone in range.
+     * @return Info of the beatmap file, for example if you wanted to broadcast the song name to all players.
+     */
+    public InfoData play(List<Player> playTo) {
         executorService = Executors.newScheduledThreadPool(1);
         playTo.forEach((player) -> player.playSound(player.getLocation(), name, 1, 1));
         this.playTo = playTo;
@@ -38,15 +43,21 @@ public class BeatmapPlayer {
             };
             executorService.schedule(task, event.getTime(), TimeUnit.MICROSECONDS);
         });
+        return info;
     }
-    
+    /**
+     * Stops execution of this BeatmapPlayer and stops sound for all players that music is being played to.
+     */
     public void stop() {
         if (executorService != null) {
             executorService.shutdownNow();
         }
         playTo.forEach(player -> player.stopSound(name));
     }
-    
+    /**
+     * https://bsmg.wiki/mapping/map-format.html
+     * Internal handler of LightEvents.
+     */
     private void handle(LightEvent event) {
         Color color;
         if (event.getValue() < 4 && event.getValue() != 0) {
@@ -64,22 +75,22 @@ public class BeatmapPlayer {
         } else switch (event.getType()) {
             // Ring spin
             case 8 -> this.getClass();
-            //toggle zoom
+            // Toggle ring zoom
             case 9 -> this.getClass();
             
-            //rotation speed multiplier for left lasers
+            // Rotation speed multiplier for left lasers
             case 12 -> LightChannel.LEFT_ROTATING_LASERS.getHandler().setSpeed(event.getValue());
-            //rotation speed multiplier for right lasers
+            // Rotation speed multiplier for right lasers
             case 13 -> LightChannel.RIGHT_ROTATING_LASERS.getHandler().setSpeed(event.getValue());
         }
     }
     
     private void handleValue(LightEventHandler handler, int value, Color color) {
         switch (value) {
-            case 0 -> handler.off(color.getRGB());
-            case 1, 5 -> handler.on(color.getRGB());
-            case 2, 6 -> handler.flash(color.getRGB());
-            case 3, 7 -> handler.flashOff(color.getRGB());
+            case 0 -> handler.off(color);
+            case 1, 5 -> handler.on(color);
+            case 2, 6 -> handler.flash(color);
+            case 3, 7 -> handler.flashOff(color);
         }
     }
 }
