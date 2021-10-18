@@ -2,6 +2,7 @@ package com.ilm9001.nightclub.light.event;
 
 import com.ilm9001.nightclub.light.Light;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,16 +20,16 @@ public class LightEventHandler {
         lights.remove(light);
     }
     
-    public void on(int color) {
+    public void on(Color color) {
         lights.forEach(Light::on);
     }
-    public void off(int color) {
+    public void off(Color color) {
         lights.forEach(Light::off);
     }
-    public void flash(int color) {
+    public void flash(Color color) {
         lights.forEach(Light::flash);
     }
-    public void flashOff(int color) {
+    public void flashOff(Color color) {
         lights.forEach(Light::flashOff);
     }
     public void setSpeed(double multiplier) {

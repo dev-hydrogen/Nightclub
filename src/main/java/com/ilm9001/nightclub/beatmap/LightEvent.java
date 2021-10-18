@@ -3,6 +3,10 @@ package com.ilm9001.nightclub.beatmap;
 import com.google.gson.JsonObject;
 import lombok.Getter;
 
+/**
+ * A singular Light Event from a parsed beatmap file.
+ * https://bsmg.wiki/mapping/map-format.html
+ */
 public class LightEvent {
     @Getter private final Integer type;
     @Getter private final Integer value;
