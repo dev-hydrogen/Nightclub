@@ -35,7 +35,7 @@ public class Light {
     @Getter @Setter private int timeToFadeToBlack; // x * 100 ms
     @Getter private int lightCount;
     @Getter private boolean flipStartAndEnd; // flipped start and end makes downward pointing beams brighter, upward pointing beams less bright
-    @Getter private double rotation;
+    @Getter private double rotation; // in radians
     
     private final transient List<LaserWrapper> lasers = new ArrayList<>();
     @Getter @Setter private transient double length = 0; // 0 to 100, percentage of maxLength.
@@ -108,7 +108,7 @@ public class Light {
                     x value that is seperated evenly for each laser.
                      */
                     Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize().scalarMultiply(getMaxLengthPercent());
-                    Rotation r = new Rotation(v, Math.toRadians(this.rotation), RotationConvention.FRAME_TRANSFORM);
+                    Rotation r = new Rotation(v, this.rotation, RotationConvention.FRAME_TRANSFORM);
                     Vector3D v2 = this.pattern.getPattern().apply(v, x + (100.0 / lasers.size()) * i, r, this.patternSizeMultiplier * (length / 100));
                     Vector3D v3 = v.add(v2);
                     
