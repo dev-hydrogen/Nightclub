@@ -12,19 +12,27 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class BeatmapParser {
     /**
-     * Get the info.dat file information (bpm, artist, song name, level author)
+     * Get the info.dat file information (bpm, artist, song folder, level author)
      *
-     * @param name Name of the folder the info.dat file is in, should be spelled exactly as is on file, usually without uppercase letters.
-     * @return InfoData which includes bpm, artist, song name and the beatmaps author.
+     * @param folder Name of the folder the info.dat file is in, may be case-sensitive on certain filesystems.
+     * @return InfoData which includes bpm, artist, song folder and the beatmaps author.
      * Returns null if no info.dat file can be found.
      */
-    public static @Nullable InfoData getInfoData(String name) {
+    public static @Nullable InfoData getInfoData(String folder) {
         File dataFolder = Nightclub.DATA_FOLDER;
-        String infoFile = dataFolder + "/" + name + "/info.dat";
+        File infoFolder = new File(dataFolder + "/" + folder);
+        @SuppressWarnings("ConstantConditions") // compiler warns about "infoFolder.listFiles() might be null". please tell me how.
+        File infoFile = infoFolder.isDirectory() && infoFolder.listFiles() != null ? Arrays.stream(infoFolder.listFiles())
+                .filter(file -> file.getName().equalsIgnoreCase("info.dat"))
+                .findFirst().orElse(null) : null;
+        if (infoFile == null || !infoFile.isFile() || infoFile.isDirectory()) {
+            return null;
+        }
         JsonObject info;
         JsonArray difficultyBeatmapSets;
         String filename = "";
