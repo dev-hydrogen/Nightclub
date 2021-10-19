@@ -100,7 +100,7 @@ public class Light {
                     length = 100.0;
                 }
                 x = (x + multipliedSpeed) % 100;
-                length %= 100;
+                
                 for (int i = 0; i < lasers.size(); i++) {
                     LaserWrapper laser = lasers.get(i);
                     /*
