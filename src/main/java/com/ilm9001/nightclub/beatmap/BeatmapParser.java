@@ -52,8 +52,8 @@ public class BeatmapParser {
             String characteristic = ((JsonObject) element).get("_beatmapCharacteristicName").getAsString();
             JsonArray difficultyBeatmaps = ((JsonObject) element).get("_difficultyBeatmaps").getAsJsonArray();
             filename = difficultyBeatmaps.get(difficultyBeatmaps.size() - 1).getAsJsonObject().get("_beatmapFilename").getAsString();
-            Nightclub.getInstance().getLogger().info("Beatmap filename " + filename);
-            if (characteristic.contains("Lightshow")) {
+            
+            if (characteristic.contains("Lightshow") || characteristic.contains("Standard")) {
                 break;
             }
         }
@@ -83,7 +83,6 @@ public class BeatmapParser {
         }
         File beatMapFile = new File(dataFolder + "/" + name + "/" + info.getBeatmapFileName());
         double bpm = info.getBeatsPerMinute().doubleValue();
-        Nightclub.getInstance().getLogger().info("Beatmap filename and path " + beatMapFile);
         if (!beatMapFile.isFile()) {
             // compatability with older versions where you had to make sure your difficulty file was spelled exactly the same as the folder it was in
             beatMapFile = new File(dataFolder + "/" + name + "/" + name + ".dat");
