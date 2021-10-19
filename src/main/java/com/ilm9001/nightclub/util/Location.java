@@ -43,7 +43,7 @@ public class Location implements Cloneable {
     }
     
     public org.bukkit.Location getBukkitLocation() {
-        return new org.bukkit.Location(Bukkit.getWorlds().get(0), x, y, z, (float) -pitch, (float) yaw + 90 % 360);
+        return new org.bukkit.Location(Bukkit.getWorlds().get(0), x, y, z, (float) -pitch, (float) yaw + 270);
         //TODO: fix hardcoded world
     }
     

@@ -24,17 +24,18 @@ public class Light {
     // annotations lol
     @Getter private final UUID uniqueID;
     @Getter @Setter private String name;
-    @Getter @Setter private Location location;
+    @Getter private Location location;
     @Getter private LightPattern pattern;
-    @Getter @Setter private LightType type;
+    @Getter private LightType type;
     @Getter private LightChannel channel;
-    @Getter @Setter private double maxLength;
+    @Getter private double maxLength;
     @Getter @Setter private double onLength; // 0 to 100, percentage of maxLength
     @Getter private double speed;
-    @Getter @Setter private double patternSizeMultiplier;
+    @Getter private double patternSizeMultiplier;
     @Getter @Setter private int timeToFadeToBlack; // x * 100 ms
-    @Getter @Setter private int lightCount;
-    @Getter @Setter private boolean flipStartAndEnd; // flipped start and end makes downward pointing beams brighter, upward pointing beams less bright
+    @Getter private int lightCount;
+    @Getter private boolean flipStartAndEnd; // flipped start and end makes downward pointing beams brighter, upward pointing beams less bright
+    @Getter private double rotation;
     
     private final transient List<LaserWrapper> lasers = new ArrayList<>();
     @Getter @Setter private transient double length = 0; // 0 to 100, percentage of maxLength.
@@ -88,7 +89,7 @@ public class Light {
             try {
                 if (timeToFade > 0 && length > 0) {
                     timeToFade--;
-                    length -= 100.0 / timeToFadeToBlack;
+                    length -= 100.0 / this.timeToFadeToBlack;
                 }
                 if (length <= 0) {
                     off();
@@ -107,14 +108,11 @@ public class Light {
                     x value that is seperated evenly for each laser.
                      */
                     Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize().scalarMultiply(getMaxLengthPercent());
-                    Rotation r = null;
-                    if (v.getNorm() != 0) {
-                        r = new Rotation(v, this.location.getRotation(), RotationConvention.VECTOR_OPERATOR);
-                    }
+                    Rotation r = new Rotation(v, Math.toRadians(this.rotation), RotationConvention.FRAME_TRANSFORM);
                     Vector3D v2 = this.pattern.getPattern().apply(v, x + (100.0 / lasers.size()) * i, r, this.patternSizeMultiplier * (length / 100));
                     Vector3D v3 = v.add(v2);
                     
-                    if (flipStartAndEnd) {
+                    if (this.flipStartAndEnd) {
                         laser.setStart(this.location.clone().add(v3.getX(), v3.getZ(), v3.getY()));
                     } else {
                         laser.setEnd(this.location.clone().add(v3.getX(), v3.getZ(), v3.getY()));
@@ -122,6 +120,7 @@ public class Light {
                 }
             } catch (Exception e) {
                 // do nothing
+                e.printStackTrace();
             }
         };
     }
@@ -145,21 +144,19 @@ public class Light {
     
     /**
      * Stops all current LaserWrapper's and (re-)builds them. Use when changing pattern, pitch, yaw, location, LightType, lightCount.
-     * If you want to turn them back on, call start() and on()
+     * If you want to turn them back on, call on()
      */
     public void buildLasers() {
         for (LaserWrapper lsr : lasers) {
             lsr.stop();
         }
+        isOn = false;
         lasers.clear();
         for (int i = 0; i < lightCount; i++) {
             LaserWrapper laser;
             Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize().scalarMultiply(maxLength * onLength / 100.0);
-            Rotation r = null;
-            if (v.getNorm() != 0) {
-                r = new Rotation(v, this.location.getRotation(), RotationConvention.VECTOR_OPERATOR);
-            }
-            Vector3D v2 = this.pattern.getPattern().apply(v, x + (100.0 / lightCount) * i, r, this.patternSizeMultiplier * (onLength / 130));
+            Rotation r = new Rotation(v, this.rotation, RotationConvention.FRAME_TRANSFORM);
+            Vector3D v2 = this.pattern.getPattern().apply(v, 0 + (100.0 / lightCount) * i, r, this.patternSizeMultiplier * (onLength / 100));
             Vector3D v3 = v.add(v2);
             if (flipStartAndEnd) {
                 laser = new LaserWrapper(location.clone().add(v3.getX(), v3.getZ(), v3.getY()), location, -1, 256, type);
@@ -178,7 +175,9 @@ public class Light {
             x = 0;
         }
         isOn = true;
-        length = onLength;
+        if (length < onLength) {
+            length = onLength;
+        }
         timeToFade = 0;
     }
     /**
@@ -198,8 +197,8 @@ public class Light {
             if (length < onLength) {
                 length = onLength;
             }
-            length += (100 - onLength) / 5;
-            timeToFade += 1;
+            length += (100 - onLength) / 3;
+            timeToFade += 2;
             lasers.forEach(LaserWrapper::changeColor);
         } else {
             flashOff();
@@ -210,6 +209,7 @@ public class Light {
      */
     public void flashOff() {
         on();
+        flash();
         timeToFade = timeToFadeToBlack;
     }
     /**
@@ -253,5 +253,33 @@ public class Light {
             this.pattern = pattern;
             buildLasers();
         }
+    }
+    public void setMaxLength(double maxLength) {
+        this.maxLength = maxLength;
+        buildLasers();
+    }
+    public void setType(LightType type) {
+        this.type = type;
+        buildLasers();
+    }
+    public void setPatternSizeMultiplier(double patternSizeMultiplier) {
+        this.patternSizeMultiplier = patternSizeMultiplier;
+        buildLasers();
+    }
+    public void setLocation(Location location) {
+        this.location = location;
+        buildLasers();
+    }
+    public void setFlipStartAndEnd(boolean flipStartAndEnd) {
+        this.flipStartAndEnd = flipStartAndEnd;
+        buildLasers();
+    }
+    public void setLightCount(int lightCount) {
+        this.lightCount = lightCount;
+        buildLasers();
+    }
+    public void setRotation(double rotation) {
+        this.rotation = rotation;
+        buildLasers();
     }
 }
