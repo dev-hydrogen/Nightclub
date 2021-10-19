@@ -24,7 +24,7 @@ public class LightCommand extends BaseCommand {
     @Description("Build a new Light!")
     public static void onBuild(Player player, String[] args) {
         light = new Light(UUID.randomUUID(), "Unnamed-Light", Location.getFromBukkitLocation(player.getLocation().add(0, 1, 0)),
-                15, 70, 2, 3, 45, 5, true, LightPattern.CIRCLE,
+                15, 70, 2, 3, 45, 5, player.getLocation().getPitch() > -10, LightPattern.CIRCLE,
                 LightType.GUARDIAN_BEAM, LightChannel.CENTER_LIGHTS);
         light.start();
         light.on();
@@ -41,6 +41,7 @@ public class LightCommand extends BaseCommand {
         @CommandCompletion("@pattern")
         public static void onPattern(String[] args) {
             light.setPattern(LightPattern.valueOf(args[0]));
+            light.on();
         }
         
         @Subcommand("maxlength")
@@ -64,6 +65,7 @@ public class LightCommand extends BaseCommand {
         @Description("Alter the pattern size multiplier")
         public static void onModifyPatternMultiplier(String[] args) {
             light.setPatternSizeMultiplier(Util.parseNumber(args[0]).doubleValue());
+            light.on();
         }
         
         @Subcommand("speed")
@@ -78,7 +80,6 @@ public class LightCommand extends BaseCommand {
         @Description("Alter the amount of lights")
         public static void onModifyLightCount(String[] args) {
             light.setLightCount(Util.parseNumber(args[0]).intValue());
-            light.buildLasers();
             light.on();
         }
         
@@ -88,7 +89,6 @@ public class LightCommand extends BaseCommand {
         @CommandCompletion("@type")
         public static void onModifyType(String[] args) {
             light.setType(LightType.valueOf(args[0]));
-            light.buildLasers();
             light.on();
         }
         
@@ -96,7 +96,8 @@ public class LightCommand extends BaseCommand {
         @CommandAlias("r")
         @Description("Alter rotation")
         public static void onModifyRotation(String[] args) {
-            light.getLocation().setRotation(Util.parseNumber(args[0]).doubleValue());
+            light.setRotation(Math.toRadians(Util.parseNumber(args[0]).doubleValue()));
+            light.on();
         }
         
         @Subcommand("channel")
