@@ -5,8 +5,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.ilm9001.nightclub.commands.BeatmapCommand;
 import com.ilm9001.nightclub.commands.LightCommand;
+import com.ilm9001.nightclub.commands.LightUniverseCommand;
 import com.ilm9001.nightclub.json.LightJSONReader;
 import com.ilm9001.nightclub.json.LightJSONWriter;
+import com.ilm9001.nightclub.light.Light;
 import com.ilm9001.nightclub.light.LightType;
 import com.ilm9001.nightclub.light.LightUniverse;
 import com.ilm9001.nightclub.light.LightUniverseManager;
@@ -39,6 +41,7 @@ public final class Nightclub extends JavaPlugin {
                 .serializeNulls()
                 .setPrettyPrinting()
                 .registerTypeAdapter(LightUniverse.class, new LightUniverse.LightUniverseInstanceCreator())
+                .registerTypeAdapter(Light.class, new Light.LightUniverseInstanceCreator())
                 .create();
         
         instance = this;
@@ -84,9 +87,22 @@ public final class Nightclub extends JavaPlugin {
             }
             return strings;
         });
+        commandManager.getCommandCompletions().registerCompletion("universes", c -> {
+            Collection<LightUniverse> lightUniverses = getLightUniverseManager().getUniverses();
+            Collection<String> strings = new ArrayList<>();
+            lightUniverses.forEach(lu -> strings.add(lu.getName()));
+            return strings;
+        });
+        commandManager.getCommandCompletions().registerCompletion("lights", c -> {
+            Collection<Light> lights = getLightUniverseManager().getLoadedUniverse().getLights();
+            Collection<String> strings = new ArrayList<>();
+            lights.forEach(l -> strings.add(l.getName()));
+            return strings;
+        });
         
         commandManager.registerCommand(new LightCommand());
         commandManager.registerCommand(new BeatmapCommand());
+        commandManager.registerCommand(new LightUniverseCommand());
     }
     
     @Override

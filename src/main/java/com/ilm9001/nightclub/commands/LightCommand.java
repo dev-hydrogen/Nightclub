@@ -5,8 +5,11 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandCompletion;
 import co.aikar.commands.annotation.Description;
 import co.aikar.commands.annotation.Subcommand;
+import com.ilm9001.nightclub.Nightclub;
 import com.ilm9001.nightclub.light.Light;
 import com.ilm9001.nightclub.light.LightType;
+import com.ilm9001.nightclub.light.LightUniverse;
+import com.ilm9001.nightclub.light.LightUniverseManager;
 import com.ilm9001.nightclub.light.event.LightChannel;
 import com.ilm9001.nightclub.light.pattern.LightPattern;
 import com.ilm9001.nightclub.util.Location;
@@ -24,8 +27,48 @@ public class LightCommand extends BaseCommand {
     @Description("Build a new Light!")
     public static void onBuild(Player player, String[] args) {
         light = new Light(UUID.randomUUID(), "Unnamed-Light", Location.getFromBukkitLocation(player.getLocation().add(0, 1, 0)),
-                15, 70, 2, 3, 45, 5, player.getLocation().getPitch() > -10, LightPattern.CIRCLE,
+                15, 80, 0.3, 5, 45, 3, player.getLocation().getPitch() > -10, LightPattern.CIRCLE,
                 LightType.GUARDIAN_BEAM, LightChannel.CENTER_LIGHTS);
+        light.start();
+        light.on();
+        LightUniverseManager manager = Nightclub.getLightUniverseManager();
+        if (manager.getLoadedUniverse() != null) {
+            manager.getLoadedUniverse().addLight(light);
+            manager.save();
+        }
+    }
+    
+    @Subcommand("remove")
+    @CommandAlias("r")
+    @Description("Remove currently loaded Light")
+    public static void onRemove() {
+        LightUniverseManager manager = Nightclub.getLightUniverseManager();
+        if (manager.getLoadedUniverse() == null && light == null) {
+            return;
+        }
+        light.off();
+        light.stop();
+        light.getChannel().getHandler().removeListener(light);
+        manager.getLoadedUniverse().removeLight(light);
+        manager.save();
+        light = null;
+    }
+    
+    @Subcommand("load")
+    @CommandAlias("l")
+    @Description("Load a Light from currently loaded LightUniverse")
+    @CommandCompletion("@lights")
+    public static void onLoad(String[] args) {
+        LightUniverseManager manager = Nightclub.getLightUniverseManager();
+        LightUniverse universe = manager.getLoadedUniverse();
+        if (universe == null || args.length < 1) {
+            return;
+        }
+        Light nullableLight = universe.getLight(args[0]);
+        if (nullableLight == null) {
+            return;
+        }
+        light = nullableLight;
         light.start();
         light.on();
     }
@@ -35,11 +78,22 @@ public class LightCommand extends BaseCommand {
     @Description("Modify a Light's data")
     public class LightDataCommand extends BaseCommand {
         
+        @Subcommand("name")
+        @CommandAlias("n")
+        @Description("Alter Light Name")
+        public static void onNameChange(String[] args) {
+            if (args.length < 1) {
+                return;
+            }
+            light.setName(args[0]);
+        }
+        
         @Subcommand("pattern")
         @CommandAlias("p")
         @Description("Alter pattern")
         @CommandCompletion("@pattern")
         public static void onPattern(String[] args) {
+            if (light == null) return;
             light.setPattern(LightPattern.valueOf(args[0]));
             light.on();
         }
@@ -48,6 +102,7 @@ public class LightCommand extends BaseCommand {
         @CommandAlias("ml")
         @Description("Alter max length multiplier")
         public static void onMaxLength(String[] args) {
+            if (light == null) return;
             light.setMaxLength(Util.parseNumber(args[0]).doubleValue());
             light.on();
         }
@@ -56,6 +111,7 @@ public class LightCommand extends BaseCommand {
         @CommandAlias("ol")
         @Description("Alter the on length percentage")
         public static void onModifyOnLength(String[] args) {
+            if (light == null) return;
             light.setOnLength(Util.parseNumber(args[0]).doubleValue());
             light.on();
         }
@@ -64,6 +120,7 @@ public class LightCommand extends BaseCommand {
         @CommandAlias("pm")
         @Description("Alter the pattern size multiplier")
         public static void onModifyPatternMultiplier(String[] args) {
+            if (light == null) return;
             light.setPatternSizeMultiplier(Util.parseNumber(args[0]).doubleValue());
             light.on();
         }
@@ -72,6 +129,7 @@ public class LightCommand extends BaseCommand {
         @CommandAlias("s")
         @Description("Alter speed")
         public static void onModifySpeed(String[] args) {
+            if (light == null) return;
             light.setSpeed(Util.parseNumber(args[0]).doubleValue());
         }
         
@@ -79,6 +137,7 @@ public class LightCommand extends BaseCommand {
         @CommandAlias("lc")
         @Description("Alter the amount of lights")
         public static void onModifyLightCount(String[] args) {
+            if (light == null) return;
             light.setLightCount(Util.parseNumber(args[0]).intValue());
             light.on();
         }
@@ -88,6 +147,7 @@ public class LightCommand extends BaseCommand {
         @Description("Alter the Light's type")
         @CommandCompletion("@type")
         public static void onModifyType(String[] args) {
+            if (light == null) return;
             light.setType(LightType.valueOf(args[0]));
             light.on();
         }
@@ -96,6 +156,7 @@ public class LightCommand extends BaseCommand {
         @CommandAlias("r")
         @Description("Alter rotation")
         public static void onModifyRotation(String[] args) {
+            if (light == null) return;
             light.setRotation(Math.toRadians(Util.parseNumber(args[0]).doubleValue()));
             light.on();
         }
@@ -105,6 +166,7 @@ public class LightCommand extends BaseCommand {
         @Description("Change a Light's channel")
         @CommandCompletion("@channels")
         public static void onModifyChannel(String[] args) {
+            if (light == null) return;
             light.setChannel(LightChannel.valueOf(args[0]));
         }
     }
@@ -117,21 +179,25 @@ public class LightCommand extends BaseCommand {
         @Subcommand("on")
         @Description("Turn light on")
         public static void onTurnOn() {
+            if (light == null) return;
             light.on();
         }
         @Subcommand("off")
         @Description("Turn light off")
         public static void onTurnOff() {
+            if (light == null) return;
             light.off();
         }
         @Subcommand("flash")
         @Description("Flash light")
         public static void onFlash() {
+            if (light == null) return;
             light.flash();
         }
         @Subcommand("flashoff")
         @Description("Flash off light")
         public static void onFlashOff() {
+            if (light == null) return;
             light.flashOff();
         }
         

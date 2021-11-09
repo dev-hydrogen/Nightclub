@@ -5,8 +5,7 @@ import com.ilm9001.nightclub.Nightclub;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -22,7 +21,7 @@ public class LightUniverse {
     @Getter private final int id;
     @Getter @Setter private String name;
     @Getter private final List<Light> lights;
-    @Getter @Setter private World world;
+    @Getter private boolean isLoaded;
     
     public LightUniverse() {
         // pain
@@ -30,26 +29,48 @@ public class LightUniverse {
                 new ArrayList<>(),
                 UUID.randomUUID(),
                 Nightclub.getJSONreader().getLastUniverse().getId() + 1,
-                "Unnamed-Universe",
-                Bukkit.getWorlds().get(0)
+                "Unnamed-Universe"
         );
     }
     
-    public LightUniverse(List<Light> lights, UUID uniqueID, int id, String name, World world) {
+    public LightUniverse(List<Light> lights, UUID uniqueID, int id, String name) {
         this.lights = lights;
         this.uniqueID = uniqueID;
         this.id = id;
-        this.world = world;
         if (name.equals("Unnamed-Universe")) {
             name += "-" + id;
         }
         this.name = name;
     }
+    public void load() {
+        this.lights.forEach(light -> {
+            light.start();
+            light.load();
+            light.on();
+            Nightclub.getInstance().getLogger().info(light.toString());
+        });
+        isLoaded = true;
+        Nightclub.getInstance().getLogger().info(this.toString());
+    }
+    public void unload() {
+        this.lights.forEach(light -> {
+            light.unload();
+            light.stop();
+        });
+        isLoaded = false;
+    }
     
-    public Light getLight(UUID uuid) {
+    public @Nullable Light getLight(UUID uuid) {
         return lights
                 .stream()
                 .filter(light -> uuid.equals(light.getUniqueID()))
+                .findFirst()
+                .orElse(null);
+    }
+    public @Nullable Light getLight(String name) {
+        return lights
+                .stream()
+                .filter(light -> name.equals(light.getName()))
                 .findFirst()
                 .orElse(null);
     }
@@ -64,7 +85,7 @@ public class LightUniverse {
     
     public static class LightUniverseInstanceCreator implements InstanceCreator<LightUniverse> {
         public LightUniverse createInstance(Type type) {
-            return new LightUniverse(new ArrayList<>(), UUID.randomUUID(), 0, "LightUniverseInstanceCreator", Bukkit.getWorlds().get(0));
+            return new LightUniverse(new ArrayList<>(), UUID.randomUUID(), 0, "LightUniverseInstanceCreator");
         }
     }
 }

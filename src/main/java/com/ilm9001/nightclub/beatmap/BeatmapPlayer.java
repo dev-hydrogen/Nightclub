@@ -33,11 +33,13 @@ public class BeatmapPlayer {
      * @return Info of the beatmap file, for example if you wanted to broadcast the song name to all players.
      */
     public InfoData play(List<Player> playTo) {
+        for (LightChannel channel : LightChannel.values()) { // turn all lights off before starting
+            channel.getHandler().off(new Color(0x000000));
+        }
         executorService = Executors.newScheduledThreadPool(1);
         playTo.forEach((player) -> player.playSound(player.getLocation(), name, 1, 1));
         this.playTo = playTo;
         events.forEach((event) -> {
-            // i cant lambda this :(
             Runnable task = () -> {
                 handle(event);
             };

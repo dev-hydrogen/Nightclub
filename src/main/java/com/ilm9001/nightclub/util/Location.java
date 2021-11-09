@@ -18,6 +18,9 @@ public class Location implements Cloneable {
     private double yaw;
     private double rotation;
     
+    public Location() {
+        this(0, 0, 0, 0, 0, 0);
+    }
     public Location(Number x, Number y, Number z, Number pitch, Number yaw) {
         this(x, y, z, pitch, yaw, 0);
     }

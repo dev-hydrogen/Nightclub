@@ -2,6 +2,7 @@ package com.ilm9001.nightclub.light;
 
 import com.ilm9001.nightclub.Nightclub;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.List;
  */
 public class LightUniverseManager {
     @Getter private final List<LightUniverse> universes;
+    @Getter @Setter private LightUniverse loadedUniverse;
     
     /**
      * Adds all LightUniverses found from the LightJSONReader to memory
