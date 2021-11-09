@@ -3,7 +3,6 @@ package com.ilm9001.nightclub.json;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.ilm9001.nightclub.light.LightUniverse;
-import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,7 +32,7 @@ public class LightJSONReader {
             e.printStackTrace();
         }
         if (universes.isEmpty()) {
-            return new LightUniverse(new ArrayList<>(), UUID.randomUUID(), 0, "Unnamed-Universe", Bukkit.getWorlds().get(0));
+            return new LightUniverse(new ArrayList<>(), UUID.randomUUID(), 0, "Unnamed-Universe");
         }
         return universes.get(universes.size() - 1);
     }

@@ -1,5 +1,6 @@
 package com.ilm9001.nightclub.light;
 
+import com.google.gson.InstanceCreator;
 import com.ilm9001.nightclub.laser.LaserWrapper;
 import com.ilm9001.nightclub.light.event.LightChannel;
 import com.ilm9001.nightclub.light.pattern.LightPattern;
@@ -9,8 +10,10 @@ import org.apache.commons.math3.geometry.euclidean.threed.Rotation;
 import org.apache.commons.math3.geometry.euclidean.threed.RotationConvention;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -47,7 +50,7 @@ public class Light {
     private transient Thread thread;
     
     public Light(Location loc, LightPattern pattern, LightType type, LightChannel channel) {
-        this(loc, "Unnamed-Light", pattern, type, channel);
+        this(loc, "Unnamed-Light" + new Random().nextInt(), pattern, type, channel);
     }
     
     public Light(Location loc, String name, LightPattern pattern, LightType type, LightChannel channel) {
@@ -86,43 +89,49 @@ public class Light {
         }
         
         run = () -> {
-            try {
-                if (timeToFade > 0 && length > 0) {
-                    timeToFade--;
-                    length -= 100.0 / this.timeToFadeToBlack;
-                }
-                if (length <= 0) {
-                    off();
-                    timeToFade = 0;
-                    length = 0.1;
-                }
-                if (length > 100) {
-                    length = 100.0;
-                }
-                x = (x + multipliedSpeed) % 100;
+            if (timeToFade > 0 && length > 0) {
+                timeToFade--;
+                length -= 100.0 / this.timeToFadeToBlack;
+            }
+            if (length <= 0) {
+                off();
+                timeToFade = 0;
+                length = 0.1;
+            }
+            if (length > 100) {
+                length = 100.0;
+            }
+            x = (x + multipliedSpeed) % 100;
+            
+            for (int i = 0; i < lasers.size(); i++) {
+                LaserWrapper laser = lasers.get(i);
+                /*
+                Here we make a ray the size of length from the location of this Light, then we add a 2d plane to it (which is where our pattern is) with a
+                x value that is seperated evenly for each laser.
+                 */
+                Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize().scalarMultiply(getMaxLengthPercent());
+                Rotation r = new Rotation(v, this.rotation, RotationConvention.FRAME_TRANSFORM);
+                Vector3D v2 = this.pattern.getPattern().apply(v, x + (100.0 / lasers.size()) * i, r, this.patternSizeMultiplier * (length / 100));
+                Vector3D v3 = v.add(v2);
                 
-                for (int i = 0; i < lasers.size(); i++) {
-                    LaserWrapper laser = lasers.get(i);
-                    /*
-                    Here we make a ray the size of length from the location of this Light, then we add a 2d plane to it (which is where our pattern is) with a
-                    x value that is seperated evenly for each laser.
-                     */
-                    Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize().scalarMultiply(getMaxLengthPercent());
-                    Rotation r = new Rotation(v, this.rotation, RotationConvention.FRAME_TRANSFORM);
-                    Vector3D v2 = this.pattern.getPattern().apply(v, x + (100.0 / lasers.size()) * i, r, this.patternSizeMultiplier * (length / 100));
-                    Vector3D v3 = v.add(v2);
-                    
-                    if (this.flipStartAndEnd) {
-                        laser.setStart(this.location.clone().add(v3.getX(), v3.getZ(), v3.getY()));
-                    } else {
-                        laser.setEnd(this.location.clone().add(v3.getX(), v3.getZ(), v3.getY()));
-                    }
+                if (this.flipStartAndEnd) {
+                    laser.setStart(this.location.clone().add(v3.getX(), v3.getZ(), v3.getY()));
+                } else {
+                    laser.setEnd(this.location.clone().add(v3.getX(), v3.getZ(), v3.getY()));
                 }
-            } catch (Exception e) {
-                // do nothing
-                e.printStackTrace();
             }
         };
+    }
+    
+    public void load() {
+        this.channel.getHandler().removeListener(this);
+        this.channel.getHandler().addListener(this);
+        this.multipliedSpeed = speed;
+        buildLasers();
+    }
+    public void unload() {
+        this.channel.getHandler().removeListener(this);
+        off();
     }
     /**
      * Starts the movement runnable of this Light. This Light will be completely stationary if it is not started before being turned on.
@@ -198,7 +207,7 @@ public class Light {
                 length = onLength;
             }
             length += (100 - onLength) / 3;
-            timeToFade += 2;
+            timeToFade += 3;
             lasers.forEach(LaserWrapper::changeColor);
         } else {
             flashOff();
@@ -281,5 +290,10 @@ public class Light {
     public void setRotation(double rotation) {
         this.rotation = rotation;
         buildLasers();
+    }
+    public static class LightUniverseInstanceCreator implements InstanceCreator<Light> {
+        public Light createInstance(Type type) {
+            return new Light(new Location(0, 0, 0, 0, 0), LightPattern.STILL, LightType.GUARDIAN_BEAM, LightChannel.CENTER_LIGHTS);
+        }
     }
 }
