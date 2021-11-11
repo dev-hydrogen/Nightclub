@@ -3,6 +3,7 @@ package com.ilm9001.nightclub.light;
 import com.google.gson.InstanceCreator;
 import com.ilm9001.nightclub.laser.LaserWrapper;
 import com.ilm9001.nightclub.light.event.LightChannel;
+import com.ilm9001.nightclub.light.event.LightSpeedChannel;
 import com.ilm9001.nightclub.light.pattern.LightPattern;
 import com.ilm9001.nightclub.util.Location;
 import lombok.*;
@@ -31,6 +32,7 @@ public class Light {
     @Getter private LightPattern pattern;
     @Getter private LightType type;
     @Getter private LightChannel channel;
+    @Getter private LightSpeedChannel speedChannel;
     @Getter private double maxLength;
     @Getter @Setter private double onLength; // 0 to 100, percentage of maxLength
     @Getter private double speed;
@@ -38,7 +40,6 @@ public class Light {
     @Getter @Setter private int timeToFadeToBlack; // x * 100 ms
     @Getter private int lightCount;
     @Getter private boolean flipStartAndEnd; // flipped start and end makes downward pointing beams brighter, upward pointing beams less bright
-    @Getter private double rotation; // in radians
     
     private final transient List<LaserWrapper> lasers = new ArrayList<>();
     @Getter @Setter private transient double length = 0; // 0 to 100, percentage of maxLength.
@@ -58,12 +59,12 @@ public class Light {
     }
     
     public Light(Location loc, UUID uniqueID, String name, LightPattern pattern, LightType type, LightChannel channel) {
-        this(uniqueID, name, loc, 0, 0, 0, 0, 0, 0, false, pattern, type, channel);
+        this(uniqueID, name, loc, 0, 0, 0, 0, 0, 0, false, pattern, type, channel, LightSpeedChannel.DEFAULT);
     }
     
     @Builder
     public Light(UUID uuid, String name, Location location, double maxLength, double onLength, double speed, double patternSizeMultiplier, int timeToFadeToBlack, int lightCount,
-                 boolean flipStartAndEnd, LightPattern pattern, LightType type, LightChannel channel) {
+                 boolean flipStartAndEnd, LightPattern pattern, LightType type, LightChannel channel, LightSpeedChannel speedChannel) {
         this.uniqueID = uuid;
         this.name = name;
         this.location = location;
@@ -75,12 +76,11 @@ public class Light {
         this.pattern = pattern;
         this.type = type;
         this.channel = channel;
+        this.speedChannel = speedChannel;
         this.flipStartAndEnd = flipStartAndEnd;
         this.patternSizeMultiplier = patternSizeMultiplier;
-        this.multipliedSpeed = speed;
         
-        this.channel.getHandler().addListener(this);
-        buildLasers();
+        load();
         
         if (flipStartAndEnd) {
             lasers.forEach((laser) -> laser.setEnd(location));
@@ -110,7 +110,7 @@ public class Light {
                 x value that is seperated evenly for each laser.
                  */
                 Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize().scalarMultiply(getMaxLengthPercent());
-                Rotation r = new Rotation(v, this.rotation, RotationConvention.FRAME_TRANSFORM);
+                Rotation r = new Rotation(v, this.location.getRotation(), RotationConvention.FRAME_TRANSFORM);
                 Vector3D v2 = this.pattern.getPattern().apply(v, x + (100.0 / lasers.size()) * i, r, this.patternSizeMultiplier * (length / 100));
                 Vector3D v3 = v.add(v2);
                 
@@ -125,13 +125,17 @@ public class Light {
     
     public void load() {
         this.channel.getHandler().removeListener(this);
+        this.speedChannel.getChannel().getHandler().removeSpeedListener(this);
         this.channel.getHandler().addListener(this);
+        this.speedChannel.getChannel().getHandler().addSpeedListener(this);
         this.multipliedSpeed = speed;
         buildLasers();
     }
     public void unload() {
         this.channel.getHandler().removeListener(this);
+        this.speedChannel.getChannel().getHandler().removeSpeedListener(this);
         off();
+        stop();
     }
     /**
      * Starts the movement runnable of this Light. This Light will be completely stationary if it is not started before being turned on.
@@ -164,7 +168,7 @@ public class Light {
         for (int i = 0; i < lightCount; i++) {
             LaserWrapper laser;
             Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize().scalarMultiply(maxLength * onLength / 100.0);
-            Rotation r = new Rotation(v, this.rotation, RotationConvention.FRAME_TRANSFORM);
+            Rotation r = new Rotation(v, this.location.getRotation(), RotationConvention.FRAME_TRANSFORM);
             Vector3D v2 = this.pattern.getPattern().apply(v, 0 + (100.0 / lightCount) * i, r, this.patternSizeMultiplier * (onLength / 100));
             Vector3D v3 = v.add(v2);
             if (flipStartAndEnd) {
@@ -231,6 +235,16 @@ public class Light {
         channel.getHandler().addListener(this);
         this.channel = channel;
     }
+    
+    /**
+     *
+     */
+    public void setSpeedChannel(LightSpeedChannel speedChannel) {
+        this.speedChannel.getChannel().getHandler().removeSpeedListener(this);
+        speedChannel.getChannel().getHandler().addSpeedListener(this);
+        this.speedChannel = speedChannel;
+    }
+    
     /**
      * Set speed before it is internally multiplied by LightEvents.
      *
@@ -288,7 +302,7 @@ public class Light {
         buildLasers();
     }
     public void setRotation(double rotation) {
-        this.rotation = rotation;
+        this.location.setRotation(rotation);
         buildLasers();
     }
     public static class LightUniverseInstanceCreator implements InstanceCreator<Light> {
