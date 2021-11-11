@@ -11,11 +11,13 @@ import com.ilm9001.nightclub.light.LightType;
 import com.ilm9001.nightclub.light.LightUniverse;
 import com.ilm9001.nightclub.light.LightUniverseManager;
 import com.ilm9001.nightclub.light.event.LightChannel;
+import com.ilm9001.nightclub.light.event.LightSpeedChannel;
 import com.ilm9001.nightclub.light.pattern.LightPattern;
 import com.ilm9001.nightclub.util.Location;
 import com.ilm9001.nightclub.util.Util;
 import org.bukkit.entity.Player;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @CommandAlias("light|li")
@@ -28,7 +30,7 @@ public class LightCommand extends BaseCommand {
     public static void onBuild(Player player, String[] args) {
         light = new Light(UUID.randomUUID(), "Unnamed-Light", Location.getFromBukkitLocation(player.getLocation().add(0, 1, 0)),
                 15, 80, 0.3, 5, 45, 3, player.getLocation().getPitch() > -10, LightPattern.CIRCLE,
-                LightType.GUARDIAN_BEAM, LightChannel.CENTER_LIGHTS);
+                LightType.GUARDIAN_BEAM, LightChannel.CENTER_LIGHTS, LightSpeedChannel.DEFAULT);
         light.start();
         light.on();
         LightUniverseManager manager = Nightclub.getLightUniverseManager();
@@ -84,6 +86,13 @@ public class LightCommand extends BaseCommand {
         public static void onNameChange(String[] args) {
             if (args.length < 1) {
                 return;
+            } else {
+                // check if lights name is already taken, if it is, return
+                for (Light light : Nightclub.getLightUniverseManager().getLoadedUniverse().getLights()) {
+                    if (Objects.equals(light.getName(), args[0])) {
+                        return;
+                    }
+                }
             }
             light.setName(args[0]);
         }

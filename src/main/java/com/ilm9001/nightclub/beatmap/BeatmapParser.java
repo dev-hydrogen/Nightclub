@@ -1,9 +1,6 @@
 package com.ilm9001.nightclub.beatmap;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import com.ilm9001.nightclub.Nightclub;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,6 +33,7 @@ public class BeatmapParser {
         JsonObject info;
         JsonArray difficultyBeatmapSets;
         String filename = "";
+        boolean isChroma = false;
         
         try {
             JsonParser parser = new JsonParser();
@@ -51,6 +49,16 @@ public class BeatmapParser {
         for (JsonElement element : difficultyBeatmapSets) {
             String characteristic = ((JsonObject) element).get("_beatmapCharacteristicName").getAsString();
             JsonArray difficultyBeatmaps = ((JsonObject) element).get("_difficultyBeatmaps").getAsJsonArray();
+            JsonObject customData = (JsonObject) difficultyBeatmaps.get(5);
+            JsonArray requirements;
+            if (customData != null) {
+                requirements = (JsonArray) customData.get("_requirements");
+                if (requirements != null) {
+                    isChroma = requirements.contains(new JsonPrimitive("Chroma"))
+                            || requirements.contains(new JsonPrimitive("Chroma Lighting Events"))
+                            || requirements.contains(new JsonPrimitive("Chroma Special Events"));
+                }
+            }
             filename = difficultyBeatmaps.get(difficultyBeatmaps.size() - 1).getAsJsonObject().get("_beatmapFilename").getAsString();
             
             if (characteristic.contains("Lightshow") || characteristic.contains("Standard")) {
@@ -65,6 +73,7 @@ public class BeatmapParser {
                 .mapper(info.get("_levelAuthorName").getAsString())
                 .songSubName(info.get("_songSubName").getAsString())
                 .beatmapFileName(filename)
+                .isChroma(isChroma)
                 .build();
     }
     /**
@@ -83,8 +92,9 @@ public class BeatmapParser {
         }
         File beatMapFile = new File(dataFolder + "/" + name + "/" + info.getBeatmapFileName());
         double bpm = info.getBeatsPerMinute().doubleValue();
+        boolean isChroma = info.isChroma();
         if (!beatMapFile.isFile()) {
-            // compatability with older versions where you had to make sure your difficulty file was spelled exactly the same as the folder it was in
+            // compatability with older versions of the plugin where you had to make sure your difficulty file was spelled exactly the same as the folder it was in
             beatMapFile = new File(dataFolder + "/" + name + "/" + name + ".dat");
             if (!beatMapFile.isFile()) {
                 return new ArrayList<>();
@@ -102,7 +112,7 @@ public class BeatmapParser {
             return events;
         }
         
-        eventObject.forEach(obj -> events.add(new LightEvent((JsonObject) obj, bpm)));
+        eventObject.forEach(obj -> events.add(new LightEvent((JsonObject) obj, bpm, isChroma)));
         
         return events;
     }

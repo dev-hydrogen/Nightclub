@@ -40,9 +40,7 @@ public class BeatmapPlayer {
         playTo.forEach((player) -> player.playSound(player.getLocation(), name, 1, 1));
         this.playTo = playTo;
         events.forEach((event) -> {
-            Runnable task = () -> {
-                handle(event);
-            };
+            Runnable task = () -> handle(event);
             executorService.schedule(task, event.getTime(), TimeUnit.MICROSECONDS);
         });
         return info;
@@ -61,19 +59,10 @@ public class BeatmapPlayer {
      * Internal handler of LightEvents.
      */
     private void handle(LightEvent event) {
-        Color color;
-        if (event.getValue() < 4 && event.getValue() != 0) {
-            color = new Color(0x0066ff);
-        } else if (event.getValue() > 4) {
-            color = new Color(0xff0066);
-        } else {
-            color = new Color(0x000000);
-        }
-        
         // shorter way of handling events than using a switch case
-        if (event.getType() >= 0 || event.getType() < 5) {
+        if (event.getType() >= 0 && event.getType() < 5) {
             Optional<LightChannel> channel = Arrays.stream(LightChannel.values()).filter((lc) -> event.getType() == lc.getType()).findFirst();
-            channel.ifPresent(lightChannel -> handleValue(lightChannel.getHandler(), event.getValue(), color));
+            channel.ifPresent(lightChannel -> handleValue(lightChannel.getHandler(), event.getValue(), event.getColor()));
         } else switch (event.getType()) {
             // Ring spin
             case 8 -> this.getClass();

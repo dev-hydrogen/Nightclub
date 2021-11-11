@@ -15,14 +15,16 @@ public class InfoData {
     @Getter private final String songSubName;
     @Getter private final String mapperName;
     @Getter private final String beatmapFileName;
+    @Getter private final boolean isChroma;
     
     @Builder
-    public InfoData(Number bpm, String author, String song, String songSubName, String mapper, String beatmapFileName) {
+    public InfoData(Number bpm, String author, String song, String songSubName, String mapper, String beatmapFileName, boolean isChroma) {
         this.beatsPerMinute = bpm;
         this.songAuthorName = author;
         this.songName = song;
         this.mapperName = mapper;
         this.songSubName = songSubName;
         this.beatmapFileName = beatmapFileName;
+        this.isChroma = isChroma;
     }
 }
