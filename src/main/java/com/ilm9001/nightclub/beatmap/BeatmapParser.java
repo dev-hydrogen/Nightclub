@@ -49,10 +49,11 @@ public class BeatmapParser {
         for (JsonElement element : difficultyBeatmapSets) {
             String characteristic = ((JsonObject) element).get("_beatmapCharacteristicName").getAsString();
             JsonArray difficultyBeatmaps = ((JsonObject) element).get("_difficultyBeatmaps").getAsJsonArray();
-            JsonObject customData = (JsonObject) difficultyBeatmaps.get(5);
+            JsonElement customData = difficultyBeatmaps.get(difficultyBeatmaps.size() - 1).getAsJsonObject().get("_customData");
             JsonArray requirements;
             if (customData != null) {
-                requirements = (JsonArray) customData.get("_requirements");
+                JsonObject customDataObject = customData.getAsJsonObject();
+                requirements = (JsonArray) customDataObject.get("_requirements");
                 if (requirements != null) {
                     isChroma = requirements.contains(new JsonPrimitive("Chroma"))
                             || requirements.contains(new JsonPrimitive("Chroma Lighting Events"))

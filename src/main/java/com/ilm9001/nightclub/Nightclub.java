@@ -13,14 +13,15 @@ import com.ilm9001.nightclub.light.LightType;
 import com.ilm9001.nightclub.light.LightUniverse;
 import com.ilm9001.nightclub.light.LightUniverseManager;
 import com.ilm9001.nightclub.light.event.LightChannel;
+import com.ilm9001.nightclub.light.event.LightSpeedChannel;
 import com.ilm9001.nightclub.light.pattern.LightPattern;
+import com.ilm9001.nightclub.util.Util;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.logging.Level;
 
@@ -61,24 +62,10 @@ public final class Nightclub extends JavaPlugin {
         
         commandManager = new PaperCommandManager(this);
         
-        commandManager.getCommandCompletions().registerCompletion("pattern", c -> {
-            Collection<LightPattern> collection = new ArrayList<>(Arrays.asList(LightPattern.values()));
-            Collection<String> strings = new ArrayList<>();
-            collection.forEach((pattern) -> strings.add(pattern.toString()));
-            return strings;
-        });
-        commandManager.getCommandCompletions().registerCompletion("type", c -> {
-            Collection<LightType> collection = new ArrayList<>(Arrays.asList(LightType.values()));
-            Collection<String> strings = new ArrayList<>();
-            collection.forEach((pattern) -> strings.add(pattern.toString()));
-            return strings;
-        });
-        commandManager.getCommandCompletions().registerCompletion("channels", c -> {
-            Collection<LightChannel> collection = new ArrayList<>(Arrays.asList(LightChannel.values()));
-            Collection<String> strings = new ArrayList<>();
-            collection.forEach((pattern) -> strings.add(pattern.toString()));
-            return strings;
-        });
+        commandManager.getCommandCompletions().registerCompletion("pattern", c -> Util.getStringValuesFromEnum(LightPattern.class));
+        commandManager.getCommandCompletions().registerCompletion("type", c -> Util.getStringValuesFromEnum(LightType.class));
+        commandManager.getCommandCompletions().registerCompletion("channels", c -> Util.getStringValuesFromEnum(LightChannel.class));
+        commandManager.getCommandCompletions().registerCompletion("speedchannels", c -> Util.getStringValuesFromEnum(LightSpeedChannel.class));
         commandManager.getCommandCompletions().registerCompletion("beatmaps", c -> {
             File[] directories = new File(getDataFolder().getAbsolutePath()).listFiles(File::isDirectory);
             Collection<String> strings = new ArrayList<>();

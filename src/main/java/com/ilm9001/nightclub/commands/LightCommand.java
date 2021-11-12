@@ -178,6 +178,22 @@ public class LightCommand extends BaseCommand {
             if (light == null) return;
             light.setChannel(LightChannel.valueOf(args[0]));
         }
+        @Subcommand("speedchannel")
+        @CommandAlias("sc")
+        @Description("Change a Light's speed channel")
+        @CommandCompletion("@speedchannels")
+        public static void onModifySpeedChannel(String[] args) {
+            if (light == null) return;
+            light.setSpeedChannel(LightSpeedChannel.valueOf(args[0]));
+        }
+        
+        @Subcommand("setlocation")
+        @CommandAlias("sl")
+        @Description("Set the lights location to your location, including pitch and yaw")
+        public static void onSetLocation(Player player, String[] args) {
+            if (light == null || player == null) return;
+            light.setLocation(Location.getFromBukkitLocation(player.getLocation().add(0, 1, 0)));
+        }
     }
     
     @Subcommand("control")

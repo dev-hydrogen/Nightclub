@@ -3,6 +3,7 @@ package com.ilm9001.nightclub.beatmap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import lombok.Getter;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 
@@ -15,14 +16,14 @@ public final class LightEvent {
     @Getter private final Integer value;
     @Getter private final Long time;
     @Getter private final Color color;
-    @Getter private final JsonObject customData;
+    @Getter @Nullable private final JsonObject customData;
     
     public LightEvent(JsonObject event, double bpm, boolean isChroma) {
         type = event.get("_type").getAsInt();
         value = event.get("_value").getAsInt();
         time = Math.round(event.get("_time").getAsDouble() * 1000.0 * 1000.0 * 60.0 / bpm); // THIS IS MICROSECONDS!
-        customData = event.get("_customData").getAsJsonObject();
-        if (isChroma) {
+        customData = (JsonObject) event.get("_customData");
+        if (isChroma && customData != null && customData.get("_color").getAsJsonArray() != null) {
             JsonArray color = customData.get("_color").getAsJsonArray();
             float r = color.get(0).getAsFloat();
             float g = color.get(1).getAsFloat();
