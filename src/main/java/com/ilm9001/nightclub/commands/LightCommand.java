@@ -49,9 +49,7 @@ public class LightCommand extends BaseCommand {
         if (manager.getLoadedUniverse() == null && light == null) {
             return;
         }
-        light.off();
-        light.stop();
-        light.getChannel().getHandler().removeListener(light);
+        light.unload();
         manager.getLoadedUniverse().removeLight(light);
         manager.save();
         light = null;

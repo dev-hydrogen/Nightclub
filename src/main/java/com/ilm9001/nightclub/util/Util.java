@@ -1,5 +1,6 @@
 package com.ilm9001.nightclub.util;
 
+import java.io.File;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -20,10 +21,14 @@ public class Util {
         }
     }
     
-    public static <T extends Enum<T>> Collection<String> getStringValuesFromEnum(Class<T> enumValues) {
-        Collection<T> collection = new ArrayList<>(Arrays.asList(enumValues.getEnumConstants()));
+    public static Collection<String> getStringValuesFromArray(Object[] objects) {
+        Collection<Object> collection = Arrays.asList(objects);
         Collection<String> strings = new ArrayList<>();
-        collection.forEach((pattern) -> strings.add(pattern.toString()));
+        if (objects instanceof File[]) {
+            collection.forEach((file) -> strings.add(((File) file).getName()));
+        } else {
+            collection.forEach((object) -> strings.add(object.toString()));
+        }
         return strings;
     }
 }

@@ -18,11 +18,10 @@ import com.ilm9001.nightclub.light.pattern.LightPattern;
 import com.ilm9001.nightclub.util.Util;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.logging.Level;
 
 public final class Nightclub extends JavaPlugin {
@@ -58,34 +57,20 @@ public final class Nightclub extends JavaPlugin {
             this.getServer().getPluginManager().disablePlugin(this);
         }
         
+        //register bstats
+        Metrics metrics = new Metrics(this, 12300);
+        
         lightUniverseManager = new LightUniverseManager();
         
         commandManager = new PaperCommandManager(this);
         
-        commandManager.getCommandCompletions().registerCompletion("pattern", c -> Util.getStringValuesFromEnum(LightPattern.class));
-        commandManager.getCommandCompletions().registerCompletion("type", c -> Util.getStringValuesFromEnum(LightType.class));
-        commandManager.getCommandCompletions().registerCompletion("channels", c -> Util.getStringValuesFromEnum(LightChannel.class));
-        commandManager.getCommandCompletions().registerCompletion("speedchannels", c -> Util.getStringValuesFromEnum(LightSpeedChannel.class));
-        commandManager.getCommandCompletions().registerCompletion("beatmaps", c -> {
-            File[] directories = new File(getDataFolder().getAbsolutePath()).listFiles(File::isDirectory);
-            Collection<String> strings = new ArrayList<>();
-            for (File f : directories) {
-                strings.add(f.getName());
-            }
-            return strings;
-        });
-        commandManager.getCommandCompletions().registerCompletion("universes", c -> {
-            Collection<LightUniverse> lightUniverses = getLightUniverseManager().getUniverses();
-            Collection<String> strings = new ArrayList<>();
-            lightUniverses.forEach(lu -> strings.add(lu.getName()));
-            return strings;
-        });
-        commandManager.getCommandCompletions().registerCompletion("lights", c -> {
-            Collection<Light> lights = getLightUniverseManager().getLoadedUniverse().getLights();
-            Collection<String> strings = new ArrayList<>();
-            lights.forEach(l -> strings.add(l.getName()));
-            return strings;
-        });
+        commandManager.getCommandCompletions().registerCompletion("pattern", c -> Util.getStringValuesFromArray(LightPattern.values()));
+        commandManager.getCommandCompletions().registerCompletion("type", c -> Util.getStringValuesFromArray(LightType.values()));
+        commandManager.getCommandCompletions().registerCompletion("channels", c -> Util.getStringValuesFromArray(LightChannel.values()));
+        commandManager.getCommandCompletions().registerCompletion("speedchannels", c -> Util.getStringValuesFromArray(LightSpeedChannel.values()));
+        commandManager.getCommandCompletions().registerCompletion("beatmaps", c -> Util.getStringValuesFromArray(new File(getDataFolder().getAbsolutePath()).listFiles(File::isDirectory)));
+        commandManager.getCommandCompletions().registerCompletion("universes", c -> Util.getStringValuesFromArray(getLightUniverseManager().getUniverses().toArray()));
+        commandManager.getCommandCompletions().registerCompletion("lights", c -> Util.getStringValuesFromArray(getLightUniverseManager().getLoadedUniverse().getLights().toArray()));
         
         commandManager.registerCommand(new LightCommand());
         commandManager.registerCommand(new BeatmapCommand());
