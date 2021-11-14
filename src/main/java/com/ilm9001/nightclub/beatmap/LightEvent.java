@@ -17,12 +17,14 @@ public final class LightEvent {
     @Getter private final Long time;
     @Getter private final Color color;
     @Getter @Nullable private final JsonObject customData;
+    @Getter private final boolean isChroma;
     
     public LightEvent(JsonObject event, double bpm, boolean isChroma) {
         type = event.get("_type").getAsInt();
         value = event.get("_value").getAsInt();
         time = Math.round(event.get("_time").getAsDouble() * 1000.0 * 1000.0 * 60.0 / bpm); // THIS IS MICROSECONDS!
         customData = (JsonObject) event.get("_customData");
+        this.isChroma = isChroma;
         if (isChroma && customData != null && customData.get("_color") != null) {
             JsonArray color = customData.get("_color").getAsJsonArray();
             float r = color.get(0).getAsFloat();

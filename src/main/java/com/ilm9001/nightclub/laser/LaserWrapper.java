@@ -47,7 +47,7 @@ public class LaserWrapper {
     public void setStart(@NotNull Location start) {
         this.start = start;
         try {
-            laser.moveStart(start.getBukkitLocation());
+            laser.moveStart(this.start.getBukkitLocation());
         } catch (ReflectiveOperationException e) {
             e.printStackTrace();
         }
@@ -56,7 +56,7 @@ public class LaserWrapper {
     public void setEnd(@NotNull Location end) {
         this.end = end;
         try {
-            laser.moveEnd(end.getBukkitLocation());
+            laser.moveEnd(this.end.getBukkitLocation());
         } catch (ReflectiveOperationException e) {
             e.printStackTrace();
         }

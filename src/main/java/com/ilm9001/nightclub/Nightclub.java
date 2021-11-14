@@ -1,5 +1,7 @@
 package com.ilm9001.nightclub;
 
+import co.aikar.commands.BukkitCommandCompletionContext;
+import co.aikar.commands.CommandCompletions;
 import co.aikar.commands.PaperCommandManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -15,7 +17,6 @@ import com.ilm9001.nightclub.light.LightUniverseManager;
 import com.ilm9001.nightclub.light.event.LightChannel;
 import com.ilm9001.nightclub.light.event.LightSpeedChannel;
 import com.ilm9001.nightclub.light.pattern.LightPattern;
-import com.ilm9001.nightclub.util.Util;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.bstats.bukkit.Metrics;
@@ -23,6 +24,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.util.logging.Level;
+
+import static com.ilm9001.nightclub.util.Util.*;
+
 
 public final class Nightclub extends JavaPlugin {
     public static final String JSON_FILE_NAME = "lights.json";
@@ -64,13 +68,14 @@ public final class Nightclub extends JavaPlugin {
         
         commandManager = new PaperCommandManager(this);
         
-        commandManager.getCommandCompletions().registerCompletion("pattern", c -> Util.getStringValuesFromArray(LightPattern.values()));
-        commandManager.getCommandCompletions().registerCompletion("type", c -> Util.getStringValuesFromArray(LightType.values()));
-        commandManager.getCommandCompletions().registerCompletion("channels", c -> Util.getStringValuesFromArray(LightChannel.values()));
-        commandManager.getCommandCompletions().registerCompletion("speedchannels", c -> Util.getStringValuesFromArray(LightSpeedChannel.values()));
-        commandManager.getCommandCompletions().registerCompletion("beatmaps", c -> Util.getStringValuesFromArray(new File(getDataFolder().getAbsolutePath()).listFiles(File::isDirectory)));
-        commandManager.getCommandCompletions().registerCompletion("universes", c -> Util.getStringValuesFromArray(getLightUniverseManager().getUniverses().toArray()));
-        commandManager.getCommandCompletions().registerCompletion("lights", c -> Util.getStringValuesFromArray(getLightUniverseManager().getLoadedUniverse().getLights().toArray()));
+        CommandCompletions<BukkitCommandCompletionContext> completions = commandManager.getCommandCompletions();
+        completions.registerCompletion("pattern", c -> getStringValuesFromArray(LightPattern.values()));
+        completions.registerCompletion("type", c -> getStringValuesFromArray(LightType.values()));
+        completions.registerCompletion("channels", c -> getStringValuesFromArray(LightChannel.values()));
+        completions.registerCompletion("speedchannels", c -> getStringValuesFromArray(LightSpeedChannel.values()));
+        completions.registerCompletion("beatmaps", c -> getStringValuesFromFiles(new File(getDataFolder().getAbsolutePath()).listFiles(File::isDirectory)));
+        completions.registerCompletion("universes", c -> getStringValuesFromLightUniverses(getLightUniverseManager().getUniverses()));
+        completions.registerCompletion("lights", c -> getStringValuesFromLights(getLightUniverseManager().getLoadedUniverse().getLights()));
         
         commandManager.registerCommand(new LightCommand());
         commandManager.registerCommand(new BeatmapCommand());

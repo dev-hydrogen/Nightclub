@@ -14,6 +14,7 @@ import com.ilm9001.nightclub.util.Location;
 import com.ilm9001.nightclub.util.Util;
 import org.bukkit.entity.Player;
 
+import java.awt.*;
 import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
@@ -23,21 +24,26 @@ import java.util.UUID;
 public class LightCommand extends BaseCommand {
     private static Light light;
     
+    public static boolean isUnloaded() {
+        return light == null || Nightclub.getLightUniverseManager().getLoadedUniverse() == null;
+    }
+    
     @Subcommand("build")
     @CommandAlias("b")
     @Description("Build a new Light!")
     @CommandPermission("nightclub.light")
     public static void onBuild(Player player, String[] args) {
+        LightUniverseManager manager = Nightclub.getLightUniverseManager();
+        if (manager.getLoadedUniverse() == null) {
+            return;
+        }
         light = new Light(UUID.randomUUID(), "Unnamed-Light" + new Random().nextInt(), Location.getFromBukkitLocation(player.getLocation().add(0, 1, 0)),
                 15, 80, 0.3, 5, 45, 3, player.getLocation().getPitch() > -10, LightPattern.CIRCLE,
                 LightType.GUARDIAN_BEAM, LightChannel.CENTER_LIGHTS, LightSpeedChannel.DEFAULT);
         light.start();
-        light.on();
-        LightUniverseManager manager = Nightclub.getLightUniverseManager();
-        if (manager.getLoadedUniverse() != null) {
-            manager.getLoadedUniverse().addLight(light);
-            manager.save();
-        }
+        light.on(new Color(0x0066ff));
+        manager.getLoadedUniverse().addLight(light);
+        manager.save();
     }
     
     @Subcommand("remove")
@@ -46,9 +52,7 @@ public class LightCommand extends BaseCommand {
     @CommandPermission("nightclub.light")
     public static void onRemove() {
         LightUniverseManager manager = Nightclub.getLightUniverseManager();
-        if (manager.getLoadedUniverse() == null && light == null) {
-            return;
-        }
+        if (isUnloaded()) return;
         light.unload();
         manager.getLoadedUniverse().removeLight(light);
         manager.save();
@@ -72,7 +76,7 @@ public class LightCommand extends BaseCommand {
         }
         light = nullableLight;
         light.start();
-        light.on();
+        light.on(new Color(0x0066ff));
     }
     
     @Subcommand("data")
@@ -86,7 +90,7 @@ public class LightCommand extends BaseCommand {
         @Description("Alter Light Name")
         @CommandPermission("nightclub.light")
         public static void onNameChange(String[] args) {
-            if (args.length < 1) {
+            if (args.length < 1 || isUnloaded()) {
                 return;
             } else {
                 // check if lights name is already taken, if it is, return
@@ -105,9 +109,9 @@ public class LightCommand extends BaseCommand {
         @CommandCompletion("@pattern")
         @CommandPermission("nightclub.light")
         public static void onPattern(String[] args) {
-            if (light == null) return;
+            if (isUnloaded()) return;
             light.setPattern(LightPattern.valueOf(args[0]));
-            light.on();
+            light.on(new Color(0x0066ff));
         }
         
         @Subcommand("maxlength")
@@ -115,9 +119,9 @@ public class LightCommand extends BaseCommand {
         @Description("Alter max length multiplier")
         @CommandPermission("nightclub.light")
         public static void onMaxLength(String[] args) {
-            if (light == null) return;
+            if (isUnloaded()) return;
             light.setMaxLength(Util.parseNumber(args[0]).doubleValue());
-            light.on();
+            light.on(new Color(0x0066ff));
         }
         
         @Subcommand("onlength")
@@ -125,9 +129,9 @@ public class LightCommand extends BaseCommand {
         @Description("Alter the on length percentage")
         @CommandPermission("nightclub.light")
         public static void onModifyOnLength(String[] args) {
-            if (light == null) return;
+            if (isUnloaded()) return;
             light.setOnLength(Util.parseNumber(args[0]).doubleValue());
-            light.on();
+            light.on(new Color(0x0066ff));
         }
         
         @Subcommand("patternmultiplier")
@@ -135,9 +139,9 @@ public class LightCommand extends BaseCommand {
         @Description("Alter the pattern size multiplier")
         @CommandPermission("nightclub.light")
         public static void onModifyPatternMultiplier(String[] args) {
-            if (light == null) return;
+            if (isUnloaded()) return;
             light.setPatternSizeMultiplier(Util.parseNumber(args[0]).doubleValue());
-            light.on();
+            light.on(new Color(0x0066ff));
         }
         
         @Subcommand("speed")
@@ -145,8 +149,8 @@ public class LightCommand extends BaseCommand {
         @Description("Alter speed")
         @CommandPermission("nightclub.light")
         public static void onModifySpeed(String[] args) {
-            if (light == null) return;
-            light.setSpeed(Util.parseNumber(args[0]).doubleValue());
+            if (isUnloaded()) return;
+            light.setBaseSpeed(Util.parseNumber(args[0]).doubleValue());
         }
         
         @Subcommand("lightcount")
@@ -154,9 +158,9 @@ public class LightCommand extends BaseCommand {
         @Description("Alter the amount of lights")
         @CommandPermission("nightclub.light")
         public static void onModifyLightCount(String[] args) {
-            if (light == null) return;
+            if (isUnloaded()) return;
             light.setLightCount(Util.parseNumber(args[0]).intValue());
-            light.on();
+            light.on(new Color(0x0066ff));
         }
         
         @Subcommand("type")
@@ -165,9 +169,9 @@ public class LightCommand extends BaseCommand {
         @CommandCompletion("@type")
         @CommandPermission("nightclub.light")
         public static void onModifyType(String[] args) {
-            if (light == null) return;
+            if (isUnloaded()) return;
             light.setType(LightType.valueOf(args[0]));
-            light.on();
+            light.on(new Color(0x0066ff));
         }
         
         @Subcommand("rotation")
@@ -175,9 +179,9 @@ public class LightCommand extends BaseCommand {
         @Description("Alter rotation")
         @CommandPermission("nightclub.light")
         public static void onModifyRotation(String[] args) {
-            if (light == null) return;
+            if (isUnloaded()) return;
             light.setRotation(Math.toRadians(Util.parseNumber(args[0]).doubleValue()));
-            light.on();
+            light.on(new Color(0x0066ff));
         }
         
         @Subcommand("channel")
@@ -186,7 +190,7 @@ public class LightCommand extends BaseCommand {
         @CommandCompletion("@channels")
         @CommandPermission("nightclub.light")
         public static void onModifyChannel(String[] args) {
-            if (light == null) return;
+            if (isUnloaded()) return;
             light.setChannel(LightChannel.valueOf(args[0]));
         }
         @Subcommand("speedchannel")
@@ -195,7 +199,7 @@ public class LightCommand extends BaseCommand {
         @CommandCompletion("@speedchannels")
         @CommandPermission("nightclub.light")
         public static void onModifySpeedChannel(String[] args) {
-            if (light == null) return;
+            if (isUnloaded()) return;
             light.setSpeedChannel(LightSpeedChannel.valueOf(args[0]));
         }
         
@@ -204,7 +208,7 @@ public class LightCommand extends BaseCommand {
         @Description("Set the lights location to your location, including pitch and yaw")
         @CommandPermission("nightclub.light")
         public static void onSetLocation(Player player, String[] args) {
-            if (light == null || player == null) return;
+            if (isUnloaded() || player == null) return;
             light.setLocation(Location.getFromBukkitLocation(player.getLocation().add(0, 1, 0)));
         }
     }
@@ -219,29 +223,29 @@ public class LightCommand extends BaseCommand {
         @Description("Turn light on")
         @CommandPermission("nightclub.light")
         public static void onTurnOn() {
-            if (light == null) return;
-            light.on();
+            if (isUnloaded()) return;
+            light.on(new Color(0x0066ff));
         }
         @Subcommand("off")
         @Description("Turn light off")
         @CommandPermission("nightclub.light")
         public static void onTurnOff() {
-            if (light == null) return;
+            if (isUnloaded()) return;
             light.off();
         }
         @Subcommand("flash")
         @Description("Flash light")
         @CommandPermission("nightclub.light")
         public static void onFlash() {
-            if (light == null) return;
-            light.flash();
+            if (isUnloaded()) return;
+            light.flash(new Color(0x0066ff));
         }
         @Subcommand("flashoff")
         @Description("Flash off light")
         @CommandPermission("nightclub.light")
         public static void onFlashOff() {
-            if (light == null) return;
-            light.flashOff();
+            if (isUnloaded()) return;
+            light.flashOff(new Color(0x0066ff));
         }
         
     }

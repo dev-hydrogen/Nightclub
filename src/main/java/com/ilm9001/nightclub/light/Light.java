@@ -11,6 +11,7 @@ import org.apache.commons.math3.geometry.euclidean.threed.Rotation;
 import org.apache.commons.math3.geometry.euclidean.threed.RotationConvention;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
+import java.awt.*;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -83,9 +84,9 @@ public class Light {
         load();
         
         if (flipStartAndEnd) {
-            lasers.forEach((laser) -> laser.setEnd(location));
+            lasers.forEach((laser) -> laser.setEnd(this.location));
         } else {
-            lasers.forEach((laser) -> laser.setStart(location));
+            lasers.forEach((laser) -> laser.setStart(this.location));
         }
         
         run = () -> {
@@ -106,12 +107,16 @@ public class Light {
             for (int i = 0; i < lasers.size(); i++) {
                 LaserWrapper laser = lasers.get(i);
                 /*
-                Here we make a ray the size of length from the location of this Light, then we add a 2d plane to it (which is where our pattern is) with a
+                Here we make a ray the size of (length) from the location of this Light, then we add a 2d plane to it (which is where our pattern is) with a
                 x value that is seperated evenly for each laser.
                  */
+                double seperated = x + (100.0 / lasers.size()) * i;
+                if (this.pattern == LightPattern.LINE) {
+                    seperated = x + (50.0 / lasers.size()) * i;
+                }
                 Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize().scalarMultiply(getMaxLengthPercent());
                 Rotation r = new Rotation(v, this.location.getRotation(), RotationConvention.FRAME_TRANSFORM);
-                Vector3D v2 = this.pattern.getPattern().apply(v, x + (100.0 / lasers.size()) * i, r, this.patternSizeMultiplier * (length / 100));
+                Vector3D v2 = this.pattern.getPattern().apply(v, seperated, r, this.patternSizeMultiplier * (length / 100));
                 Vector3D v3 = v.add(v2);
                 
                 if (this.flipStartAndEnd) {
@@ -167,9 +172,13 @@ public class Light {
         lasers.clear();
         for (int i = 0; i < lightCount; i++) {
             LaserWrapper laser;
+            double seperated = 0 + (100.0 / lightCount) * i;
+            if (pattern == LightPattern.LINE) {
+                seperated = 0 + (50.0 / lightCount) * i;
+            }
             Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize().scalarMultiply(maxLength * onLength / 100.0);
             Rotation r = new Rotation(v, this.location.getRotation(), RotationConvention.FRAME_TRANSFORM);
-            Vector3D v2 = this.pattern.getPattern().apply(v, 0 + (100.0 / lightCount) * i, r, this.patternSizeMultiplier * (onLength / 100));
+            Vector3D v2 = this.pattern.getPattern().apply(v, seperated, r, this.patternSizeMultiplier * (onLength / 100));
             Vector3D v3 = v.add(v2);
             if (flipStartAndEnd) {
                 laser = new LaserWrapper(location.clone().add(v3.getX(), v3.getZ(), v3.getY()), location, -1, 256, type);
@@ -182,15 +191,13 @@ public class Light {
     /**
      * Turns Light on, sets length to onLength and sets timeToFade to 0
      */
-    public void on() {
+    public void on(Color color) {
         lasers.forEach(LaserWrapper::start);
-        if (!isOn) {
-            x = 0;
-        }
-        isOn = true;
-        if (length < onLength) {
+        if (length < onLength && !isOn) {
             length = onLength;
         }
+        length = onLength * (color.getAlpha() / 255.0);
+        isOn = true;
         timeToFade = 0;
     }
     /**
@@ -205,24 +212,22 @@ public class Light {
     /**
      * Flashes light in a similar way to beat saber, simulating brightness with a longer beam
      */
-    public void flash() {
+    public void flash(Color color) {
         if (isOn) {
-            if (length < onLength) {
-                length = onLength;
-            }
+            length = onLength * (color.getAlpha() / 255.0);
             length += (100 - onLength) / 3;
             timeToFade += 3;
             lasers.forEach(LaserWrapper::changeColor);
         } else {
-            flashOff();
+            flashOff(color);
         }
     }
     /**
      * Flashes light in a similar way to beat saber, simulating brightness with a longer beam and then fades to black
      */
-    public void flashOff() {
-        on();
-        flash();
+    public void flashOff(Color color) {
+        on(color);
+        flash(color);
         timeToFade = timeToFadeToBlack;
     }
     /**

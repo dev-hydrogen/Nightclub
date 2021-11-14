@@ -29,16 +29,16 @@ public class LightEventHandler {
     }
     
     public void on(Color color) {
-        lights.forEach(Light::on);
+        lights.forEach(l -> l.on(color));
     }
     public void off(Color color) {
         lights.forEach(Light::off);
     }
     public void flash(Color color) {
-        lights.forEach(Light::flash);
+        lights.forEach(l -> l.flash(color));
     }
     public void flashOff(Color color) {
-        lights.forEach(Light::flashOff);
+        lights.forEach(l -> l.flashOff(color));
     }
     public void setSpeed(double multiplier) {
         lights.forEach(l -> l.setSpeed(multiplier));

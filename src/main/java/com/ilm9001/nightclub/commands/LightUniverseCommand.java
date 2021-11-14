@@ -14,6 +14,10 @@ import java.util.concurrent.atomic.AtomicReference;
 public class LightUniverseCommand extends BaseCommand {
     private static final LightUniverseManager manager = Nightclub.getLightUniverseManager();
     
+    public static boolean isUnloaded() {
+        return manager.getLoadedUniverse() == null;
+    }
+    
     @Subcommand("build")
     @Description("Build a new LightUniverse")
     @CommandPermission("nightclub.lightuniverse")
@@ -64,28 +68,22 @@ public class LightUniverseCommand extends BaseCommand {
     @Description("Set the currently loaded LightUniverses name")
     @CommandPermission("nightclub.lightuniverse")
     public static void onSetName(String[] args) {
-        if (args.length < 1) {
-            return;
-        }
-        if (manager.getLoadedUniverse() != null) {
-            manager.getLoadedUniverse().setName(args[0]);
-        }
+        if (args.length < 1 || isUnloaded()) return;
+        manager.getLoadedUniverse().setName(args[0]);
     }
     
     @Subcommand("getid")
     @Description("Get ID of loaded LightUniverse")
     @CommandPermission("nightclub.lightuniverse")
     public static void onGetID(CommandSender sender) {
-        if (manager.getLoadedUniverse() != null) {
-            sender.sendMessage("Currently loaded ID: " + manager.getLoadedUniverse().getId());
-        }
+        if (isUnloaded()) return;
+        sender.sendMessage("Currently loaded ID: " + manager.getLoadedUniverse().getId());
     }
     @Subcommand("getname")
     @Description("Get name of loaded LightUniverse")
     @CommandPermission("nightclub.lightuniverse")
     public static void onGetName(CommandSender sender) {
-        if (manager.getLoadedUniverse() != null) {
-            sender.sendMessage("Currently loaded ID: " + manager.getLoadedUniverse().getName());
-        }
+        if (isUnloaded()) return;
+        sender.sendMessage("Currently loaded ID: " + manager.getLoadedUniverse().getName());
     }
 }

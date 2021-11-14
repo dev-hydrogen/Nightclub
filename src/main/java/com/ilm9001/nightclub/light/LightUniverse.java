@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +47,7 @@ public class LightUniverse {
         this.lights.forEach(light -> {
             light.start();
             light.load();
-            light.on();
+            light.on(new Color(0x0066ff));
             Nightclub.getInstance().getLogger().info(light.toString());
         });
         isLoaded = true;
