@@ -38,7 +38,7 @@ public class LightCommand extends BaseCommand {
             return;
         }
         if (light != null) {
-            light.off();
+            light.off(new Color(0x000000));
             light.stop();
         }
         light = new Light(UUID.randomUUID(), "Unnamed-Light" + new Random().nextInt(), Location.getFromBukkitLocation(player.getLocation().add(0, 1, 0)),
@@ -235,7 +235,7 @@ public class LightCommand extends BaseCommand {
         @CommandPermission("nightclub.light")
         public static void onTurnOff() {
             if (isUnloaded()) return;
-            light.off();
+            light.off(new Color(0x000000));
         }
         @Subcommand("flash")
         @Description("Flash light")

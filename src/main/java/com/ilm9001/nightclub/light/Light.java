@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 @ToString
 @EqualsAndHashCode
-public class Light {
+public class Light implements LightInterface {
     private static final transient ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
     private static final transient int DELAY = 100; // run every x ms
     // annotations lol
@@ -95,7 +95,7 @@ public class Light {
                 length -= 100.0 / this.timeToFadeToBlack;
             }
             if (length <= 0) {
-                off();
+                off(new Color(0x000000));
                 timeToFade = 0;
                 length = 0.1;
             }
@@ -139,7 +139,7 @@ public class Light {
     public void unload() {
         this.channel.getHandler().removeListener(this);
         this.speedChannel.getChannel().getHandler().removeSpeedListener(this);
-        off();
+        off(new Color(0x000000));
         stop();
     }
     /**
@@ -204,7 +204,7 @@ public class Light {
     /**
      * Turns Light off, sets length to 0.1 and sets timeToFade to 0
      */
-    public void off() {
+    public void off(Color color) {
         lasers.forEach(LaserWrapper::stop);
         isOn = false;
         length = 0.1;
