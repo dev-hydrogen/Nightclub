@@ -37,10 +37,6 @@ public class LightCommand extends BaseCommand {
         if (manager.getLoadedUniverse() == null) {
             return;
         }
-        if (light != null) {
-            light.off(new Color(0x000000));
-            light.stop();
-        }
         light = new Light(UUID.randomUUID(), "Unnamed-Light" + new Random().nextInt(), Location.getFromBukkitLocation(player.getLocation().add(0, 1, 0)),
                 15, 80, 0.3, 5, 45, 3, player.getLocation().getPitch() > -10, LightPattern.CIRCLE,
                 LightType.GUARDIAN_BEAM, LightChannel.CENTER_LIGHTS, LightSpeedChannel.DEFAULT);
