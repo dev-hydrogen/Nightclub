@@ -29,15 +29,15 @@ public class Light {
     // annotations lol
     @Getter private final UUID uniqueID;
     @Getter @Setter private String name;
-    @Getter private Location location;
-    @Getter private LightPattern pattern;
-    @Getter private LightType type;
+    @Getter @Setter private Location location;
+    @Getter @Setter private LightPattern pattern;
+    @Getter @Setter private LightType type;
     @Getter private LightChannel channel;
     @Getter private LightSpeedChannel speedChannel;
-    @Getter private double maxLength;
+    @Getter @Setter private double maxLength;
     @Getter @Setter private double onLength; // 0 to 100, percentage of maxLength
     @Getter private double speed;
-    @Getter private double patternSizeMultiplier;
+    @Getter @Setter private double patternSizeMultiplier;
     @Getter @Setter private int timeToFadeToBlack; // x * 100 ms
     @Getter private int lightCount;
     @Getter private boolean flipStartAndEnd; // flipped start and end makes downward pointing beams brighter, upward pointing beams less bright
@@ -146,7 +146,8 @@ public class Light {
      * Starts the movement runnable of this Light. This Light will be completely stationary if it is not started before being turned on.
      */
     public void start() {
-        if (thread == null || !thread.isAlive()) {
+        stop();
+        if (thread == null || thread.isInterrupted()) {
             thread = new Thread(run);
             executorService.scheduleAtFixedRate(thread, 1, DELAY, TimeUnit.MILLISECONDS);
         }
@@ -155,7 +156,7 @@ public class Light {
      * Stops (interrupts) the movement runnable of this Light.
      */
     public void stop() {
-        if (thread != null && thread.isAlive()) {
+        if (thread != null && thread.isAlive() && !thread.isInterrupted()) {
             thread.interrupt();
         }
     }
@@ -271,33 +272,6 @@ public class Light {
     private double getMaxLengthPercent() {
         return maxLength * length / 100.0;
     }
-    /**
-     * Set new LightPattern to use
-     *
-     * @param pattern LightPattern to use
-     */
-    public void setPattern(LightPattern pattern) {
-        if (pattern != this.pattern) {
-            this.pattern = pattern;
-            buildLasers();
-        }
-    }
-    public void setMaxLength(double maxLength) {
-        this.maxLength = maxLength;
-        buildLasers();
-    }
-    public void setType(LightType type) {
-        this.type = type;
-        buildLasers();
-    }
-    public void setPatternSizeMultiplier(double patternSizeMultiplier) {
-        this.patternSizeMultiplier = patternSizeMultiplier;
-        buildLasers();
-    }
-    public void setLocation(Location location) {
-        this.location = location;
-        buildLasers();
-    }
     public void setFlipStartAndEnd(boolean flipStartAndEnd) {
         this.flipStartAndEnd = flipStartAndEnd;
         buildLasers();
@@ -308,7 +282,6 @@ public class Light {
     }
     public void setRotation(double rotation) {
         this.location.setRotation(rotation);
-        buildLasers();
     }
     public static class LightUniverseInstanceCreator implements InstanceCreator<Light> {
         public Light createInstance(Type type) {

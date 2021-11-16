@@ -19,6 +19,9 @@ public class BeatmapCommand extends BaseCommand {
     @CommandCompletion("@beatmaps")
     @CommandPermission("nightclub.beatmap")
     public static void onPlay(String[] args) {
+        if (player != null && player.isPlaying()) {
+            return;
+        }
         player = new BeatmapPlayer(args[0]);
         player.play(new ArrayList<>(Bukkit.getOnlinePlayers()));
     }

@@ -46,4 +46,13 @@ public final class LightEvent {
             }
         }
     }
+    
+    public LightEvent(int type, int value, long time, Color color, boolean isChroma) {
+        this.type = type;
+        this.value = value;
+        this.time = time;
+        this.color = color;
+        this.isChroma = isChroma;
+        this.customData = null;
+    }
 }

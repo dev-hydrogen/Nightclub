@@ -2,6 +2,7 @@ package com.ilm9001.nightclub.beatmap;
 
 import com.ilm9001.nightclub.light.event.LightChannel;
 import com.ilm9001.nightclub.light.event.LightEventHandler;
+import lombok.Getter;
 import org.bukkit.entity.Player;
 
 import java.awt.*;
@@ -19,6 +20,7 @@ public class BeatmapPlayer {
     private final InfoData info;
     private final String name;
     private ScheduledExecutorService executorService;
+    @Getter private boolean isPlaying;
     
     /**
      * Constructor that defines a new Beatmap you can play from.
@@ -38,23 +40,44 @@ public class BeatmapPlayer {
      * @return Info of the beatmap file, for example if you wanted to broadcast the song name to all players.
      */
     public InfoData play(List<Player> playTo) {
-        for (LightChannel channel : LightChannel.values()) { // turn all lights off before starting
-            channel.getHandler().off(new Color(0x000000));
-        }
+        List<LightChannel> channelList = Arrays.asList(LightChannel.values());
+        this.playTo = playTo;
         executorService = Executors.newScheduledThreadPool(1);
         playTo.forEach((player) -> player.playSound(player.getLocation(), name, 1, 1));
-        this.playTo = playTo;
+        isPlaying = true;
+        
+        channelList.forEach(channel -> {
+            //start all channels up and then turn them off to wait for beatmap instructions
+            channel.getHandler().start();
+            channel.getHandler().off(new Color(0x000000));
+        });
+        
         events.forEach((event) -> {
             Runnable task = () -> handle(event);
             executorService.schedule(task, event.getTime(), TimeUnit.MICROSECONDS);
         });
+        
+        //schedule turn off after the show is over
+        Runnable task = () -> channelList.forEach(channel -> {
+            channel.getHandler().off(new Color(0x000000));
+            channel.getHandler().stop();
+            isPlaying = false;
+        });
+        executorService.schedule(task, events.get(events.size() - 1).getTime() + 5000000, TimeUnit.MICROSECONDS);
+        
         return info;
     }
     /**
      * Stops execution of this BeatmapPlayer and stops sound for all players that music is being played to.
      */
     public void stop() {
+        List<LightChannel> channelList = Arrays.asList(LightChannel.values());
         if (executorService != null) {
+            executorService.schedule(() -> channelList.forEach(channel -> {
+                channel.getHandler().off(new Color(0x000000));
+                channel.getHandler().stop();
+                isPlaying = false;
+            }), 0, TimeUnit.MILLISECONDS);
             executorService.shutdownNow();
         }
         playTo.forEach(player -> player.stopSound(name));

@@ -40,6 +40,12 @@ public class LightEventHandler {
     public void flashOff(Color color) {
         lights.forEach(l -> l.flashOff(color));
     }
+    public void start() {
+        lights.forEach(Light::start);
+    }
+    public void stop() {
+        lights.forEach(Light::stop);
+    }
     public void setSpeed(double multiplier) {
         lights.forEach(l -> l.setSpeed(multiplier));
         speedListeners.forEach(l -> l.setSpeed(multiplier));
