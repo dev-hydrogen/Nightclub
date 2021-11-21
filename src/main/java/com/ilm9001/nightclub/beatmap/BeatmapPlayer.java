@@ -72,12 +72,12 @@ public class BeatmapPlayer {
      */
     public void stop() {
         List<LightChannel> channelList = Arrays.asList(LightChannel.values());
+        channelList.forEach(channel -> {
+            channel.getHandler().off(new Color(0x000000));
+            channel.getHandler().stop();
+            isPlaying = false;
+        });
         if (executorService != null) {
-            channelList.forEach(channel -> {
-                channel.getHandler().off(new Color(0x000000));
-                channel.getHandler().stop();
-                isPlaying = false;
-            });
             executorService.shutdownNow();
         }
         playTo.forEach(player -> player.stopSound(name));

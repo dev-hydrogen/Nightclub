@@ -25,7 +25,7 @@ public class LightCommand extends BaseCommand {
     private static Light light;
     
     public static boolean isUnloaded() {
-        return light == null || Nightclub.getLightUniverseManager().getLoadedUniverse() == null;
+        return light == null || Nightclub.getLightUniverseManager().getLoadedUniverse() == null || BeatmapCommand.getPlayer().isPlaying();
     }
     
     @Subcommand("build")
@@ -34,7 +34,7 @@ public class LightCommand extends BaseCommand {
     @CommandPermission("nightclub.light")
     public static void onBuild(Player player, String[] args) {
         LightUniverseManager manager = Nightclub.getLightUniverseManager();
-        if (manager.getLoadedUniverse() == null) {
+        if (manager.getLoadedUniverse() == null || BeatmapCommand.getPlayer().isPlaying()) {
             return;
         }
         light = new Light(UUID.randomUUID(), "Unnamed-Light" + new Random().nextInt(), Location.getFromBukkitLocation(player.getLocation().add(0, 1, 0)),
@@ -67,7 +67,7 @@ public class LightCommand extends BaseCommand {
     public static void onLoad(String[] args) {
         LightUniverseManager manager = Nightclub.getLightUniverseManager();
         LightUniverse universe = manager.getLoadedUniverse();
-        if (universe == null || args.length < 1) {
+        if (universe == null || args.length < 1 || BeatmapCommand.getPlayer().isPlaying()) {
             return;
         }
         Light nullableLight = universe.getLight(args[0]);
@@ -172,6 +172,7 @@ public class LightCommand extends BaseCommand {
             if (isUnloaded()) return;
             light.setType(LightType.valueOf(args[0]));
             light.on(new Color(0x0066ff));
+            light.buildLasers();
         }
         
         @Subcommand("rotation")
@@ -210,6 +211,19 @@ public class LightCommand extends BaseCommand {
         public static void onSetLocation(Player player, String[] args) {
             if (isUnloaded() || player == null) return;
             light.setLocation(Location.getFromBukkitLocation(player.getLocation().add(0, 1, 0)));
+            light.buildLasers();
+            light.on(new Color(0x000000));
+        }
+        
+        @Subcommand("flip")
+        @CommandAlias("fl")
+        @Description("Flip start and end locations of light")
+        @CommandPermission("nightclub.light")
+        public static void onSetLocation(String[] args) {
+            if (isUnloaded()) return;
+            light.setFlipStartAndEnd(!light.isFlipStartAndEnd());
+            light.buildLasers();
+            light.on(new Color(0x000000));
         }
     }
     

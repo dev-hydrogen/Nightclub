@@ -3,6 +3,7 @@ package com.ilm9001.nightclub.commands;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import com.ilm9001.nightclub.beatmap.BeatmapPlayer;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 @CommandPermission("nightclub.beatmap")
 public class BeatmapCommand extends BaseCommand {
     
-    private static BeatmapPlayer player;
+    @Getter private static BeatmapPlayer player;
     
     @Subcommand("play")
     @CommandAlias("p")

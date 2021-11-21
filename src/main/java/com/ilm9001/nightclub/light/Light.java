@@ -24,14 +24,14 @@ import java.util.concurrent.TimeUnit;
 @ToString
 @EqualsAndHashCode
 public class Light implements LightInterface {
-    private static final transient ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+    private transient ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
     private static final transient int DELAY = 100; // run every x ms
     // annotations lol
     @Getter private final UUID uniqueID;
     @Getter @Setter private String name;
     @Getter @Setter private Location location;
     @Getter @Setter private LightPattern pattern;
-    @Getter @Setter private LightType type;
+    @Getter private LightType type;
     @Getter private LightChannel channel;
     @Getter private LightSpeedChannel speedChannel;
     @Getter @Setter private double maxLength;
@@ -49,7 +49,7 @@ public class Light implements LightInterface {
     @Getter @Setter private transient double multipliedSpeed; // speed, but when internally multiplied by events
     @Getter @Setter private transient int timeToFade; // internal fade off value
     private final transient Runnable run;
-    private transient Thread thread;
+    private transient boolean isLoaded;
     
     public Light(Location loc, LightPattern pattern, LightType type, LightChannel channel) {
         this(loc, "Unnamed-Light" + new Random().nextInt(), pattern, type, channel);
@@ -135,30 +135,28 @@ public class Light implements LightInterface {
         this.speedChannel.getChannel().getHandler().addSpeedListener(this);
         this.multipliedSpeed = speed;
         buildLasers();
+        isLoaded = true;
     }
     public void unload() {
         this.channel.getHandler().removeListener(this);
         this.speedChannel.getChannel().getHandler().removeSpeedListener(this);
         off(new Color(0x000000));
         stop();
+        isLoaded = false;
     }
     /**
      * Starts the movement runnable of this Light. This Light will be completely stationary if it is not started before being turned on.
      */
     public void start() {
         stop();
-        if (thread == null || thread.isInterrupted()) {
-            thread = new Thread(run);
-            executorService.scheduleAtFixedRate(thread, 1, DELAY, TimeUnit.MILLISECONDS);
-        }
+        executorService = Executors.newScheduledThreadPool(1);
+        executorService.scheduleAtFixedRate(run, 1, DELAY, TimeUnit.MILLISECONDS);
     }
     /**
-     * Stops (interrupts) the movement runnable of this Light.
+     * Stops the movement runnable of this Light.
      */
     public void stop() {
-        if (thread != null && thread.isAlive() && !thread.isInterrupted()) {
-            thread.interrupt();
-        }
+        executorService.shutdownNow();
     }
     
     /**
@@ -193,6 +191,7 @@ public class Light implements LightInterface {
      * Turns Light on, sets length to onLength and sets timeToFade to 0
      */
     public void on(Color color) {
+        if (!isLoaded) return;
         lasers.forEach(LaserWrapper::start);
         if (length < onLength && !isOn) {
             length = onLength;
@@ -205,6 +204,7 @@ public class Light implements LightInterface {
      * Turns Light off, sets length to 0.1 and sets timeToFade to 0
      */
     public void off(Color color) {
+        if (!isLoaded) return;
         lasers.forEach(LaserWrapper::stop);
         isOn = false;
         length = 0.1;
@@ -214,6 +214,7 @@ public class Light implements LightInterface {
      * Flashes light in a similar way to beat saber, simulating brightness with a longer beam
      */
     public void flash(Color color) {
+        if (!isLoaded) return;
         if (isOn) {
             length = onLength * (color.getAlpha() / 255.0);
             length += (100 - onLength) / 3;
@@ -227,6 +228,7 @@ public class Light implements LightInterface {
      * Flashes light in a similar way to beat saber, simulating brightness with a longer beam and then fades to black
      */
     public void flashOff(Color color) {
+        if (!isLoaded) return;
         on(color);
         flash(color);
         timeToFade = timeToFadeToBlack;
@@ -263,9 +265,10 @@ public class Light implements LightInterface {
      * Set speed with LightEvent-specified multiplier
      */
     public void setSpeed(double multiplier) {
-        if (this.multipliedSpeed == speed * multiplier) {
+        if (!isLoaded) return;
+        if (this.multipliedSpeed == speed * multiplier) { // laser "reset"
             x = (x + 12) % 100;
-        } // laser "reset"
+        }
         this.multipliedSpeed = speed * multiplier;
     }
     
@@ -283,6 +286,11 @@ public class Light implements LightInterface {
     public void setRotation(double rotation) {
         this.location.setRotation(rotation);
     }
+    public void setType(LightType type) {
+        this.type = type;
+        buildLasers();
+    }
+    
     public static class LightUniverseInstanceCreator implements InstanceCreator<Light> {
         public Light createInstance(Type type) {
             return new Light(new Location(0, 0, 0, 0, 0), LightPattern.STILL, LightType.GUARDIAN_BEAM, LightChannel.CENTER_LIGHTS);

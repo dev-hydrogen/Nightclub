@@ -39,15 +39,15 @@ public class LightUniverseCommand extends BaseCommand {
         if (args.length < 1) {
             return;
         }
+        if (lightUniverse != null && lightUniverse.isLoaded()) {
+            lightUniverse.unload();
+        }
         AtomicReference<LightUniverse> lightUniverseAtomic = new AtomicReference<>();
         Nightclub.getLightUniverseManager().getUniverses().forEach((universe -> {
             if (args[0].equals(universe.getName())) {
                 lightUniverseAtomic.set(universe);
             }
         }));
-        if (lightUniverse != null && lightUniverse.isLoaded()) {
-            lightUniverse.unload();
-        }
         lightUniverse = lightUniverseAtomic.get();
         lightUniverse.load();
         manager.setLoadedUniverse(lightUniverse);

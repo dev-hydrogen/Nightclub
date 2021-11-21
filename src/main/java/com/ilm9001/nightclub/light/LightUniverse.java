@@ -51,11 +51,11 @@ public class LightUniverse {
             Nightclub.getInstance().getLogger().info(light.toString());
         });
         isLoaded = true;
-        Nightclub.getInstance().getLogger().info(this.toString());
     }
     public void unload() {
         this.lights.forEach(light -> {
             light.unload();
+            light.off(new Color(0x000000));
             light.stop();
         });
         isLoaded = false;
