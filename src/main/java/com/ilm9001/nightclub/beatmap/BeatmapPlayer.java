@@ -1,7 +1,6 @@
 package com.ilm9001.nightclub.beatmap;
 
 import com.ilm9001.nightclub.light.event.LightChannel;
-import com.ilm9001.nightclub.light.event.LightEventHandler;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 
@@ -48,8 +47,8 @@ public class BeatmapPlayer {
         
         channelList.forEach(channel -> {
             //start all channels up and then turn them off to wait for beatmap instructions
-            channel.getHandler().start();
-            channel.getHandler().off(new Color(0x000000));
+            channel.start();
+            channel.off(new Color(0x000000));
         });
         
         events.forEach((event) -> {
@@ -59,8 +58,8 @@ public class BeatmapPlayer {
         
         //schedule turn off after the show is over
         Runnable task = () -> channelList.forEach(channel -> {
-            channel.getHandler().off(new Color(0x000000));
-            channel.getHandler().stop();
+            channel.off(new Color(0x000000));
+            channel.stop();
             isPlaying = false;
         });
         executorService.schedule(task, events.get(events.size() - 1).getTime() + 5000000, TimeUnit.MICROSECONDS);
@@ -73,8 +72,8 @@ public class BeatmapPlayer {
     public void stop() {
         List<LightChannel> channelList = Arrays.asList(LightChannel.values());
         channelList.forEach(channel -> {
-            channel.getHandler().off(new Color(0x000000));
-            channel.getHandler().stop();
+            channel.off(new Color(0x000000));
+            channel.stop();
             isPlaying = false;
         });
         if (executorService != null) {
@@ -90,7 +89,7 @@ public class BeatmapPlayer {
         // shorter way of handling events than using a switch case
         if (event.getType() >= 0 && event.getType() < 5) {
             Optional<LightChannel> channel = Arrays.stream(LightChannel.values()).filter((lc) -> event.getType() == lc.getType()).findFirst();
-            channel.ifPresent(lightChannel -> handleValue(lightChannel.getHandler(), event.getValue(), event.getColor()));
+            channel.ifPresent(lightChannel -> handleValue(lightChannel, event.getValue(), event.getColor()));
         } else switch (event.getType()) {
             // Ring spin
             case 8 -> this.getClass();
@@ -98,13 +97,13 @@ public class BeatmapPlayer {
             case 9 -> this.getClass();
             
             // Rotation speed multiplier for left lasers
-            case 12 -> LightChannel.LEFT_ROTATING_LASERS.getHandler().setSpeed(event.getValue());
+            case 12 -> LightChannel.LEFT_ROTATING_LASERS.setSpeed(event.getValue());
             // Rotation speed multiplier for right lasers
-            case 13 -> LightChannel.RIGHT_ROTATING_LASERS.getHandler().setSpeed(event.getValue());
+            case 13 -> LightChannel.RIGHT_ROTATING_LASERS.setSpeed(event.getValue());
         }
     }
     
-    private void handleValue(LightEventHandler handler, int value, Color color) {
+    private void handleValue(LightChannel handler, int value, Color color) {
         switch (value) {
             case 0 -> handler.off(color);
             case 1, 5 -> handler.on(color);

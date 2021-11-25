@@ -4,7 +4,6 @@ import com.google.gson.InstanceCreator;
 import com.ilm9001.nightclub.laser.LaserWrapper;
 import com.ilm9001.nightclub.light.event.LightChannel;
 import com.ilm9001.nightclub.light.event.LightSpeedChannel;
-import com.ilm9001.nightclub.light.pattern.LightPattern;
 import com.ilm9001.nightclub.util.Location;
 import lombok.*;
 import org.apache.commons.math3.geometry.euclidean.threed.Rotation;
@@ -129,17 +128,17 @@ public class Light implements LightInterface {
     }
     
     public void load() {
-        this.channel.getHandler().removeListener(this);
-        this.speedChannel.getChannel().getHandler().removeSpeedListener(this);
-        this.channel.getHandler().addListener(this);
-        this.speedChannel.getChannel().getHandler().addSpeedListener(this);
+        this.channel.removeListener(this);
+        this.speedChannel.getChannel().removeSpeedListener(this);
+        this.channel.addListener(this);
+        this.speedChannel.getChannel().addSpeedListener(this);
         this.multipliedSpeed = speed;
         buildLasers();
         isLoaded = true;
     }
     public void unload() {
-        this.channel.getHandler().removeListener(this);
-        this.speedChannel.getChannel().getHandler().removeSpeedListener(this);
+        this.channel.removeListener(this);
+        this.speedChannel.getChannel().removeSpeedListener(this);
         off(new Color(0x000000));
         stop();
         isLoaded = false;
@@ -239,8 +238,8 @@ public class Light implements LightInterface {
      * @param channel LightChannel to listen to
      */
     public void setChannel(LightChannel channel) {
-        this.channel.getHandler().removeListener(this);
-        channel.getHandler().addListener(this);
+        this.channel.removeListener(this);
+        channel.addListener(this);
         this.channel = channel;
     }
     
@@ -248,8 +247,8 @@ public class Light implements LightInterface {
      *
      */
     public void setSpeedChannel(LightSpeedChannel speedChannel) {
-        this.speedChannel.getChannel().getHandler().removeSpeedListener(this);
-        speedChannel.getChannel().getHandler().addSpeedListener(this);
+        this.speedChannel.getChannel().removeSpeedListener(this);
+        speedChannel.getChannel().addSpeedListener(this);
         this.speedChannel = speedChannel;
     }
     

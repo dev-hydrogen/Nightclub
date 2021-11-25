@@ -1,4 +1,4 @@
-package com.ilm9001.nightclub.light.pattern;
+package com.ilm9001.nightclub.light;
 
 import com.ilm9001.nightclub.util.Util;
 import org.apache.commons.math3.geometry.euclidean.threed.Plane;
