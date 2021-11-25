@@ -22,11 +22,12 @@ public class LightUniverseCommand extends BaseCommand {
     @Description("Build a new LightUniverse")
     @CommandPermission("nightclub.lightuniverse")
     public static void onBuild(String[] args) {
+        if (BeatmapCommand.getPlayer() != null && BeatmapCommand.getPlayer().isPlaying()) return;
         LightUniverse universe = new LightUniverse();
-        manager.add(universe);
         if (manager.getLoadedUniverse() != null) {
             manager.getLoadedUniverse().unload();
         }
+        manager.add(universe);
         manager.setLoadedUniverse(universe);
     }
     
@@ -35,13 +36,14 @@ public class LightUniverseCommand extends BaseCommand {
     @CommandCompletion("@universes")
     @CommandPermission("nightclub.lightuniverse")
     public static void onLoad(String[] args) {
+        if (BeatmapCommand.getPlayer() != null && BeatmapCommand.getPlayer().isPlaying()) return;
         LightUniverse lightUniverse = manager.getLoadedUniverse();
-        if (args.length < 1) {
-            return;
-        }
+        if (args.length < 1) return;
+        
         if (lightUniverse != null && lightUniverse.isLoaded()) {
             lightUniverse.unload();
         }
+        
         AtomicReference<LightUniverse> lightUniverseAtomic = new AtomicReference<>();
         Nightclub.getLightUniverseManager().getUniverses().forEach((universe -> {
             if (args[0].equals(universe.getName())) {
@@ -49,6 +51,7 @@ public class LightUniverseCommand extends BaseCommand {
             }
         }));
         lightUniverse = lightUniverseAtomic.get();
+        
         lightUniverse.load();
         manager.setLoadedUniverse(lightUniverse);
     }
@@ -57,6 +60,7 @@ public class LightUniverseCommand extends BaseCommand {
     @Description("Unload currently loaded LightUniverse")
     @CommandPermission("nightclub.lightuniverse")
     public static void onUnload() {
+        if (BeatmapCommand.getPlayer() != null && BeatmapCommand.getPlayer().isPlaying()) return;
         LightUniverse lightUniverse = manager.getLoadedUniverse();
         if (lightUniverse != null && lightUniverse.isLoaded()) {
             lightUniverse.unload();

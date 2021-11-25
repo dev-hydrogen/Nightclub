@@ -107,16 +107,16 @@ public class Light implements LightInterface {
             for (int i = 0; i < lasers.size(); i++) {
                 LaserWrapper laser = lasers.get(i);
                 /*
-                Here we make a ray the size of (length) from the location of this Light, then we add a 2d plane to it (which is where our pattern is) with a
-                x value that is seperated evenly for each laser.
+                Here we make a ray the size of (length) from the location of this Light, then we add a 2d plane to it (which is where our pattern is) with an
+                x value that is separated evenly for each laser.
                  */
-                double seperated = x + (100.0 / lasers.size()) * i;
+                double separated = x + (100.0 / lasers.size()) * i;
                 if (this.pattern == LightPattern.LINE) {
-                    seperated = x + (50.0 / lasers.size()) * i;
+                    separated = x + (50.0 / lasers.size()) * i;
                 }
                 Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize().scalarMultiply(getMaxLengthPercent());
                 Rotation r = new Rotation(v, this.location.getRotation(), RotationConvention.FRAME_TRANSFORM);
-                Vector3D v2 = this.pattern.getPattern().apply(v, seperated, r, this.patternSizeMultiplier * (length / 100));
+                Vector3D v2 = this.pattern.apply(v, separated, r, this.patternSizeMultiplier * (length / 100));
                 Vector3D v3 = v.add(v2);
                 
                 if (this.flipStartAndEnd) {
@@ -171,13 +171,13 @@ public class Light implements LightInterface {
         lasers.clear();
         for (int i = 0; i < lightCount; i++) {
             LaserWrapper laser;
-            double seperated = 0 + (100.0 / lightCount) * i;
+            double separated = 0 + (100.0 / lightCount) * i;
             if (pattern == LightPattern.LINE) {
-                seperated = 0 + (50.0 / lightCount) * i;
+                separated = 0 + (50.0 / lightCount) * i;
             }
             Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize().scalarMultiply(maxLength * onLength / 100.0);
             Rotation r = new Rotation(v, this.location.getRotation(), RotationConvention.FRAME_TRANSFORM);
-            Vector3D v2 = this.pattern.getPattern().apply(v, seperated, r, this.patternSizeMultiplier * (onLength / 100));
+            Vector3D v2 = this.pattern.apply(v, separated, r, this.patternSizeMultiplier * (onLength / 100));
             Vector3D v3 = v.add(v2);
             if (flipStartAndEnd) {
                 laser = new LaserWrapper(location.clone().add(v3.getX(), v3.getZ(), v3.getY()), location, -1, 256, type);
@@ -269,7 +269,13 @@ public class Light implements LightInterface {
         if (this.multipliedSpeed == speed * multiplier) { // laser "reset"
             x = (x + 12) % 100;
         }
+        if (multiplier == 0) {
+            x = 100.0 / lightCount;
+        }
         this.multipliedSpeed = speed * multiplier;
+        if (multipliedSpeed >= 40.0) {
+            multipliedSpeed = 40.0;
+        }
     }
     
     private double getMaxLengthPercent() {

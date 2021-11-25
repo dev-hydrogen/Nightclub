@@ -34,9 +34,8 @@ public class LightCommand extends BaseCommand {
     @CommandPermission("nightclub.light")
     public static void onBuild(Player player, String[] args) {
         LightUniverseManager manager = Nightclub.getLightUniverseManager();
-        if (manager.getLoadedUniverse() == null || BeatmapCommand.getPlayer().isPlaying()) {
-            return;
-        }
+        if (manager.getLoadedUniverse() == null || BeatmapCommand.getPlayer().isPlaying()) return;
+        
         light = new Light(UUID.randomUUID(), "Unnamed-Light" + new Random().nextInt(), Location.getFromBukkitLocation(player.getLocation().add(0, 1, 0)),
                 15, 80, 0.3, 5, 45, 3, player.getLocation().getPitch() > -10, LightPattern.CIRCLE,
                 LightType.GUARDIAN_BEAM, LightChannel.CENTER_LIGHTS, LightSpeedChannel.DEFAULT);
@@ -67,13 +66,11 @@ public class LightCommand extends BaseCommand {
     public static void onLoad(String[] args) {
         LightUniverseManager manager = Nightclub.getLightUniverseManager();
         LightUniverse universe = manager.getLoadedUniverse();
-        if (universe == null || args.length < 1 || BeatmapCommand.getPlayer().isPlaying()) {
-            return;
-        }
+        if (universe == null || args.length < 1 || BeatmapCommand.getPlayer().isPlaying()) return;
+        
         Light nullableLight = universe.getLight(args[0]);
-        if (nullableLight == null) {
-            return;
-        }
+        
+        if (nullableLight == null) return;
         light = nullableLight;
         light.start();
         light.on(new Color(0x0066ff));
