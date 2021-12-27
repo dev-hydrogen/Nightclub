@@ -21,7 +21,7 @@ public class LightCommand extends BaseCommand {
     private static Light light;
     
     public static boolean isUnloaded() {
-        return light == null || Nightclub.getLightUniverseManager().getLoadedUniverse() == null || BeatmapCommand.getPlayer().isPlaying();
+        return light == null || Nightclub.getLightUniverseManager().getLoadedUniverse() == null || (BeatmapCommand.getPlayer() != null && BeatmapCommand.getPlayer().isPlaying());
     }
     
     @Subcommand("build")
@@ -30,11 +30,12 @@ public class LightCommand extends BaseCommand {
     @CommandPermission("nightclub.light")
     public static void onBuild(Player player, String[] args) {
         LightUniverseManager manager = Nightclub.getLightUniverseManager();
-        if (manager.getLoadedUniverse() == null || BeatmapCommand.getPlayer().isPlaying()) return;
+        if (manager.getLoadedUniverse() == null || (BeatmapCommand.getPlayer() != null && BeatmapCommand.getPlayer().isPlaying()))
+            return;
         
         light = new Light(UUID.randomUUID(), "Unnamed-Light" + new Random().nextInt(), Location.getFromBukkitLocation(player.getLocation().add(0, 1, 0)),
-                15, 80, 0.3, 5, 45, 3, player.getLocation().getPitch() > -10, LightPattern.CIRCLE,
-                LightType.GUARDIAN_BEAM, LightChannel.CENTER_LIGHTS, LightSpeedChannel.DEFAULT);
+                15, 80, 0.3, 0.2, 5, 3, 45, 4, player.getLocation().getPitch() > -10,
+                LightPattern.CIRCLE, LightPattern.STILL, LightType.GUARDIAN_BEAM, LightChannel.CENTER_LIGHTS, LightSpeedChannel.DEFAULT, 0, Math.toRadians(45));
         light.start();
         light.on(new Color(0x0066ff));
         manager.getLoadedUniverse().addLight(light);
@@ -62,7 +63,9 @@ public class LightCommand extends BaseCommand {
     public static void onLoad(String[] args) {
         LightUniverseManager manager = Nightclub.getLightUniverseManager();
         LightUniverse universe = manager.getLoadedUniverse();
-        if (universe == null || args.length < 1 || BeatmapCommand.getPlayer().isPlaying()) return;
+        if (Nightclub.getLightUniverseManager().getLoadedUniverse() == null || (BeatmapCommand.getPlayer() != null && BeatmapCommand.getPlayer().isPlaying()) || args.length < 1) {
+            return;
+        }
         
         Light nullableLight = universe.getLight(args[0]);
         
@@ -103,7 +106,17 @@ public class LightCommand extends BaseCommand {
         @CommandPermission("nightclub.light")
         public static void onPattern(String[] args) {
             if (isUnloaded()) return;
-            light.setPattern(LightPattern.valueOf(args[0]));
+            light.getData().setPattern(LightPattern.valueOf(args[0]));
+            light.on(new Color(0x0066ff));
+        }
+        @Subcommand("secondarypattern")
+        @CommandAlias("sp")
+        @Description("Alter second pattern")
+        @CommandCompletion("@pattern")
+        @CommandPermission("nightclub.light")
+        public static void onSecondPattern(String[] args) {
+            if (isUnloaded()) return;
+            light.getData().setSecondPattern(LightPattern.valueOf(args[0]));
             light.on(new Color(0x0066ff));
         }
         
@@ -113,7 +126,7 @@ public class LightCommand extends BaseCommand {
         @CommandPermission("nightclub.light")
         public static void onMaxLength(String[] args) {
             if (isUnloaded()) return;
-            light.setMaxLength(Util.parseNumber(args[0]).doubleValue());
+            light.getData().setMaxLength(Util.parseNumber(args[0]).doubleValue());
             light.on(new Color(0x0066ff));
         }
         
@@ -123,7 +136,7 @@ public class LightCommand extends BaseCommand {
         @CommandPermission("nightclub.light")
         public static void onModifyOnLength(String[] args) {
             if (isUnloaded()) return;
-            light.setOnLength(Util.parseNumber(args[0]).doubleValue());
+            light.getData().setOnLength(Util.parseNumber(args[0]).doubleValue());
             light.on(new Color(0x0066ff));
         }
         
@@ -133,7 +146,16 @@ public class LightCommand extends BaseCommand {
         @CommandPermission("nightclub.light")
         public static void onModifyPatternMultiplier(String[] args) {
             if (isUnloaded()) return;
-            light.setPatternSizeMultiplier(Util.parseNumber(args[0]).doubleValue());
+            light.getData().setPatternSizeMultiplier(Util.parseNumber(args[0]).doubleValue());
+            light.on(new Color(0x0066ff));
+        }
+        @Subcommand("secondarypatternmultiplier")
+        @CommandAlias("spm")
+        @Description("Alter the secondary pattern size multiplier")
+        @CommandPermission("nightclub.light")
+        public static void onModifySecondaryPatternMultiplier(String[] args) {
+            if (isUnloaded()) return;
+            light.getData().setSecondaryPatternSizeMultiplier(Util.parseNumber(args[0]).doubleValue());
             light.on(new Color(0x0066ff));
         }
         
@@ -146,13 +168,23 @@ public class LightCommand extends BaseCommand {
             light.setBaseSpeed(Util.parseNumber(args[0]).doubleValue());
         }
         
+        @Subcommand("secondaryspeed")
+        @CommandAlias("ss")
+        @Description("Alter secondary speed")
+        @CommandPermission("nightclub.light")
+        public static void onModifySecondarySpeed(String[] args) {
+            if (isUnloaded()) return;
+            light.setSecondaryBaseSpeed(Util.parseNumber(args[0]).doubleValue());
+        }
+        
         @Subcommand("lightcount")
         @CommandAlias("lc")
         @Description("Alter the amount of lights")
         @CommandPermission("nightclub.light")
         public static void onModifyLightCount(String[] args) {
             if (isUnloaded()) return;
-            light.setLightCount(Util.parseNumber(args[0]).intValue());
+            light.getData().setLightCount(Util.parseNumber(args[0]).intValue());
+            light.buildLasers();
             light.on(new Color(0x0066ff));
         }
         
@@ -174,7 +206,19 @@ public class LightCommand extends BaseCommand {
         @CommandPermission("nightclub.light")
         public static void onModifyRotation(String[] args) {
             if (isUnloaded()) return;
-            light.setRotation(Math.toRadians(Util.parseNumber(args[0]).doubleValue()));
+            light.getData().setRotation(Math.toRadians(Util.parseNumber(args[0]).doubleValue()));
+            light.buildLasers();
+            light.on(new Color(0x0066ff));
+        }
+        
+        @Subcommand("secondaryrotation")
+        @CommandAlias("sr")
+        @Description("Alter secondary rotation")
+        @CommandPermission("nightclub.light")
+        public static void onModifySecondaryRotation(String[] args) {
+            if (isUnloaded()) return;
+            light.getData().setSecondaryRotation(Math.toRadians(Util.parseNumber(args[0]).doubleValue()));
+            light.buildLasers();
             light.on(new Color(0x0066ff));
         }
         
@@ -214,7 +258,7 @@ public class LightCommand extends BaseCommand {
         @CommandPermission("nightclub.light")
         public static void onSetLocation(String[] args) {
             if (isUnloaded()) return;
-            light.setFlipStartAndEnd(!light.isFlipStartAndEnd());
+            light.getData().setFlipStartAndEnd(!light.getData().isFlipStartAndEnd());
             light.buildLasers();
             light.on(new Color(0x000000));
         }

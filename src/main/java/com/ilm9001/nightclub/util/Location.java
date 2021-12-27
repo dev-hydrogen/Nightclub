@@ -16,21 +16,16 @@ public class Location implements Cloneable {
     private double z;
     private double pitch;
     private double yaw;
-    private double rotation;
     
     public Location() {
-        this(0, 0, 0, 0, 0, 0);
+        this(0, 0, 0, 0, 0);
     }
     public Location(Number x, Number y, Number z, Number pitch, Number yaw) {
-        this(x, y, z, pitch, yaw, 0);
-    }
-    public Location(Number x, Number y, Number z, Number pitch, Number yaw, Number rotation) {
         this.x = x.doubleValue();
         this.y = y.doubleValue();
         this.z = z.doubleValue();
         this.pitch = pitch.doubleValue() % 360;
         this.yaw = yaw.doubleValue() % 360;
-        this.rotation = rotation.doubleValue();
     }
     
     public static Location getFromBukkitLocation(org.bukkit.Location loc) {

@@ -1,7 +1,7 @@
 package com.ilm9001.nightclub.light.event;
 
 import com.ilm9001.nightclub.light.Light;
-import com.ilm9001.nightclub.light.LightInterface;
+import com.ilm9001.nightclub.light.LightI;
 import lombok.Getter;
 
 import java.awt.*;
@@ -16,23 +16,23 @@ public enum LightChannel {
     CENTER_LIGHTS(4);
     
     @Getter private final int type;
-    private final List<LightInterface> lights;
-    private final List<LightInterface> speedListeners;
+    private final List<LightI> lights;
+    private final List<LightI> speedListeners;
     LightChannel(int type) {
         this.type = type;
         lights = new ArrayList<>();
         speedListeners = new ArrayList<>();
     }
-    public void addListener(LightInterface light) {
+    public void addListener(LightI light) {
         lights.add(light);
     }
-    public void removeListener(LightInterface light) {
+    public void removeListener(LightI light) {
         lights.remove(light);
     }
-    public void addSpeedListener(LightInterface light) {
+    public void addSpeedListener(LightI light) {
         speedListeners.add(light);
     }
-    public void removeSpeedListener(LightInterface light) {
+    public void removeSpeedListener(LightI light) {
         speedListeners.remove(light);
     }
     
@@ -49,10 +49,10 @@ public enum LightChannel {
         lights.forEach(l -> l.flashOff(color));
     }
     public void start() {
-        lights.forEach(LightInterface::start);
+        lights.forEach(LightI::start);
     }
     public void stop() {
-        lights.forEach(LightInterface::stop);
+        lights.forEach(LightI::stop);
     }
     public void setSpeed(double multiplier) {
         lights.forEach(l -> {

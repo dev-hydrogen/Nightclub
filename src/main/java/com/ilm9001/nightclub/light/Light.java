@@ -22,30 +22,25 @@ import java.util.concurrent.TimeUnit;
 
 @ToString
 @EqualsAndHashCode
-public class Light implements LightInterface {
+public class Light implements LightI {
     private transient ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
     private static final transient int DELAY = 100; // run every x ms
     // annotations lol
     @Getter private final UUID uniqueID;
     @Getter @Setter private String name;
     @Getter @Setter private Location location;
-    @Getter @Setter private LightPattern pattern;
+    @Getter @Setter private LightData data;
     @Getter private LightType type;
     @Getter private LightChannel channel;
     @Getter private LightSpeedChannel speedChannel;
-    @Getter @Setter private double maxLength;
-    @Getter @Setter private double onLength; // 0 to 100, percentage of maxLength
-    @Getter private double speed;
-    @Getter @Setter private double patternSizeMultiplier;
-    @Getter @Setter private int timeToFadeToBlack; // x * 100 ms
-    @Getter private int lightCount;
-    @Getter private boolean flipStartAndEnd; // flipped start and end makes downward pointing beams brighter, upward pointing beams less bright
     
     private final transient List<LaserWrapper> lasers = new ArrayList<>();
     @Getter @Setter private transient double length = 0; // 0 to 100, percentage of maxLength.
     @Getter @Setter private transient double x = 0; // 0 to 100, usually percentage of 360
+    @Getter @Setter private transient double x2 = 0; // 0 to 100, usually percentage of 360, secondary pattern
     private transient boolean isOn = false;
     @Getter @Setter private transient double multipliedSpeed; // speed, but when internally multiplied by events
+    @Getter @Setter private transient double secondaryMultipliedSpeed;
     @Getter @Setter private transient int timeToFade; // internal fade off value
     private final transient Runnable run;
     private transient boolean isLoaded;
@@ -59,26 +54,34 @@ public class Light implements LightInterface {
     }
     
     public Light(Location loc, UUID uniqueID, String name, LightPattern pattern, LightType type, LightChannel channel) {
-        this(uniqueID, name, loc, 0, 0, 0, 0, 0, 0, false, pattern, type, channel, LightSpeedChannel.DEFAULT);
+        this(uniqueID, name, loc, 0, 0, 0, 0, 0, 0, 0, 0, false, pattern, LightPattern.STILL, type, channel, LightSpeedChannel.DEFAULT, 0, 0);
     }
     
     @Builder
-    public Light(UUID uuid, String name, Location location, double maxLength, double onLength, double speed, double patternSizeMultiplier, int timeToFadeToBlack, int lightCount,
-                 boolean flipStartAndEnd, LightPattern pattern, LightType type, LightChannel channel, LightSpeedChannel speedChannel) {
+    public Light(UUID uuid, String name, Location location, double maxLength, double onLength, double speed, double secondarySpeed, double patternSizeMultiplier,
+                 double secondaryPatternMultiplier, int timeToFadeToBlack, int lightCount, boolean flipStartAndEnd, LightPattern pattern, LightPattern secondaryPattern,
+                 LightType type, LightChannel channel, LightSpeedChannel speedChannel, double rotation, double secondaryRotation) {
+        data = new LightData();
+        
         this.uniqueID = uuid;
         this.name = name;
         this.location = location;
-        this.maxLength = maxLength;
-        this.onLength = onLength;
-        this.speed = speed;
-        this.timeToFadeToBlack = timeToFadeToBlack;
-        this.lightCount = lightCount;
-        this.pattern = pattern;
         this.type = type;
         this.channel = channel;
         this.speedChannel = speedChannel;
-        this.flipStartAndEnd = flipStartAndEnd;
-        this.patternSizeMultiplier = patternSizeMultiplier;
+        data.setMaxLength(maxLength);
+        data.setOnLength(onLength);
+        data.setSpeed(speed);
+        data.setSecondarySpeed(secondarySpeed);
+        data.setTimeToFadeToBlack(timeToFadeToBlack);
+        data.setLightCount(lightCount);
+        data.setPattern(pattern);
+        data.setFlipStartAndEnd(flipStartAndEnd);
+        data.setPatternSizeMultiplier(patternSizeMultiplier);
+        data.setSecondaryPatternSizeMultiplier(secondaryPatternMultiplier);
+        data.setSecondPattern(secondaryPattern);
+        data.setRotation(rotation);
+        data.setSecondaryRotation(secondaryRotation);
         
         load();
         
@@ -91,7 +94,7 @@ public class Light implements LightInterface {
         run = () -> {
             if (timeToFade > 0 && length > 0) {
                 timeToFade--;
-                length -= 100.0 / this.timeToFadeToBlack;
+                length -= 100.0 / data.getTimeToFadeToBlack();
             }
             if (length <= 0) {
                 off(new Color(0x000000));
@@ -102,6 +105,7 @@ public class Light implements LightInterface {
                 length = 100.0;
             }
             x = (x + multipliedSpeed) % 100;
+            x2 = (x2 + secondaryMultipliedSpeed) % 100;
             
             for (int i = 0; i < lasers.size(); i++) {
                 LaserWrapper laser = lasers.get(i);
@@ -110,18 +114,17 @@ public class Light implements LightInterface {
                 x value that is separated evenly for each laser.
                  */
                 double separated = x + (100.0 / lasers.size()) * i;
-                if (this.pattern == LightPattern.LINE) {
-                    separated = x + (50.0 / lasers.size()) * i;
-                }
                 Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize().scalarMultiply(getMaxLengthPercent());
-                Rotation r = new Rotation(v, this.location.getRotation(), RotationConvention.FRAME_TRANSFORM);
-                Vector3D v2 = this.pattern.apply(v, separated, r, this.patternSizeMultiplier * (length / 100));
-                Vector3D v3 = v.add(v2);
+                Rotation r = new Rotation(v, this.data.getRotation(), RotationConvention.FRAME_TRANSFORM);
+                Rotation r2 = new Rotation(v, this.data.getSecondaryRotation(), RotationConvention.FRAME_TRANSFORM);
+                Vector3D v2 = data.getPattern().apply(v, separated, r, data.getPatternSizeMultiplier() * (length / 100));
+                Vector3D v3 = data.getSecondPattern().apply(v, x2, r2, data.getSecondaryPatternSizeMultiplier() * (length / 100));
+                Vector3D v4 = v.add(v3).add(v2);
                 
-                if (this.flipStartAndEnd) {
-                    laser.setStart(this.location.clone().add(v3.getX(), v3.getZ(), v3.getY()));
+                if (data.isFlipStartAndEnd()) {
+                    laser.setStart(this.location.clone().add(v4.getX(), v4.getZ(), v4.getY()));
                 } else {
-                    laser.setEnd(this.location.clone().add(v3.getX(), v3.getZ(), v3.getY()));
+                    laser.setEnd(this.location.clone().add(v4.getX(), v4.getZ(), v4.getY()));
                 }
             }
         };
@@ -132,7 +135,8 @@ public class Light implements LightInterface {
         this.speedChannel.getChannel().removeSpeedListener(this);
         this.channel.addListener(this);
         this.speedChannel.getChannel().addSpeedListener(this);
-        this.multipliedSpeed = speed;
+        this.multipliedSpeed = data.getSpeed();
+        this.secondaryMultipliedSpeed = data.getSecondarySpeed();
         buildLasers();
         isLoaded = true;
     }
@@ -168,20 +172,19 @@ public class Light implements LightInterface {
         }
         isOn = false;
         lasers.clear();
-        for (int i = 0; i < lightCount; i++) {
+        for (int i = 0; i < data.getLightCount(); i++) {
             LaserWrapper laser;
-            double separated = 0 + (100.0 / lightCount) * i;
-            if (pattern == LightPattern.LINE) {
-                separated = 0 + (50.0 / lightCount) * i;
-            }
-            Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize().scalarMultiply(maxLength * onLength / 100.0);
-            Rotation r = new Rotation(v, this.location.getRotation(), RotationConvention.FRAME_TRANSFORM);
-            Vector3D v2 = this.pattern.apply(v, separated, r, this.patternSizeMultiplier * (onLength / 100));
-            Vector3D v3 = v.add(v2);
-            if (flipStartAndEnd) {
-                laser = new LaserWrapper(location.clone().add(v3.getX(), v3.getZ(), v3.getY()), location, -1, 256, type);
+            double separated = 0 + (100.0 / data.getLightCount()) * i;
+            Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize().scalarMultiply(data.getMaxLength() * data.getOnLength() / 100.0);
+            Rotation r = new Rotation(v, this.data.getRotation(), RotationConvention.FRAME_TRANSFORM);
+            Rotation r2 = new Rotation(v, this.data.getSecondaryRotation(), RotationConvention.FRAME_TRANSFORM);
+            Vector3D v2 = data.getPattern().apply(v, separated, r, data.getPatternSizeMultiplier() * (data.getOnLength() / 100));
+            Vector3D v3 = data.getSecondPattern().apply(v, 0.0, r2, data.getSecondaryPatternSizeMultiplier() * (data.getOnLength() / 100));
+            Vector3D v4 = v.add(v3).add(v2);
+            if (data.isFlipStartAndEnd()) {
+                laser = new LaserWrapper(location.clone().add(v4.getX(), v4.getZ(), v4.getY()), location, -1, 256, type);
             } else {
-                laser = new LaserWrapper(location, location.clone().add(v3.getX(), v3.getZ(), v3.getY()), -1, 256, type);
+                laser = new LaserWrapper(location, location.clone().add(v4.getX(), v4.getZ(), v4.getY()), -1, 256, type);
             }
             lasers.add(laser);
         }
@@ -192,10 +195,10 @@ public class Light implements LightInterface {
     public void on(Color color) {
         if (!isLoaded) return;
         lasers.forEach(LaserWrapper::start);
-        if (length < onLength && !isOn) {
-            length = onLength;
+        if (length < data.getOnLength() && !isOn) {
+            length = data.getOnLength();
         }
-        length = onLength * (color.getAlpha() / 255.0);
+        length = data.getOnLength() * (color.getAlpha() / 255.0);
         isOn = true;
         timeToFade = 0;
     }
@@ -215,8 +218,8 @@ public class Light implements LightInterface {
     public void flash(Color color) {
         if (!isLoaded) return;
         if (isOn) {
-            length = onLength * (color.getAlpha() / 255.0);
-            length += (100 - onLength) / 3;
+            length = data.getOnLength() * (color.getAlpha() / 255.0);
+            length += (100 - data.getOnLength()) / 3;
             timeToFade += 3;
             lasers.forEach(LaserWrapper::changeColor);
         } else {
@@ -230,7 +233,7 @@ public class Light implements LightInterface {
         if (!isLoaded) return;
         on(color);
         flash(color);
-        timeToFade = timeToFadeToBlack;
+        timeToFade = data.getTimeToFadeToBlack();
     }
     /**
      * Set which LightChannel this Light should be listening to.
@@ -258,39 +261,46 @@ public class Light implements LightInterface {
      * @param speed Base Speed before multiplier
      */
     public void setBaseSpeed(double speed) {
-        this.speed = speed;
+        data.setSpeed(speed);
+        multipliedSpeed = speed;
     }
+    public void setSecondaryBaseSpeed(double speed) {
+        data.setSecondarySpeed(speed);
+        secondaryMultipliedSpeed = speed;
+    }
+    
     /**
      * Set speed with LightEvent-specified multiplier
      */
     public void setSpeed(double multiplier) {
         if (!isLoaded) return;
-        if (this.multipliedSpeed == speed * multiplier) { // laser "reset"
+        if (multipliedSpeed == 0 && multiplier > 0) {
+            double random = new Random().nextDouble() * 100;
+            x += random;
+            x2 += random;
+        }
+        if (this.multipliedSpeed == data.getSpeed() * multiplier) { // laser "reset"
             x = (x + 12) % 100;
+            x2 = (x2 + 12) % 100;
         }
         if (multiplier == 0) {
-            x = 100.0 / lightCount;
+            x = 100.0 / data.getLightCount();
+            x2 = 100.0 / data.getLightCount();
         }
-        this.multipliedSpeed = speed * multiplier;
+        this.multipliedSpeed = data.getSpeed() * multiplier;
+        this.secondaryMultipliedSpeed = data.getSecondarySpeed() * multiplier;
         if (multipliedSpeed >= 40.0) {
             multipliedSpeed = 40.0;
+            if (secondaryMultipliedSpeed >= 40.0) {
+                secondaryMultipliedSpeed = 40.0;
+            }
         }
     }
     
     private double getMaxLengthPercent() {
-        return maxLength * length / 100.0;
+        return data.getMaxLength() * length / 100.0;
     }
-    public void setFlipStartAndEnd(boolean flipStartAndEnd) {
-        this.flipStartAndEnd = flipStartAndEnd;
-        buildLasers();
-    }
-    public void setLightCount(int lightCount) {
-        this.lightCount = lightCount;
-        buildLasers();
-    }
-    public void setRotation(double rotation) {
-        this.location.setRotation(rotation);
-    }
+    
     public void setType(LightType type) {
         this.type = type;
         buildLasers();

@@ -2,7 +2,7 @@ package com.ilm9001.nightclub.light;
 
 import java.awt.*;
 
-public interface LightInterface {
+public interface LightI {
     void on(Color color);
     
     void off(Color color);
