@@ -1,7 +1,9 @@
 package com.ilm9001.nightclub.util;
 
+import com.ilm9001.nightclub.commands.CommandError;
 import com.ilm9001.nightclub.light.Light;
 import com.ilm9001.nightclub.light.LightUniverse;
+import org.bukkit.ChatColor;
 
 import java.io.File;
 import java.text.NumberFormat;
@@ -47,4 +49,19 @@ public class Util {
         lightUniverses.forEach(lightUniverse -> strings.add(lightUniverse.getName()));
         return strings;
     }
+    public static String formatErrors(List<CommandError> errors) {
+        //cba to use components
+        if (errors.stream().noneMatch(commandError -> commandError != CommandError.VALID)) {
+            return "";
+        }
+        String formattedErrors = ChatColor.RED + "One or more errors occurred while trying to execute the command:" + System.lineSeparator();
+        for (CommandError error : errors) {
+            if (error == CommandError.VALID) {
+                continue;
+            }
+            formattedErrors += "" + ChatColor.BLUE + ChatColor.ITALIC + error.getErrorMessage() + System.lineSeparator();
+        }
+        return formattedErrors;
+    }
+    
 }

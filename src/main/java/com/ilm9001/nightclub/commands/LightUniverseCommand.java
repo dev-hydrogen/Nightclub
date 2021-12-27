@@ -7,22 +7,39 @@ import com.ilm9001.nightclub.light.LightUniverse;
 import com.ilm9001.nightclub.light.LightUniverseManager;
 import org.bukkit.command.CommandSender;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static com.ilm9001.nightclub.util.Util.formatErrors;
+
 
 @CommandAlias("lightuniverse|lu")
 @CommandPermission("nightclub.lightuniverse")
 public class LightUniverseCommand extends BaseCommand {
     private static final LightUniverseManager manager = Nightclub.getLightUniverseManager();
     
-    public static boolean isUnloaded() {
-        return manager.getLoadedUniverse() == null;
+    static List<CommandError> isUnloaded() {
+        List<CommandError> errors = new ArrayList<>();
+        errors.add(Nightclub.getLightUniverseManager().getLoadedUniverse() == null ? CommandError.LIGHTUNIVERSE_UNLOADED : CommandError.VALID);
+        errors.add(BeatmapCommand.getPlayer() != null && BeatmapCommand.getPlayer().isPlaying() ? CommandError.BEATMAP_PLAYING : CommandError.VALID);
+        return errors;
+    }
+    static List<CommandError> isUnloaded(String[] args, int minArgsLength) {
+        List<CommandError> errors = isUnloaded();
+        errors.add(args.length < minArgsLength ? CommandError.TOO_LITTLE_ARGUMENTS : CommandError.VALID);
+        return errors;
     }
     
     @Subcommand("build")
     @Description("Build a new LightUniverse")
     @CommandPermission("nightclub.lightuniverse")
-    public static void onBuild(String[] args) {
-        if (BeatmapCommand.getPlayer() != null && BeatmapCommand.getPlayer().isPlaying()) return;
+    public static void onBuild(CommandSender sender, String[] args) {
+        if (isUnloaded().stream().anyMatch(error -> error != CommandError.VALID && error != CommandError.LIGHTUNIVERSE_UNLOADED)) {
+            sender.sendMessage(formatErrors(isUnloaded()));
+            return;
+        }
         LightUniverse universe = new LightUniverse();
         if (manager.getLoadedUniverse() != null) {
             manager.getLoadedUniverse().unload();
@@ -35,10 +52,12 @@ public class LightUniverseCommand extends BaseCommand {
     @Description("Load a LightUniverse from provided argument")
     @CommandCompletion("@universes")
     @CommandPermission("nightclub.lightuniverse")
-    public static void onLoad(String[] args) {
-        if (BeatmapCommand.getPlayer() != null && BeatmapCommand.getPlayer().isPlaying()) return;
+    public static void onLoad(CommandSender sender, String[] args) {
+        if (isUnloaded(args, 1).stream().anyMatch(error -> error != CommandError.VALID && error != CommandError.LIGHTUNIVERSE_UNLOADED)) {
+            sender.sendMessage(formatErrors(isUnloaded()));
+            return;
+        }
         LightUniverse lightUniverse = manager.getLoadedUniverse();
-        if (args.length < 1) return;
         
         if (lightUniverse != null && lightUniverse.isLoaded()) {
             lightUniverse.unload();
@@ -71,8 +90,14 @@ public class LightUniverseCommand extends BaseCommand {
     @Subcommand("setname")
     @Description("Set the currently loaded LightUniverses name")
     @CommandPermission("nightclub.lightuniverse")
-    public static void onSetName(String[] args) {
-        if (args.length < 1 || isUnloaded()) return;
+    public static void onSetName(CommandSender sender, String[] args) {
+        List<CommandError> errors = isUnloaded(args, 1);
+        errors.add(Nightclub.getLightUniverseManager().getUniverses().stream().anyMatch(universe -> Objects.equals(universe.getName(), args[0]))
+                ? CommandError.NAME_ALREADY_EXISTS : CommandError.VALID);
+        if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
+            sender.sendMessage(formatErrors(errors));
+            return;
+        }
         manager.getLoadedUniverse().setName(args[0]);
     }
     
@@ -80,14 +105,20 @@ public class LightUniverseCommand extends BaseCommand {
     @Description("Get ID of loaded LightUniverse")
     @CommandPermission("nightclub.lightuniverse")
     public static void onGetID(CommandSender sender) {
-        if (isUnloaded()) return;
+        if (isUnloaded().stream().anyMatch(error -> error != CommandError.VALID)) {
+            sender.sendMessage(formatErrors(isUnloaded()));
+            return;
+        }
         sender.sendMessage("Currently loaded ID: " + manager.getLoadedUniverse().getId());
     }
     @Subcommand("getname")
     @Description("Get name of loaded LightUniverse")
     @CommandPermission("nightclub.lightuniverse")
     public static void onGetName(CommandSender sender) {
-        if (isUnloaded()) return;
+        if (isUnloaded().stream().anyMatch(error -> error != CommandError.VALID)) {
+            sender.sendMessage(formatErrors(isUnloaded()));
+            return;
+        }
         sender.sendMessage("Currently loaded ID: " + manager.getLoadedUniverse().getName());
     }
 }
