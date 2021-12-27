@@ -111,5 +111,4 @@ public class BeatmapPlayer {
             case 3, 7 -> handler.flashOff(color);
         }
     }
-    
 }
