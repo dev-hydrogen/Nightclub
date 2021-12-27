@@ -48,7 +48,6 @@ public class LightUniverse {
             light.start();
             light.load();
             light.on(new Color(0x0066ff));
-            Nightclub.getInstance().getLogger().info(light.toString());
         });
         isLoaded = true;
     }
