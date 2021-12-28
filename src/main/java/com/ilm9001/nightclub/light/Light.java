@@ -56,36 +56,31 @@ public class Light implements LightI {
     public Light(Location loc, UUID uniqueID, String name, LightPattern pattern, LightType type, LightChannel channel) {
         this(uniqueID, name, loc, 0, 0, 0, 0, 0, 0, 0, 0, false, pattern, LightPattern.STILL, type, channel, LightSpeedChannel.DEFAULT, 0, 0);
     }
-    
+    /**
+     * @deprecated Use LightData instead.
+     */
     @Builder
+    @Deprecated
     public Light(UUID uuid, String name, Location location, double maxLength, double onLength, double speed, double secondarySpeed, double patternSizeMultiplier,
                  double secondaryPatternMultiplier, int timeToFadeToBlack, int lightCount, boolean flipStartAndEnd, LightPattern pattern, LightPattern secondaryPattern,
                  LightType type, LightChannel channel, LightSpeedChannel speedChannel, double rotation, double secondaryRotation) {
-        data = new LightData();
-        
+        this(uuid, name, location, type, channel, speedChannel, new LightData(pattern, secondaryPattern, maxLength, onLength, speed, secondarySpeed, patternSizeMultiplier,
+                secondaryPatternMultiplier, timeToFadeToBlack, lightCount, flipStartAndEnd, rotation, secondaryRotation));
+    }
+    
+    @Builder
+    public Light(UUID uuid, String name, Location location, LightType type, LightChannel channel, LightSpeedChannel speedChannel, LightData data) {
+        this.data = data;
         this.uniqueID = uuid;
         this.name = name;
         this.location = location;
         this.type = type;
         this.channel = channel;
         this.speedChannel = speedChannel;
-        data.setMaxLength(maxLength);
-        data.setOnLength(onLength);
-        data.setSpeed(speed);
-        data.setSecondarySpeed(secondarySpeed);
-        data.setTimeToFadeToBlack(timeToFadeToBlack);
-        data.setLightCount(lightCount);
-        data.setPattern(pattern);
-        data.setFlipStartAndEnd(flipStartAndEnd);
-        data.setPatternSizeMultiplier(patternSizeMultiplier);
-        data.setSecondaryPatternSizeMultiplier(secondaryPatternMultiplier);
-        data.setSecondPattern(secondaryPattern);
-        data.setRotation(rotation);
-        data.setSecondaryRotation(secondaryRotation);
         
         load();
         
-        if (flipStartAndEnd) {
+        if (data.isFlipStartAndEnd()) {
             lasers.forEach((laser) -> laser.setEnd(this.location));
         } else {
             lasers.forEach((laser) -> laser.setStart(this.location));

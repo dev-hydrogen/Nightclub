@@ -1,8 +1,10 @@
 package com.ilm9001.nightclub.light;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class LightData {
     private LightPattern pattern;
     private LightPattern secondPattern;
