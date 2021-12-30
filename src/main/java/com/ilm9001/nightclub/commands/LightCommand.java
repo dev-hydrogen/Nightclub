@@ -48,10 +48,22 @@ public class LightCommand extends BaseCommand {
             sender.sendMessage(formatErrors(errors));
             return;
         }
-        
-        light = new Light(UUID.randomUUID(), "Unnamed-Light" + new Random().nextInt(), Location.getFromBukkitLocation(player.getLocation().add(0, 1, 0)),
-                15, 80, 0.3, 0.2, 5, 3, 45, 4, player.getLocation().getPitch() > -10,
-                LightPattern.CIRCLE, LightPattern.STILL, LightType.GUARDIAN_BEAM, LightChannel.CENTER_LIGHTS, LightSpeedChannel.DEFAULT, 0, Math.toRadians(45));
+        LightData data = LightData.builder()
+                .patternData(new LightPatternData(LightPattern.LINE, 0.3, 5, 0))
+                .secondPatternData(new LightPatternData(LightPattern.LINE, 0.2, 3, 0))
+                .maxLength(15)
+                .onLength(80)
+                .timeToFadeToBlack(45)
+                .lightCount(4)
+                .flipStartAndEnd(player.getLocation().getPitch() > -10).build();
+        light = Light.builder()
+                .uuid(UUID.randomUUID())
+                .name("Unnamed-Light-" + new Random().nextInt())
+                .location(Location.getFromBukkitLocation(player.getLocation().add(0, 1, 0)))
+                .type(LightType.GUARDIAN_BEAM)
+                .channel(LightChannel.CENTER_LIGHTS)
+                .speedChannel(LightSpeedChannel.RIGHT_ROTATING_LASERS)
+                .data(data).build();
         light.start();
         light.on(new Color(0x0066ff));
         manager.getLoadedUniverse().addLight(light);
@@ -85,7 +97,9 @@ public class LightCommand extends BaseCommand {
         
         List<CommandError> errors = isUnloaded();
         errors.add(args.length < 1 ? CommandError.TOO_LITTLE_ARGUMENTS : CommandError.VALID);
-        errors.add(universe.getLight(args[0]) == null ? CommandError.INVALID_ARGUMENT : CommandError.VALID);
+        if (errors.stream().noneMatch(error -> error == CommandError.LIGHTUNIVERSE_UNLOADED)) {
+            errors.add(universe.getLight(args[0]) == null ? CommandError.INVALID_ARGUMENT : CommandError.VALID);
+        }
         if (errors.stream().anyMatch(error -> error != CommandError.VALID && error != CommandError.LIGHT_UNLOADED)) {
             sender.sendMessage(formatErrors(errors));
             return;
@@ -134,7 +148,7 @@ public class LightCommand extends BaseCommand {
                 sender.sendMessage(formatErrors(errors));
                 return;
             }
-            light.getData().setPattern(LightPattern.valueOf(args[0]));
+            light.getData().getPatternData().setPattern(LightPattern.valueOf(args[0]));
             light.on(new Color(0x0066ff));
         }
         @Subcommand("secondarypattern")
@@ -153,7 +167,7 @@ public class LightCommand extends BaseCommand {
                 sender.sendMessage(formatErrors(errors));
                 return;
             }
-            light.getData().setSecondPattern(LightPattern.valueOf(args[0]));
+            light.getData().getPatternData().setPattern(LightPattern.valueOf(args[0]));
             light.on(new Color(0x0066ff));
         }
         
@@ -192,7 +206,7 @@ public class LightCommand extends BaseCommand {
                 sender.sendMessage(formatErrors(isUnloaded(args, 1)));
                 return;
             }
-            light.getData().setPatternSizeMultiplier(Util.parseNumber(args[0]).doubleValue());
+            light.getData().getPatternData().setPatternSizeMultiplier(Util.parseNumber(args[0]).doubleValue());
             light.on(new Color(0x0066ff));
         }
         @Subcommand("secondarypatternmultiplier")
@@ -204,7 +218,7 @@ public class LightCommand extends BaseCommand {
                 sender.sendMessage(formatErrors(isUnloaded(args, 1)));
                 return;
             }
-            light.getData().setSecondaryPatternSizeMultiplier(Util.parseNumber(args[0]).doubleValue());
+            light.getData().getPatternData().setPatternSizeMultiplier(Util.parseNumber(args[0]).doubleValue());
             light.on(new Color(0x0066ff));
         }
         
@@ -276,7 +290,7 @@ public class LightCommand extends BaseCommand {
                 sender.sendMessage(formatErrors(isUnloaded(args, 1)));
                 return;
             }
-            light.getData().setRotation(Math.toRadians(Util.parseNumber(args[0]).doubleValue()));
+            light.getData().getPatternData().setRotation(Math.toRadians(Util.parseNumber(args[0]).doubleValue()));
             light.buildLasers();
             light.on(new Color(0x0066ff));
         }
@@ -290,7 +304,7 @@ public class LightCommand extends BaseCommand {
                 sender.sendMessage(formatErrors(isUnloaded(args, 1)));
                 return;
             }
-            light.getData().setSecondaryRotation(Math.toRadians(Util.parseNumber(args[0]).doubleValue()));
+            light.getData().getSecondPatternData().setRotation(Math.toRadians(Util.parseNumber(args[0]).doubleValue()));
             light.buildLasers();
             light.on(new Color(0x0066ff));
         }
@@ -344,7 +358,12 @@ public class LightCommand extends BaseCommand {
                 sender.sendMessage(formatErrors(errors));
                 return;
             }
-            light.setLocation(Location.getFromBukkitLocation(player.getLocation().add(0, 1, 0)));
+            if (args.length >= 5) {
+                light.setLocation(new Location(Util.parseNumber(args[0]), Util.parseNumber(args[1]), Util.parseNumber(args[2]), // x y z
+                        Util.parseNumber(args[3]), Util.parseNumber(args[4]))); // pitch and yaw
+            } else {
+                light.setLocation(Location.getFromBukkitLocation(player.getLocation().add(0, 1, 0)));
+            }
             light.buildLasers();
             light.on(new Color(0x000000));
         }

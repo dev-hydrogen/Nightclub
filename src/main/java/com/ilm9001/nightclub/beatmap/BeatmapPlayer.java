@@ -45,11 +45,8 @@ public class BeatmapPlayer {
         playTo.forEach((player) -> player.playSound(player.getLocation(), name, 1, 1));
         isPlaying = true;
         
-        channelList.forEach(channel -> {
-            //start all channels up and then turn them off to wait for beatmap instructions
-            channel.start();
-            channel.off(new Color(0x000000));
-        });
+        //start all channels up and then turn them off to wait for beatmap instructions
+        channelList.forEach(LightChannel::initializePlayback);
         
         events.forEach((event) -> {
             Runnable task = () -> handle(event);
@@ -57,11 +54,10 @@ public class BeatmapPlayer {
         });
         
         //schedule turn off after the show is over
-        Runnable task = () -> channelList.forEach(channel -> {
-            channel.off(new Color(0x000000));
-            channel.stop();
+        Runnable task = () -> {
             isPlaying = false;
-        });
+            channelList.forEach(LightChannel::terminatePlayback);
+        };
         executorService.schedule(task, events.get(events.size() - 1).getTime() + 5000000, TimeUnit.MICROSECONDS);
         
         return info;
@@ -71,11 +67,8 @@ public class BeatmapPlayer {
      */
     public void stop() {
         List<LightChannel> channelList = Arrays.asList(LightChannel.values());
-        channelList.forEach(channel -> {
-            channel.off(new Color(0x000000));
-            channel.stop();
-            isPlaying = false;
-        });
+        channelList.forEach(LightChannel::terminatePlayback);
+        isPlaying = false;
         if (executorService != null) {
             executorService.shutdownNow();
         }

@@ -30,23 +30,15 @@ public class Util {
     public static Collection<String> getStringValuesFromArray(Object[] objects) {
         Collection<Object> collection = Arrays.asList(objects);
         Collection<String> strings = new ArrayList<>();
-        collection.forEach(object -> strings.add(object.toString()));
-        return strings;
-    }
-    public static Collection<String> getStringValuesFromFiles(File[] files) {
-        Collection<File> collection = Arrays.asList(files);
-        Collection<String> strings = new ArrayList<>();
-        collection.forEach(file -> strings.add(file.getName()));
-        return strings;
-    }
-    public static Collection<String> getStringValuesFromLights(List<Light> lights) {
-        Collection<String> strings = new ArrayList<>();
-        lights.forEach(light -> strings.add(light.getName()));
-        return strings;
-    }
-    public static Collection<String> getStringValuesFromLightUniverses(List<LightUniverse> lightUniverses) {
-        Collection<String> strings = new ArrayList<>();
-        lightUniverses.forEach(lightUniverse -> strings.add(lightUniverse.getName()));
+        if (objects instanceof File[]) {
+            collection.forEach((file) -> strings.add(((File) file).getName()));
+        } else if (objects instanceof Light[]) {
+            collection.forEach((light) -> strings.add(((Light) light).getName()));
+        } else if (objects instanceof LightUniverse[]) {
+            collection.forEach((universe) -> strings.add(((LightUniverse) universe).getName()));
+        } else {
+            collection.forEach(object -> strings.add(object.toString()));
+        }
         return strings;
     }
     public static String formatErrors(List<CommandError> errors) {

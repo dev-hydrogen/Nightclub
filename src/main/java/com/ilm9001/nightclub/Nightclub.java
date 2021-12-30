@@ -19,9 +19,10 @@ import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.logging.Level;
 
-import static com.ilm9001.nightclub.util.Util.*;
+import static com.ilm9001.nightclub.util.Util.getStringValuesFromArray;
 
 
 public final class Nightclub extends JavaPlugin {
@@ -69,9 +70,18 @@ public final class Nightclub extends JavaPlugin {
         completions.registerCompletion("type", c -> getStringValuesFromArray(LightType.values()));
         completions.registerCompletion("channels", c -> getStringValuesFromArray(LightChannel.values()));
         completions.registerCompletion("speedchannels", c -> getStringValuesFromArray(LightSpeedChannel.values()));
-        completions.registerCompletion("beatmaps", c -> getStringValuesFromFiles(new File(getDataFolder().getAbsolutePath()).listFiles(File::isDirectory)));
-        completions.registerCompletion("universes", c -> getStringValuesFromLightUniverses(getLightUniverseManager().getUniverses()));
-        completions.registerCompletion("lights", c -> getStringValuesFromLights(getLightUniverseManager().getLoadedUniverse().getLights()));
+        completions.registerCompletion("beatmaps", c -> getStringValuesFromArray(new File(getDataFolder().getAbsolutePath()).listFiles(File::isDirectory)));
+        // https://stackoverflow.com/questions/7909747/why-does-liststring-toarray-return-object-and-not-string-how-to-work-ar
+        completions.registerCompletion("universes", c -> {
+            if (getLightUniverseManager().getUniverses() != null && !getLightUniverseManager().getUniverses().isEmpty()) {
+                return getStringValuesFromArray(getLightUniverseManager().getUniverses().toArray(new LightUniverse[0]));
+            } else return new ArrayList<>();
+        });
+        completions.registerCompletion("lights", c -> {
+            if (getLightUniverseManager().getLoadedUniverse() != null) {
+                return getStringValuesFromArray(getLightUniverseManager().getLoadedUniverse().getLights().toArray(new Light[0]));
+            } else return new ArrayList<>();
+        });
         
         commandManager.registerCommand(new LightCommand());
         commandManager.registerCommand(new BeatmapCommand());

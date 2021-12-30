@@ -54,33 +54,25 @@ public class Light implements LightI {
     }
     
     public Light(Location loc, UUID uniqueID, String name, LightPattern pattern, LightType type, LightChannel channel) {
-        this(uniqueID, name, loc, 0, 0, 0, 0, 0, 0, 0, 0, false, pattern, LightPattern.STILL, type, channel, LightSpeedChannel.DEFAULT, 0, 0);
-    }
-    /**
-     * @deprecated Use LightData instead.
-     */
-    @Builder
-    @Deprecated
-    public Light(UUID uuid, String name, Location location, double maxLength, double onLength, double speed, double secondarySpeed, double patternSizeMultiplier,
-                 double secondaryPatternMultiplier, int timeToFadeToBlack, int lightCount, boolean flipStartAndEnd, LightPattern pattern, LightPattern secondaryPattern,
-                 LightType type, LightChannel channel, LightSpeedChannel speedChannel, double rotation, double secondaryRotation) {
-        this(uuid, name, location, type, channel, speedChannel, new LightData(pattern, secondaryPattern, maxLength, onLength, speed, secondarySpeed, patternSizeMultiplier,
-                secondaryPatternMultiplier, timeToFadeToBlack, lightCount, flipStartAndEnd, rotation, secondaryRotation));
+        this(uniqueID, name, loc, type, channel, LightSpeedChannel.DEFAULT, new LightData(
+                new LightPatternData(pattern, 0, 0, 0), new LightPatternData(LightPattern.STILL,
+                0, 0, 0), 0, 0,
+                0, 0, false));
     }
     
     @Builder
     public Light(UUID uuid, String name, Location location, LightType type, LightChannel channel, LightSpeedChannel speedChannel, LightData data) {
-        this.data = data;
         this.uniqueID = uuid;
         this.name = name;
         this.location = location;
         this.type = type;
         this.channel = channel;
         this.speedChannel = speedChannel;
+        this.data = data;
         
         load();
         
-        if (data.isFlipStartAndEnd()) {
+        if (this.data.isFlipStartAndEnd()) {
             lasers.forEach((laser) -> laser.setEnd(this.location));
         } else {
             lasers.forEach((laser) -> laser.setStart(this.location));
@@ -89,7 +81,7 @@ public class Light implements LightI {
         run = () -> {
             if (timeToFade > 0 && length > 0) {
                 timeToFade--;
-                length -= 100.0 / data.getTimeToFadeToBlack();
+                length -= 100.0 / this.data.getTimeToFadeToBlack();
             }
             if (length <= 0) {
                 off(new Color(0x000000));
@@ -106,17 +98,17 @@ public class Light implements LightI {
                 LaserWrapper laser = lasers.get(i);
                 /*
                 Here we make a ray the size of (length) from the location of this Light, then we add a 2d plane to it (which is where our pattern is) with an
-                x value that is separated evenly for each laser.
+                x value that is separated evenly for each laser. This pattern is then moved (as a whole) by the second pattern.
                  */
                 double separated = x + (100.0 / lasers.size()) * i;
                 Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize().scalarMultiply(getMaxLengthPercent());
-                Rotation r = new Rotation(v, this.data.getRotation(), RotationConvention.FRAME_TRANSFORM);
-                Rotation r2 = new Rotation(v, this.data.getSecondaryRotation(), RotationConvention.FRAME_TRANSFORM);
-                Vector3D v2 = data.getPattern().apply(v, separated, r, data.getPatternSizeMultiplier() * (length / 100));
-                Vector3D v3 = data.getSecondPattern().apply(v, x2, r2, data.getSecondaryPatternSizeMultiplier() * (length / 100));
+                Rotation r = new Rotation(v, this.data.getPatternData().getRotation(), RotationConvention.FRAME_TRANSFORM);
+                Rotation r2 = new Rotation(v, this.data.getSecondPatternData().getRotation(), RotationConvention.FRAME_TRANSFORM);
+                Vector3D v2 = this.data.getPatternData().getPattern().apply(v, separated, r, this.data.getPatternData().getPatternSizeMultiplier() * (length / 100));
+                Vector3D v3 = this.data.getSecondPatternData().getPattern().apply(v, x2, r2, this.data.getSecondPatternData().getPatternSizeMultiplier() * (length / 100));
                 Vector3D v4 = v.add(v3).add(v2);
                 
-                if (data.isFlipStartAndEnd()) {
+                if (this.data.isFlipStartAndEnd()) {
                     laser.setStart(this.location.clone().add(v4.getX(), v4.getZ(), v4.getY()));
                 } else {
                     laser.setEnd(this.location.clone().add(v4.getX(), v4.getZ(), v4.getY()));
@@ -130,8 +122,8 @@ public class Light implements LightI {
         this.speedChannel.getChannel().removeSpeedListener(this);
         this.channel.addListener(this);
         this.speedChannel.getChannel().addSpeedListener(this);
-        this.multipliedSpeed = data.getSpeed();
-        this.secondaryMultipliedSpeed = data.getSecondarySpeed();
+        this.multipliedSpeed = data.getPatternData().getSpeed();
+        this.secondaryMultipliedSpeed = data.getSecondPatternData().getSpeed();
         buildLasers();
         isLoaded = true;
     }
@@ -171,10 +163,10 @@ public class Light implements LightI {
             LaserWrapper laser;
             double separated = 0 + (100.0 / data.getLightCount()) * i;
             Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize().scalarMultiply(data.getMaxLength() * data.getOnLength() / 100.0);
-            Rotation r = new Rotation(v, this.data.getRotation(), RotationConvention.FRAME_TRANSFORM);
-            Rotation r2 = new Rotation(v, this.data.getSecondaryRotation(), RotationConvention.FRAME_TRANSFORM);
-            Vector3D v2 = data.getPattern().apply(v, separated, r, data.getPatternSizeMultiplier() * (data.getOnLength() / 100));
-            Vector3D v3 = data.getSecondPattern().apply(v, 0.0, r2, data.getSecondaryPatternSizeMultiplier() * (data.getOnLength() / 100));
+            Rotation r = new Rotation(v, this.data.getPatternData().getRotation(), RotationConvention.FRAME_TRANSFORM);
+            Rotation r2 = new Rotation(v, this.data.getSecondPatternData().getRotation(), RotationConvention.FRAME_TRANSFORM);
+            Vector3D v2 = data.getPatternData().getPattern().apply(v, separated, r, data.getPatternData().getPatternSizeMultiplier() * (data.getOnLength() / 100));
+            Vector3D v3 = data.getSecondPatternData().getPattern().apply(v, 0.0, r2, data.getSecondPatternData().getPatternSizeMultiplier() * (data.getOnLength() / 100));
             Vector3D v4 = v.add(v3).add(v2);
             if (data.isFlipStartAndEnd()) {
                 laser = new LaserWrapper(location.clone().add(v4.getX(), v4.getZ(), v4.getY()), location, -1, 256, type);
@@ -256,11 +248,11 @@ public class Light implements LightI {
      * @param speed Base Speed before multiplier
      */
     public void setBaseSpeed(double speed) {
-        data.setSpeed(speed);
+        data.getPatternData().setSpeed(speed);
         multipliedSpeed = speed;
     }
     public void setSecondaryBaseSpeed(double speed) {
-        data.setSecondarySpeed(speed);
+        data.getSecondPatternData().setSpeed(speed);
         secondaryMultipliedSpeed = speed;
     }
     
@@ -274,7 +266,7 @@ public class Light implements LightI {
             x += random;
             x2 += random;
         }
-        if (this.multipliedSpeed == data.getSpeed() * multiplier) { // laser "reset"
+        if (this.multipliedSpeed == data.getPatternData().getSpeed() * multiplier) { // laser "reset"
             x = (x + 12) % 100;
             x2 = (x2 + 12) % 100;
         }
@@ -282,8 +274,8 @@ public class Light implements LightI {
             x = 100.0 / data.getLightCount();
             x2 = 100.0 / data.getLightCount();
         }
-        this.multipliedSpeed = data.getSpeed() * multiplier;
-        this.secondaryMultipliedSpeed = data.getSecondarySpeed() * multiplier;
+        this.multipliedSpeed = data.getPatternData().getSpeed() * multiplier;
+        this.secondaryMultipliedSpeed = data.getSecondPatternData().getSpeed() * multiplier;
         if (multipliedSpeed >= 40.0) {
             multipliedSpeed = 40.0;
             if (secondaryMultipliedSpeed >= 40.0) {

@@ -23,6 +23,25 @@ public enum LightChannel {
         lights = new ArrayList<>();
         speedListeners = new ArrayList<>();
     }
+    public void initializePlayback() {
+        start();
+        off(new Color(0, 0, 0));
+        reset();
+    }
+    public void terminatePlayback() {
+        off(new Color(0, 0, 0));
+        stop();
+        reset();
+    }
+    public void reset() {
+        lights.forEach(light -> {
+            if (light instanceof Light) {
+                ((Light) light).setX(0);
+                ((Light) light).setSpeed(1);
+            }
+        });
+    }
+    
     public void addListener(LightI light) {
         lights.add(light);
     }
