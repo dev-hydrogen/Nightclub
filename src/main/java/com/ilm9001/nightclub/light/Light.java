@@ -100,11 +100,16 @@ public class Light implements LightI {
                 Here we make a ray the size of (length) from the location of this Light, then we add a 2d plane to it (which is where our pattern is) with an
                 x value that is separated evenly for each laser. This pattern is then moved (as a whole) by the second pattern.
                  */
+                // x position evenly separated for each laser
                 double separated = x + (100.0 / lasers.size()) * i;
+                // a (invisible) "ray" the size of length, pointing towards the set pitch and yaw
                 Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize().scalarMultiply(getMaxLengthPercent());
+                // rotation for first and second patterns, determines "start position" when pattern is a circle
                 Rotation r = new Rotation(v, this.data.getPatternData().getRotation(), RotationConvention.FRAME_TRANSFORM);
                 Rotation r2 = new Rotation(v, this.data.getSecondPatternData().getRotation(), RotationConvention.FRAME_TRANSFORM);
+                // apply first pattern (separated evenly for each laser) to our ray
                 Vector3D v2 = this.data.getPatternData().getPattern().apply(v, separated, r, this.data.getPatternData().getPatternSizeMultiplier() * (length / 100));
+                // then apply second pattern to all lasers with the same x value
                 Vector3D v3 = this.data.getSecondPatternData().getPattern().apply(v, x2, r2, this.data.getSecondPatternData().getPatternSizeMultiplier() * (length / 100));
                 Vector3D v4 = v.add(v3).add(v2);
                 
