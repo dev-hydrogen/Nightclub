@@ -37,6 +37,7 @@ public enum LightChannel {
         lights.forEach(light -> {
             if (light instanceof Light) {
                 ((Light) light).setX(0);
+                ((Light) light).setX2(0);
                 ((Light) light).setSpeed(1);
             }
         });
