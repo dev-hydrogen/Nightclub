@@ -71,7 +71,7 @@ public class Light implements LightI {
         this.channel = channel;
         this.speedChannel = speedChannel;
         this.data = data;
-        this.marker = new DebugMarker(location.getBukkitLocation(), new Color(0, 0, 0), name, 5000);
+        this.marker = new DebugMarker(location.getBukkitLocation(), new Color(0, 0, 0), "", 5000);
         
         load();
         
@@ -241,7 +241,6 @@ public class Light implements LightI {
         flash(color);
         marker.setLocation(location.getBukkitLocation());
         marker.setColor(color);
-        marker.setName(name + new Random().nextInt());
         marker.start(256);
         timeToFade = data.getTimeToFadeToBlack();
     }
