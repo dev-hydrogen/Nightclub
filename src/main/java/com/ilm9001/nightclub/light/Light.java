@@ -199,7 +199,6 @@ public class Light implements LightI {
         timeToFade = 0;
         marker.setLocation(location.getBukkitLocation());
         marker.setColor(color);
-        marker.setName(name + new Random().nextInt());
         marker.start(256);
     }
     
@@ -226,7 +225,6 @@ public class Light implements LightI {
             lasers.forEach(LaserWrapper::changeColor);
             marker.setLocation(location.getBukkitLocation());
             marker.setColor(color);
-            marker.setName(name + new Random().nextInt());
             marker.start(256);
         } else {
             flashOff(color);
