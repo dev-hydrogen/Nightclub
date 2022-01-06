@@ -80,6 +80,14 @@ public class DebugMarker {
                         e.printStackTrace();
                     }
                     seen.add(p);
+                } else if (!isCloseEnough(p.getLocation()) && seen.contains(p)) {
+                    setData(location, new Color(0, 0, 0, 0), "", 0);
+                    try {
+                        ProtocolLibrary.getProtocolManager().sendServerPacket(p, marker);
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
+                    seen.remove(p);
                 }
             }
         };
