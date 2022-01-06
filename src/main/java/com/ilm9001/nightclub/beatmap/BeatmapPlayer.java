@@ -49,7 +49,7 @@ public class BeatmapPlayer {
         channelList.forEach(LightChannel::initializePlayback);
         
         events.forEach((event) -> {
-            Runnable task = () -> handle(event);
+            Runnable task = () -> handle(event, events);
             executorService.schedule(task, event.getTime(), TimeUnit.MICROSECONDS);
         });
         
@@ -78,7 +78,7 @@ public class BeatmapPlayer {
      * https://bsmg.wiki/mapping/map-format.html
      * Internal handler of LightEvents.
      */
-    private void handle(LightEvent event) {
+    private void handle(LightEvent event, List<LightEvent> events) {
         // shorter way of handling events than using a switch case
         if (event.getType() >= 0 && event.getType() < 5) {
             Optional<LightChannel> channel = Arrays.stream(LightChannel.values()).filter((lc) -> event.getType() == lc.getType()).findFirst();

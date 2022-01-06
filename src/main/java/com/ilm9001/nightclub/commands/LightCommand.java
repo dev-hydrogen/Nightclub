@@ -218,7 +218,7 @@ public class LightCommand extends BaseCommand {
                 sender.sendMessage(formatErrors(isUnloaded(args, 1)));
                 return;
             }
-            light.getData().getPatternData().setPatternSizeMultiplier(Util.parseNumber(args[0]).doubleValue());
+            light.getData().getSecondPatternData().setPatternSizeMultiplier(Util.parseNumber(args[0]).doubleValue());
             light.on(new Color(0x0066ff));
         }
         

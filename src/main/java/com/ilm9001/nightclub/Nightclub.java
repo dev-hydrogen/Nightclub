@@ -3,6 +3,8 @@ package com.ilm9001.nightclub;
 import co.aikar.commands.BukkitCommandCompletionContext;
 import co.aikar.commands.CommandCompletions;
 import co.aikar.commands.PaperCommandManager;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.ilm9001.nightclub.commands.BeatmapCommand;
@@ -34,6 +36,7 @@ public final class Nightclub extends JavaPlugin {
     @Getter private static Gson GSON;
     @Getter private static LightUniverseManager lightUniverseManager;
     @Getter private static PaperCommandManager commandManager;
+    @Getter private static ProtocolManager protocolManager;
     
     @SneakyThrows
     @Override
@@ -45,6 +48,7 @@ public final class Nightclub extends JavaPlugin {
                 .registerTypeAdapter(Light.class, new Light.LightUniverseInstanceCreator())
                 .create();
         
+        protocolManager = ProtocolLibrary.getProtocolManager();
         instance = this;
         JSONreader = new LightJSONReader(GSON);
         JSONwriter = new LightJSONWriter(GSON);

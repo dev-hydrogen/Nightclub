@@ -5,6 +5,7 @@ import java.awt.*;
 public interface LightI {
     void on(Color color);
     
+    
     void off(Color color);
     
     void flash(Color color);

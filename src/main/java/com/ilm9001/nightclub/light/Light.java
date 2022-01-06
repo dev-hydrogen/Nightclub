@@ -4,6 +4,7 @@ import com.google.gson.InstanceCreator;
 import com.ilm9001.nightclub.laser.LaserWrapper;
 import com.ilm9001.nightclub.light.event.LightChannel;
 import com.ilm9001.nightclub.light.event.LightSpeedChannel;
+import com.ilm9001.nightclub.util.DebugMarker;
 import com.ilm9001.nightclub.util.Location;
 import lombok.*;
 import org.apache.commons.math3.geometry.euclidean.threed.Rotation;
@@ -33,6 +34,7 @@ public class Light implements LightI {
     @Getter private LightType type;
     @Getter private LightChannel channel;
     @Getter private LightSpeedChannel speedChannel;
+    @Getter private transient final DebugMarker marker;
     
     private final transient List<LaserWrapper> lasers = new ArrayList<>();
     @Getter @Setter private transient double length = 0; // 0 to 100, percentage of maxLength.
@@ -69,6 +71,7 @@ public class Light implements LightI {
         this.channel = channel;
         this.speedChannel = speedChannel;
         this.data = data;
+        this.marker = new DebugMarker(location.getBukkitLocation(), new Color(0, 0, 0), name, 5000);
         
         load();
         
@@ -118,6 +121,7 @@ public class Light implements LightI {
                 } else {
                     laser.setEnd(this.location.clone().add(v4.getX(), v4.getZ(), v4.getY()));
                 }
+                laser.changeColor();
             }
         };
     }
@@ -193,12 +197,18 @@ public class Light implements LightI {
         length = data.getOnLength() * (color.getAlpha() / 255.0);
         isOn = true;
         timeToFade = 0;
+        marker.setLocation(location.getBukkitLocation());
+        marker.setColor(color);
+        marker.setName(name + new Random().nextInt());
+        marker.start(256);
     }
+    
     /**
      * Turns Light off, sets length to 0.1 and sets timeToFade to 0
      */
     public void off(Color color) {
         if (!isLoaded) return;
+        marker.stop();
         lasers.forEach(LaserWrapper::stop);
         isOn = false;
         length = 0.1;
@@ -214,6 +224,10 @@ public class Light implements LightI {
             length += (100 - data.getOnLength()) / 3;
             timeToFade += 3;
             lasers.forEach(LaserWrapper::changeColor);
+            marker.setLocation(location.getBukkitLocation());
+            marker.setColor(color);
+            marker.setName(name + new Random().nextInt());
+            marker.start(256);
         } else {
             flashOff(color);
         }
@@ -225,6 +239,10 @@ public class Light implements LightI {
         if (!isLoaded) return;
         on(color);
         flash(color);
+        marker.setLocation(location.getBukkitLocation());
+        marker.setColor(color);
+        marker.setName(name + new Random().nextInt());
+        marker.start(256);
         timeToFade = data.getTimeToFadeToBlack();
     }
     /**
