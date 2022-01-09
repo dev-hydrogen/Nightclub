@@ -65,13 +65,13 @@ public class DebugMarker {
         executorService = Executors.newScheduledThreadPool(1);
         // probably not the most efficient way of doing this
         Runnable run = () -> {
+            if (System.currentTimeMillis() > endTime) {
+                seen.clear();
+                callback.run();
+                executorService.shutdown();
+                return;
+            }
             for (Player p : location.getWorld().getPlayers()) {
-                if (System.currentTimeMillis() > endTime) {
-                    seen.clear();
-                    callback.run();
-                    executorService.shutdown();
-                    return;
-                }
                 if (isCloseEnough(p.getLocation()) && !seen.contains(p)) {
                     setData(location, color, name, (int) (endTime - System.currentTimeMillis())); // make sure death time is the same for all players
                     try {
