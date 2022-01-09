@@ -5,6 +5,7 @@ import com.ilm9001.nightclub.Nightclub;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -34,6 +35,8 @@ public class BeatmapParser {
         JsonArray difficultyBeatmapSets;
         String filename = "";
         boolean isChroma = false;
+        Color primaryColor = new Color(0x0066ff);
+        Color secondaryColor = new Color(0xff0055);
         
         try {
             JsonParser parser = new JsonParser();
@@ -51,13 +54,27 @@ public class BeatmapParser {
             JsonArray difficultyBeatmaps = ((JsonObject) element).get("_difficultyBeatmaps").getAsJsonArray();
             JsonElement customData = difficultyBeatmaps.get(difficultyBeatmaps.size() - 1).getAsJsonObject().get("_customData");
             JsonArray requirements;
+            JsonArray suggestions;
+            JsonObject colorLeft;
+            JsonObject colorRight;
             if (customData != null) {
                 JsonObject customDataObject = customData.getAsJsonObject();
                 requirements = (JsonArray) customDataObject.get("_requirements");
+                suggestions = (JsonArray) customDataObject.get("_suggestions");
+                colorLeft = (JsonObject) customDataObject.get("_colorLeft");
+                colorRight = (JsonObject) customDataObject.get("_colorRight");
+                if (colorLeft != null && colorRight != null) {
+                    primaryColor = new Color(colorLeft.get("r").getAsFloat(), colorLeft.get("g").getAsFloat(), colorLeft.get("b").getAsFloat());
+                    secondaryColor = new Color(colorRight.get("r").getAsFloat(), colorRight.get("g").getAsFloat(), colorRight.get("b").getAsFloat());
+                }
                 if (requirements != null) {
                     isChroma = requirements.contains(new JsonPrimitive("Chroma"))
                             || requirements.contains(new JsonPrimitive("Chroma Lighting Events"))
                             || requirements.contains(new JsonPrimitive("Chroma Special Events"));
+                } else if (suggestions != null) {
+                    isChroma = suggestions.contains(new JsonPrimitive("Chroma"))
+                            || suggestions.contains(new JsonPrimitive("Chroma Lighting Events"))
+                            || suggestions.contains(new JsonPrimitive("Chroma Special Events"));
                 }
             }
             filename = difficultyBeatmaps.get(difficultyBeatmaps.size() - 1).getAsJsonObject().get("_beatmapFilename").getAsString();
@@ -75,6 +92,8 @@ public class BeatmapParser {
                 .songSubName(info.get("_songSubName").getAsString())
                 .beatmapFileName(filename)
                 .isChroma(isChroma)
+                .primaryColor(primaryColor)
+                .secondaryColor(secondaryColor)
                 .build();
     }
     /**
@@ -113,7 +132,7 @@ public class BeatmapParser {
             return events; // empty list
         }
         
-        eventArray.forEach(obj -> events.add(new LightEvent((JsonObject) obj, bpm, isChroma)));
+        eventArray.forEach(obj -> events.add(new LightEvent((JsonObject) obj, bpm, isChroma, info)));
         
         return events;
     }

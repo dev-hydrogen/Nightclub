@@ -19,7 +19,7 @@ public final class LightEvent {
     @Getter @Nullable private final JsonObject customData;
     @Getter private final boolean isChroma;
     
-    public LightEvent(JsonObject event, double bpm, boolean isChroma) {
+    public LightEvent(JsonObject event, double bpm, boolean isChroma, InfoData info) {
         type = event.get("_type").getAsInt();
         value = event.get("_value").getAsInt();
         time = Math.round(event.get("_time").getAsDouble() * 1000.0 * 1000.0 * 60.0 / bpm); // THIS IS MICROSECONDS!
@@ -38,9 +38,9 @@ public final class LightEvent {
             this.color = new Color(r / divisor, g / divisor, b / divisor, a / divisor);
         } else {
             if (value < 4 && value != 0) {
-                color = new Color(0x0066ff);
+                color = info.getPrimaryColor();
             } else if (value > 4) {
-                color = new Color(0xff0066);
+                color = info.getSecondaryColor();
             } else {
                 color = new Color(0x000000);
             }
