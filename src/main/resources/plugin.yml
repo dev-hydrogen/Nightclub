@@ -1,7 +1,7 @@
 name: Nightclub2.0
 version: '${project.version}'
 main: com.ilm9001.nightclub.Nightclub
-api-version: 1.17
+api-version: 1.18
 authors: [ ilm9001 ]
 description: Nightclub 2.0
 depend: [ ProtocolLib ]
