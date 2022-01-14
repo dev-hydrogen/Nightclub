@@ -82,46 +82,50 @@ public class Light implements LightI {
         }
         
         run = () -> {
-            if (timeToFade > 0 && length > 0) {
-                timeToFade--;
-                length -= 100.0 / this.data.getTimeToFadeToBlack();
-            }
-            if (length <= 0) {
-                off(new Color(0x000000));
-                timeToFade = 0;
-                length = 0.1;
-            }
-            if (length > 100) {
-                length = 100.0;
-            }
-            x = (x + multipliedSpeed) % 100;
-            x2 = (x2 + secondaryMultipliedSpeed) % 100;
-            
-            for (int i = 0; i < lasers.size(); i++) {
-                LaserWrapper laser = lasers.get(i);
+            try {
+                if (timeToFade > 0 && length > 0) {
+                    timeToFade--;
+                    length -= 100.0 / this.data.getTimeToFadeToBlack();
+                }
+                if (length <= 0) {
+                    off(new Color(0x000000));
+                    timeToFade = 0;
+                    length = 0.1;
+                }
+                if (length > 100) {
+                    length = 100.0;
+                }
+                x = (x + multipliedSpeed) % 100;
+                x2 = (x2 + secondaryMultipliedSpeed) % 100;
+                
+                for (int i = 0; i < lasers.size(); i++) {
+                    LaserWrapper laser = lasers.get(i);
                 /*
                 Here we make a ray the size of (length) from the location of this Light, then we add a 2d plane to it (which is where our pattern is) with an
                 x value that is separated evenly for each laser. This pattern is then moved (as a whole) by the second pattern.
                  */
-                // x position evenly separated for each laser
-                double separated = x + (100.0 / lasers.size()) * i;
-                // a (invisible) "ray" the size of length, pointing towards the set pitch and yaw
-                Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize().scalarMultiply(getMaxLengthPercent());
-                // rotation for first and second patterns, determines "start position" when pattern is a circle
-                Rotation r = new Rotation(v, this.data.getPatternData().getRotation(), RotationConvention.FRAME_TRANSFORM);
-                Rotation r2 = new Rotation(v, this.data.getSecondPatternData().getRotation(), RotationConvention.FRAME_TRANSFORM);
-                // apply first pattern (separated evenly for each laser) to our ray
-                Vector3D v2 = this.data.getPatternData().getPattern().apply(v, separated, r, this.data.getPatternData().getPatternSizeMultiplier() * (length / 100));
-                // then apply second pattern to all lasers with the same x value
-                Vector3D v3 = this.data.getSecondPatternData().getPattern().apply(v, x2, r2, this.data.getSecondPatternData().getPatternSizeMultiplier() * (length / 100));
-                Vector3D v4 = v.add(v3).add(v2);
-                
-                if (this.data.isFlipStartAndEnd()) {
-                    laser.setStart(this.location.clone().add(v4.getX(), v4.getZ(), v4.getY()));
-                } else {
-                    laser.setEnd(this.location.clone().add(v4.getX(), v4.getZ(), v4.getY()));
+                    // x position evenly separated for each laser
+                    double separated = x + (100.0 / lasers.size()) * i;
+                    // a (invisible) "ray" the size of length, pointing towards the set pitch and yaw
+                    Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize().scalarMultiply(getMaxLengthPercent());
+                    // rotation for first and second patterns, determines "start position" when pattern is a circle
+                    Rotation r = new Rotation(v, this.data.getPatternData().getRotation(), RotationConvention.FRAME_TRANSFORM);
+                    Rotation r2 = new Rotation(v, this.data.getSecondPatternData().getRotation(), RotationConvention.FRAME_TRANSFORM);
+                    // apply first pattern (separated evenly for each laser) to our ray
+                    Vector3D v2 = this.data.getPatternData().getPattern().apply(v, separated, r, this.data.getPatternData().getPatternSizeMultiplier() * (length / 100));
+                    // then apply second pattern to all lasers with the same x value
+                    Vector3D v3 = this.data.getSecondPatternData().getPattern().apply(v, x2, r2, this.data.getSecondPatternData().getPatternSizeMultiplier() * (length / 100));
+                    Vector3D v4 = v.add(v3).add(v2);
+                    
+                    if (this.data.isFlipStartAndEnd()) {
+                        laser.setStart(this.location.clone().add(v4.getX(), v4.getZ(), v4.getY()));
+                    } else {
+                        laser.setEnd(this.location.clone().add(v4.getX(), v4.getZ(), v4.getY()));
+                    }
+                    laser.changeColor();
                 }
-                laser.changeColor();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         };
     }
@@ -194,7 +198,7 @@ public class Light implements LightI {
         if (length < data.getOnLength() && !isOn) {
             length = data.getOnLength();
         }
-        length = data.getOnLength() * (color.getAlpha() / 255.0);
+        length = Math.max(data.getOnLength() * (color.getAlpha() / 255.0), 0.05);
         isOn = true;
         timeToFade = 0;
         marker.setLocation(location.getBukkitLocation());

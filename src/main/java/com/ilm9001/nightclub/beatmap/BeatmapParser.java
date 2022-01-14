@@ -36,7 +36,7 @@ public class BeatmapParser {
         String filename = "";
         boolean isChroma = false;
         Color primaryColor = new Color(0x0066ff);
-        Color secondaryColor = new Color(0xff0055);
+        Color secondaryColor = new Color(0xff0030);
         
         try {
             JsonParser parser = new JsonParser();
@@ -66,12 +66,13 @@ public class BeatmapParser {
                 if (colorLeft != null && colorRight != null) {
                     primaryColor = new Color(colorLeft.get("r").getAsFloat(), colorLeft.get("g").getAsFloat(), colorLeft.get("b").getAsFloat());
                     secondaryColor = new Color(colorRight.get("r").getAsFloat(), colorRight.get("g").getAsFloat(), colorRight.get("b").getAsFloat());
+                    isChroma = true;
                 }
-                if (requirements != null) {
+                if (requirements != null && !isChroma) {
                     isChroma = requirements.contains(new JsonPrimitive("Chroma"))
                             || requirements.contains(new JsonPrimitive("Chroma Lighting Events"))
                             || requirements.contains(new JsonPrimitive("Chroma Special Events"));
-                } else if (suggestions != null) {
+                } else if (suggestions != null && !isChroma) {
                     isChroma = suggestions.contains(new JsonPrimitive("Chroma"))
                             || suggestions.contains(new JsonPrimitive("Chroma Lighting Events"))
                             || suggestions.contains(new JsonPrimitive("Chroma Special Events"));

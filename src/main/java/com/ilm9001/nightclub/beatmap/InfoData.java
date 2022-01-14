@@ -1,7 +1,7 @@
 package com.ilm9001.nightclub.beatmap;
 
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 
 import java.awt.*;
 
@@ -9,17 +9,17 @@ import java.awt.*;
  * This class provides extra information about a beatmap through its info.dat file
  * BPM, Artist Name, Song Name, Song Sub Name and Level Author Name are all stored in this class.
  */
-
+@Data
 public final class InfoData {
-    @Getter private final Number beatsPerMinute;
-    @Getter private final String songAuthorName;
-    @Getter private final String songName;
-    @Getter private final String songSubName;
-    @Getter private final String mapperName;
-    @Getter private final String beatmapFileName;
-    @Getter private final boolean isChroma;
-    @Getter private final Color primaryColor;
-    @Getter private final Color secondaryColor;
+    private final Number beatsPerMinute;
+    private final String songAuthorName;
+    private final String songName;
+    private final String songSubName;
+    private final String mapperName;
+    private final String beatmapFileName;
+    private final boolean isChroma;
+    private final Color primaryColor;
+    private final Color secondaryColor;
     
     @Builder
     public InfoData(Number bpm, String author, String song, String songSubName, String mapper, String beatmapFileName, boolean isChroma, Color primaryColor, Color secondaryColor) {

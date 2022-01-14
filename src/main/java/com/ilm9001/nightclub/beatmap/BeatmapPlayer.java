@@ -1,5 +1,6 @@
 package com.ilm9001.nightclub.beatmap;
 
+import com.ilm9001.nightclub.Nightclub;
 import com.ilm9001.nightclub.light.event.LightChannel;
 import lombok.Getter;
 import org.bukkit.entity.Player;
@@ -59,7 +60,7 @@ public class BeatmapPlayer {
             channelList.forEach(LightChannel::terminatePlayback);
         };
         executorService.schedule(task, events.get(events.size() - 1).getTime() + 5000000, TimeUnit.MICROSECONDS);
-        
+        Nightclub.getInstance().getLogger().info(info.toString());
         return info;
     }
     /**
