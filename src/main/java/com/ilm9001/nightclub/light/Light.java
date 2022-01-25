@@ -311,9 +311,8 @@ public class Light implements LightI {
     public void setSpeed(double multiplier) {
         if (!isLoaded) return;
         if (multipliedSpeed == 0 && multiplier > 0) {
-            double random = new Random().nextDouble() * 30;
-            x += random;
-            x2 += random;
+            x += data.getPatternData().getStartX() * 2 + 10;
+            x2 += data.getSecondPatternData().getStartX() * 2 + 10;
         }
         if (this.multipliedSpeed == data.getPatternData().getSpeed() * multiplier) { // laser "reset"
             x = (x + 12) % 100;

@@ -14,8 +14,10 @@ import org.bukkit.entity.Player;
 
 import java.awt.*;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.*;
+import java.util.Objects;
+import java.util.UUID;
 
 import static com.ilm9001.nightclub.util.Util.formatErrors;
 
@@ -59,9 +61,10 @@ public class LightCommand extends BaseCommand {
                 .timeToFadeToBlack(45)
                 .lightCount(4)
                 .flipStartAndEnd(player.getLocation().getPitch() > -10).build();
+        UUID uuid = UUID.randomUUID();
         light = Light.builder()
-                .uuid(UUID.randomUUID())
-                .name("Unnamed-Light-" + new Random().nextInt())
+                .uuid(uuid)
+                .name("Unnamed-Light-" + uuid)
                 .location(Location.getFromBukkitLocation(player.getLocation().add(0, 1, 0)))
                 .type(LightType.GUARDIAN_BEAM)
                 .channel(LightChannel.CENTER_LIGHTS)
@@ -133,13 +136,14 @@ public class LightCommand extends BaseCommand {
         }
         
         Light l = universe.getLight(args[0]);
+        UUID uuid = UUID.randomUUID();
         light = Light.builder()
-                .uuid(UUID.randomUUID())
-                .name("Unnamed-Light-" + new Random().nextInt())
+                .uuid(uuid)
+                .name("Unnamed-Light-" + uuid)
                 .location(Location.getFromBukkitLocation(player.getLocation().add(0, 1, 0)))
-                .type(LightType.GUARDIAN_BEAM)
-                .channel(LightChannel.CENTER_LIGHTS)
-                .speedChannel(LightSpeedChannel.RIGHT_ROTATING_LASERS)
+                .type(l.getType())
+                .channel(l.getChannel())
+                .speedChannel(l.getSpeedChannel())
                 .data(l.getData()).build();
         manager.getLoadedUniverse().addLight(light);
         manager.save();
