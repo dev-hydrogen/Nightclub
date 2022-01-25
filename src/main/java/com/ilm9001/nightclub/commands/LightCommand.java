@@ -457,7 +457,7 @@ public class LightCommand extends BaseCommand {
             @CommandAlias("r")
             @Description("Remove a LightID")
             @CommandPermission("nightclub.light")
-            @CommandCompletion("lightids")
+            @CommandCompletion("@lightids")
             public static void onRemoveLightID(CommandSender sender, String[] args) {
                 List<CommandError> errors = isUnloaded(args, 1);
                 try {
