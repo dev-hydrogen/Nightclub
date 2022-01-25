@@ -70,6 +70,7 @@ public class LightCommand extends BaseCommand {
                 .channel(LightChannel.CENTER_LIGHTS)
                 .speedChannel(LightSpeedChannel.RIGHT_ROTATING_LASERS)
                 .data(data).build();
+        light.load();
         light.start();
         light.on(new Color(0x0066ff));
         manager.getLoadedUniverse().addLight(light);
@@ -112,6 +113,7 @@ public class LightCommand extends BaseCommand {
         }
         
         light = universe.getLight(args[0]);
+        light.load();
         light.start();
         light.on(new Color(0x0066ff));
     }
@@ -147,6 +149,7 @@ public class LightCommand extends BaseCommand {
                 .data(l.getData()).build();
         manager.getLoadedUniverse().addLight(light);
         manager.save();
+        light.load();
         light.start();
         light.on(new Color(0x0066ff));
     }
