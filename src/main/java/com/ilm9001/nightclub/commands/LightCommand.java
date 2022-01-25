@@ -184,7 +184,7 @@ public class LightCommand extends BaseCommand {
                 errors.add(CommandError.INVALID_ARGUMENT);
             }
             if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
-                sender.sendMessage(formatErrors(isUnloaded(args, 1)));
+                sender.sendMessage(formatErrors(errors));
                 return;
             }
             
@@ -203,7 +203,7 @@ public class LightCommand extends BaseCommand {
                 errors.add(CommandError.INVALID_ARGUMENT);
             }
             if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
-                sender.sendMessage(formatErrors(isUnloaded(args, 1)));
+                sender.sendMessage(formatErrors(errors));
                 return;
             }
             light.on(new Color(0x0066ff));
@@ -221,7 +221,7 @@ public class LightCommand extends BaseCommand {
                 errors.add(CommandError.INVALID_ARGUMENT);
             }
             if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
-                sender.sendMessage(formatErrors(isUnloaded(args, 1)));
+                sender.sendMessage(formatErrors(errors));
                 return;
             }
             light.on(new Color(0x0066ff));
@@ -238,7 +238,7 @@ public class LightCommand extends BaseCommand {
                 errors.add(CommandError.INVALID_ARGUMENT);
             }
             if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
-                sender.sendMessage(formatErrors(isUnloaded(args, 1)));
+                sender.sendMessage(formatErrors(errors));
                 return;
             }
             light.on(new Color(0x0066ff));
@@ -256,7 +256,7 @@ public class LightCommand extends BaseCommand {
                 errors.add(CommandError.INVALID_ARGUMENT);
             }
             if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
-                sender.sendMessage(formatErrors(isUnloaded(args, 1)));
+                sender.sendMessage(formatErrors(errors));
             }
         }
         
@@ -272,7 +272,7 @@ public class LightCommand extends BaseCommand {
                 errors.add(CommandError.INVALID_ARGUMENT);
             }
             if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
-                sender.sendMessage(formatErrors(isUnloaded(args, 1)));
+                sender.sendMessage(formatErrors(errors));
                 return;
             }
         }
@@ -289,7 +289,7 @@ public class LightCommand extends BaseCommand {
                 errors.add(CommandError.INVALID_ARGUMENT);
             }
             if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
-                sender.sendMessage(formatErrors(isUnloaded(args, 1)));
+                sender.sendMessage(formatErrors(errors));
                 return;
             }
             light.buildLasers();
@@ -328,7 +328,7 @@ public class LightCommand extends BaseCommand {
                 errors.add(CommandError.INVALID_ARGUMENT);
             }
             if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
-                sender.sendMessage(formatErrors(isUnloaded(args, 1)));
+                sender.sendMessage(formatErrors(errors));
                 return;
             }
             light.buildLasers();
@@ -348,7 +348,7 @@ public class LightCommand extends BaseCommand {
                 errors.add(CommandError.INVALID_ARGUMENT);
             }
             if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
-                sender.sendMessage(formatErrors(isUnloaded(args, 1)));
+                sender.sendMessage(formatErrors(errors));
                 return;
             }
             light.buildLasers();
@@ -448,10 +448,27 @@ public class LightCommand extends BaseCommand {
                     errors.add(CommandError.INVALID_ARGUMENT);
                 }
                 if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
-                    sender.sendMessage(formatErrors(isUnloaded(args, 1)));
+                    sender.sendMessage(formatErrors(errors));
                     return;
                 }
-                light.buildLasers();
+                light.on(new Color(0x0066ff));
+            }
+            @Subcommand("remove")
+            @CommandAlias("r")
+            @Description("Remove a LightID")
+            @CommandPermission("nightclub.light")
+            @CommandCompletion("lightids")
+            public static void onRemoveLightID(CommandSender sender, String[] args) {
+                List<CommandError> errors = isUnloaded(args, 1);
+                try {
+                    light.getData().getLightIDs().remove(Util.parseNumber(args[0]).intValue());
+                } catch (ParseException e) {
+                    errors.add(CommandError.INVALID_ARGUMENT);
+                }
+                if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
+                    sender.sendMessage(formatErrors(errors));
+                    return;
+                }
                 light.on(new Color(0x0066ff));
             }
         }

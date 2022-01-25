@@ -15,7 +15,6 @@ import com.ilm9001.nightclub.json.LightJSONWriter;
 import com.ilm9001.nightclub.light.*;
 import com.ilm9001.nightclub.light.event.LightChannel;
 import com.ilm9001.nightclub.light.event.LightSpeedChannel;
-import com.ilm9001.nightclub.util.Easing;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.bstats.bukkit.Metrics;
@@ -75,7 +74,6 @@ public final class Nightclub extends JavaPlugin {
         completions.registerCompletion("type", c -> getStringValuesFromArray(LightType.values()));
         completions.registerCompletion("channels", c -> getStringValuesFromArray(LightChannel.values()));
         completions.registerCompletion("speedchannels", c -> getStringValuesFromArray(LightSpeedChannel.values()));
-        completions.registerCompletion("easings", c -> getStringValuesFromArray(Easing.values()));
         completions.registerCompletion("beatmaps", c -> getStringValuesFromArray(new File(getDataFolder().getAbsolutePath()).listFiles(File::isDirectory)));
         // https://stackoverflow.com/questions/7909747/why-does-liststring-toarray-return-object-and-not-string-how-to-work-ar
         completions.registerCompletion("universes", c -> {
