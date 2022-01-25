@@ -113,6 +113,40 @@ public class LightCommand extends BaseCommand {
         light.on(new Color(0x0066ff));
     }
     
+    @Subcommand("clone")
+    @CommandAlias("c")
+    @Description("Clone a Light from currently loaded LightUniverse")
+    @CommandCompletion("@lights")
+    @CommandPermission("nightclub.light")
+    public static void onClone(Player player, CommandSender sender, String[] args) {
+        LightUniverseManager manager = Nightclub.getLightUniverseManager();
+        LightUniverse universe = manager.getLoadedUniverse();
+        
+        List<CommandError> errors = isUnloaded();
+        errors.add(args.length < 1 ? CommandError.TOO_LITTLE_ARGUMENTS : CommandError.VALID);
+        if (errors.stream().noneMatch(error -> error == CommandError.LIGHTUNIVERSE_UNLOADED)) {
+            errors.add(universe.getLight(args[0]) == null ? CommandError.INVALID_ARGUMENT : CommandError.VALID);
+        }
+        if (errors.stream().anyMatch(error -> error != CommandError.VALID && error != CommandError.LIGHT_UNLOADED)) {
+            sender.sendMessage(formatErrors(errors));
+            return;
+        }
+        
+        Light l = universe.getLight(args[0]);
+        light = Light.builder()
+                .uuid(UUID.randomUUID())
+                .name("Unnamed-Light-" + new Random().nextInt())
+                .location(Location.getFromBukkitLocation(player.getLocation().add(0, 1, 0)))
+                .type(LightType.GUARDIAN_BEAM)
+                .channel(LightChannel.CENTER_LIGHTS)
+                .speedChannel(LightSpeedChannel.RIGHT_ROTATING_LASERS)
+                .data(l.getData()).build();
+        manager.getLoadedUniverse().addLight(light);
+        manager.save();
+        light.start();
+        light.on(new Color(0x0066ff));
+    }
+    
     @Subcommand("data")
     @CommandAlias("d")
     @Description("Modify a Light's data")
@@ -161,7 +195,7 @@ public class LightCommand extends BaseCommand {
         public static void onSecondPattern(CommandSender sender, String[] args) {
             List<CommandError> errors = isUnloaded(args, 1);
             try {
-                light.getData().getPatternData().setPattern(LightPattern.valueOf(args[0]));
+                light.getData().getSecondPatternData().setPattern(LightPattern.valueOf(args[0]));
             } catch (IllegalArgumentException e) {
                 errors.add(CommandError.INVALID_ARGUMENT);
             }
@@ -430,6 +464,38 @@ public class LightCommand extends BaseCommand {
             light.on(new Color(0x000000));
         }
         
+        @Subcommand("startx")
+        @CommandAlias("sx")
+        @Description("Set start x number")
+        @CommandPermission("nightclub.light")
+        public static void onStartX(CommandSender sender, String[] args) {
+            List<CommandError> errors = isUnloaded(args, 1);
+            try {
+                light.getData().getPatternData().setStartX(Util.parseNumber(args[0]).doubleValue());
+            } catch (ParseException e) {
+                errors.add(CommandError.INVALID_ARGUMENT);
+            }
+            if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
+                sender.sendMessage(formatErrors(errors));
+            }
+        }
+        
+        @Subcommand("secondarystartx")
+        @CommandAlias("ssx")
+        @Description("Set secondary start x number")
+        @CommandPermission("nightclub.light")
+        public static void onSecondaryStartX(CommandSender sender, String[] args) {
+            List<CommandError> errors = isUnloaded(args, 1);
+            try {
+                light.getData().getSecondPatternData().setStartX(Util.parseNumber(args[0]).doubleValue());
+            } catch (ParseException e) {
+                errors.add(CommandError.INVALID_ARGUMENT);
+            }
+            if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
+                sender.sendMessage(formatErrors(errors));
+            }
+        }
+        
         @Subcommand("lightid")
         @CommandAlias("lid")
         @Description("Modify a Light's lightID's")
@@ -461,7 +527,7 @@ public class LightCommand extends BaseCommand {
             public static void onRemoveLightID(CommandSender sender, String[] args) {
                 List<CommandError> errors = isUnloaded(args, 1);
                 try {
-                    light.getData().getLightIDs().remove(Util.parseNumber(args[0]).intValue());
+                    light.getData().getLightIDs().remove((Object) Util.parseNumber(args[0]).intValue());
                 } catch (ParseException e) {
                     errors.add(CommandError.INVALID_ARGUMENT);
                 }
