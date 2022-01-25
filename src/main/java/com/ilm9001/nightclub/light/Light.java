@@ -1,6 +1,7 @@
 package com.ilm9001.nightclub.light;
 
 import com.google.gson.InstanceCreator;
+import com.google.gson.JsonArray;
 import com.ilm9001.nightclub.laser.LaserWrapper;
 import com.ilm9001.nightclub.light.event.LightChannel;
 import com.ilm9001.nightclub.light.event.LightSpeedChannel;
@@ -10,6 +11,7 @@ import lombok.*;
 import org.apache.commons.math3.geometry.euclidean.threed.Rotation;
 import org.apache.commons.math3.geometry.euclidean.threed.RotationConvention;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.lang.reflect.Type;
@@ -20,6 +22,7 @@ import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.StreamSupport;
 
 @ToString
 @EqualsAndHashCode
@@ -192,8 +195,11 @@ public class Light implements LightI {
     /**
      * Turns Light on, sets length to onLength and sets timeToFade to 0
      */
-    public void on(Color color) {
+    public void on(Color color, @Nullable JsonArray lightIDs) {
         if (!isLoaded) return;
+        // check if light event is referencing any light ids in the lightid list
+        if (lightIDs != null && !data.getLightIDs().isEmpty() && StreamSupport.stream(lightIDs.spliterator(), true).noneMatch(id -> data.getLightIDs().contains(id.getAsInt())))
+            return;
         lasers.forEach(LaserWrapper::start);
         if (length < data.getOnLength() && !isOn) {
             length = data.getOnLength();
@@ -205,22 +211,33 @@ public class Light implements LightI {
         marker.setColor(color);
         marker.start(256);
     }
-    
+    public void on(Color color) {
+        on(color, null);
+    }
     /**
      * Turns Light off, sets length to 0.1 and sets timeToFade to 0
      */
-    public void off(Color color) {
+    public void off(Color color, @Nullable JsonArray lightIDs) {
         if (!isLoaded) return;
+        // check if light event is referencing any light ids in the lightid list
+        if (lightIDs != null && !data.getLightIDs().isEmpty() && StreamSupport.stream(lightIDs.spliterator(), true).noneMatch(id -> data.getLightIDs().contains(id.getAsInt())))
+            return;
         marker.stop();
         lasers.forEach(LaserWrapper::stop);
         isOn = false;
         timeToFade = 0;
     }
+    public void off(Color color) {
+        off(color, null);
+    }
     /**
      * Flashes light in a similar way to beat saber, simulating brightness with a longer beam
      */
-    public void flash(Color color) {
+    public void flash(Color color, @Nullable JsonArray lightIDs) {
         if (!isLoaded) return;
+        // check if light event is referencing any light ids in the lightid list
+        if (lightIDs != null && !data.getLightIDs().isEmpty() && StreamSupport.stream(lightIDs.spliterator(), true).noneMatch(id -> data.getLightIDs().contains(id.getAsInt())))
+            return;
         if (isOn) {
             length = data.getOnLength() * (color.getAlpha() / 255.0);
             length += (100 - data.getOnLength()) / 3;
@@ -233,17 +250,26 @@ public class Light implements LightI {
             flashOff(color);
         }
     }
+    public void flash(Color color) {
+        flash(color, null);
+    }
     /**
      * Flashes light in a similar way to beat saber, simulating brightness with a longer beam and then fades to black
      */
-    public void flashOff(Color color) {
+    public void flashOff(Color color, @Nullable JsonArray lightIDs) {
         if (!isLoaded) return;
+        // check if light event is referencing any light ids in the lightid list
+        if (lightIDs != null && !data.getLightIDs().isEmpty() && StreamSupport.stream(lightIDs.spliterator(), true).noneMatch(id -> data.getLightIDs().contains(id.getAsInt())))
+            return;
         on(color);
         flash(color);
         marker.setLocation(location.getBukkitLocation());
         marker.setColor(color);
         marker.start(256);
         timeToFade = data.getTimeToFadeToBlack();
+    }
+    public void flashOff(Color color) {
+        flashOff(color, null);
     }
     /**
      * Set which LightChannel this Light should be listening to.

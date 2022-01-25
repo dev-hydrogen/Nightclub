@@ -17,6 +17,7 @@ public final class LightEvent {
     @Getter private final Long time;
     @Getter private final Color color;
     @Getter @Nullable private final JsonObject customData;
+    @Getter @Nullable private final JsonArray lightID;
     @Getter private final boolean isChroma;
     
     public LightEvent(JsonObject event, double bpm, boolean isChroma, InfoData info) {
@@ -26,6 +27,7 @@ public final class LightEvent {
         customData = (JsonObject) event.get("_customData");
         this.isChroma = isChroma;
         if (isChroma && customData != null && customData.get("_color") != null) {
+            lightID = customData.get("_lightID") != null ? customData.get("_lightID").getAsJsonArray() : null;
             JsonArray color = customData.get("_color").getAsJsonArray();
             float r = color.get(0).getAsFloat();
             float g = color.get(1).getAsFloat();
@@ -37,6 +39,7 @@ public final class LightEvent {
             float divisor = Math.max(Math.max(r, g), Math.max(Math.max(b, a), 1F)); // Beat saber color system is utter fucking dogshit.
             this.color = new Color(r / divisor, g / divisor, b / divisor, a / divisor);
         } else {
+            lightID = null;
             if (value < 4 && value != 0) {
                 color = info.getPrimaryColor();
             } else if (value > 4) {
@@ -54,5 +57,6 @@ public final class LightEvent {
         this.color = color;
         this.isChroma = isChroma;
         this.customData = null;
+        this.lightID = null;
     }
 }

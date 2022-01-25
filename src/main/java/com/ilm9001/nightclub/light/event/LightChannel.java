@@ -1,8 +1,10 @@
 package com.ilm9001.nightclub.light.event;
 
+import com.google.gson.JsonArray;
 import com.ilm9001.nightclub.light.Light;
 import com.ilm9001.nightclub.light.LightI;
 import lombok.Getter;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -25,19 +27,19 @@ public enum LightChannel {
     }
     public void initializePlayback() {
         start();
-        off(new Color(0, 0, 0));
+        off(new Color(0, 0, 0), null);
         reset();
     }
     public void terminatePlayback() {
-        off(new Color(0, 0, 0));
+        off(new Color(0, 0, 0), null);
         stop();
         reset();
     }
     public void reset() {
         lights.forEach(light -> {
             if (light instanceof Light) {
-                ((Light) light).setX(0);
-                ((Light) light).setX2(0);
+                ((Light) light).setX(((Light) light).getData().getPatternData().getStartX());
+                ((Light) light).setX2(((Light) light).getData().getSecondPatternData().getStartX());
                 ((Light) light).setSpeed(1);
             }
         });
@@ -56,17 +58,17 @@ public enum LightChannel {
         speedListeners.remove(light);
     }
     
-    public void on(Color color) {
-        lights.forEach(l -> l.on(color));
+    public void on(Color color, @Nullable JsonArray lightIDs) {
+        lights.forEach(l -> l.on(color, lightIDs));
     }
-    public void off(Color color) {
-        lights.forEach(l -> l.off(color));
+    public void off(Color color, @Nullable JsonArray lightIDs) {
+        lights.forEach(l -> l.off(color, lightIDs));
     }
-    public void flash(Color color) {
-        lights.forEach(l -> l.flash(color));
+    public void flash(Color color, @Nullable JsonArray lightIDs) {
+        lights.forEach(l -> l.flash(color, lightIDs));
     }
-    public void flashOff(Color color) {
-        lights.forEach(l -> l.flashOff(color));
+    public void flashOff(Color color, @Nullable JsonArray lightIDs) {
+        lights.forEach(l -> l.flashOff(color, lightIDs));
     }
     public void start() {
         lights.forEach(LightI::start);

@@ -1,5 +1,6 @@
 package com.ilm9001.nightclub.beatmap;
 
+import com.google.gson.JsonArray;
 import com.ilm9001.nightclub.Nightclub;
 import com.ilm9001.nightclub.light.event.LightChannel;
 import lombok.Getter;
@@ -83,7 +84,7 @@ public class BeatmapPlayer {
         // shorter way of handling events than using a switch case
         if (event.getType() >= 0 && event.getType() < 5) {
             Optional<LightChannel> channel = Arrays.stream(LightChannel.values()).filter((lc) -> event.getType() == lc.getType()).findFirst();
-            channel.ifPresent(lightChannel -> handleValue(lightChannel, event.getValue(), event.getColor()));
+            channel.ifPresent(lightChannel -> handleValue(lightChannel, event.getValue(), event.getColor(), event.getLightID()));
         } else switch (event.getType()) {
             // Ring spin
             case 8 -> this.getClass();
@@ -97,12 +98,12 @@ public class BeatmapPlayer {
         }
     }
     
-    private void handleValue(LightChannel handler, int value, Color color) {
+    private void handleValue(LightChannel handler, int value, Color color, JsonArray lightIDs) {
         switch (value) {
-            case 0 -> handler.off(color);
-            case 1, 5 -> handler.on(color);
-            case 2, 6 -> handler.flash(color);
-            case 3, 7 -> handler.flashOff(color);
+            case 0 -> handler.off(color, lightIDs);
+            case 1, 5 -> handler.on(color, lightIDs);
+            case 2, 6 -> handler.flash(color, lightIDs);
+            case 3, 7 -> handler.flashOff(color, lightIDs);
         }
     }
 }

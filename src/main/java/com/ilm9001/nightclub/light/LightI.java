@@ -1,16 +1,17 @@
 package com.ilm9001.nightclub.light;
 
+import com.google.gson.JsonArray;
+
 import java.awt.*;
 
 public interface LightI {
-    void on(Color color);
+    void on(Color color, JsonArray lightIDs);
     
+    void off(Color color, JsonArray lightIDs);
     
-    void off(Color color);
+    void flash(Color color, JsonArray lightIDs);
     
-    void flash(Color color);
-    
-    void flashOff(Color color);
+    void flashOff(Color color, JsonArray lightIDs);
     
     void start();
     
