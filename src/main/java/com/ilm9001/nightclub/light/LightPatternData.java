@@ -10,4 +10,5 @@ public class LightPatternData {
     private double speed;
     private double patternSizeMultiplier;
     private double rotation;
+    private double startX;
 }

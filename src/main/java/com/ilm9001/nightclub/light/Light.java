@@ -57,9 +57,9 @@ public class Light implements LightI {
     
     public Light(Location loc, UUID uniqueID, String name, LightPattern pattern, LightType type, LightChannel channel) {
         this(uniqueID, name, loc, type, channel, LightSpeedChannel.DEFAULT, new LightData(
-                new LightPatternData(pattern, 0, 0, 0), new LightPatternData(LightPattern.STILL,
-                0, 0, 0), 0, 0,
-                0, 0, false));
+                new LightPatternData(pattern, 0, 0, 0, 0), new LightPatternData(LightPattern.STILL,
+                0, 0, 0, 0), new ArrayList<>(), 0, 0, 0,
+                0, false));
     }
     
     @Builder
@@ -87,7 +87,7 @@ public class Light implements LightI {
                     timeToFade--;
                     length -= 100.0 / this.data.getTimeToFadeToBlack();
                 }
-                if (length <= 0) {
+                if (length < 0.1) {
                     off(new Color(0x000000));
                     timeToFade = 0;
                     length = 0.1;
@@ -100,10 +100,10 @@ public class Light implements LightI {
                 
                 for (int i = 0; i < lasers.size(); i++) {
                     LaserWrapper laser = lasers.get(i);
-                /*
-                Here we make a ray the size of (length) from the location of this Light, then we add a 2d plane to it (which is where our pattern is) with an
-                x value that is separated evenly for each laser. This pattern is then moved (as a whole) by the second pattern.
-                 */
+                    /*
+                    Here we make a ray the size of (length) from the location of this Light, then we add a 2d plane to it (which is where our pattern is) with an
+                    x value that is separated evenly for each laser. This pattern is then moved (as a whole) by the second pattern.
+                    */
                     // x position evenly separated for each laser
                     double separated = x + (100.0 / lasers.size()) * i;
                     // a (invisible) "ray" the size of length, pointing towards the set pitch and yaw
@@ -214,7 +214,6 @@ public class Light implements LightI {
         marker.stop();
         lasers.forEach(LaserWrapper::stop);
         isOn = false;
-        length = 0.1;
         timeToFade = 0;
     }
     /**
@@ -286,7 +285,7 @@ public class Light implements LightI {
     public void setSpeed(double multiplier) {
         if (!isLoaded) return;
         if (multipliedSpeed == 0 && multiplier > 0) {
-            double random = new Random().nextDouble() * 100;
+            double random = new Random().nextDouble() * 30;
             x += random;
             x2 += random;
         }
@@ -295,8 +294,8 @@ public class Light implements LightI {
             x2 = (x2 + 12) % 100;
         }
         if (multiplier == 0) {
-            x = 100.0 / data.getLightCount();
-            x2 = 100.0 / data.getLightCount();
+            x = data.getPatternData().getStartX();
+            x2 = data.getSecondPatternData().getStartX();
         }
         this.multipliedSpeed = data.getPatternData().getSpeed() * multiplier;
         this.secondaryMultipliedSpeed = data.getSecondPatternData().getSpeed() * multiplier;

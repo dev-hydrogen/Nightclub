@@ -8,10 +8,12 @@ import com.ilm9001.nightclub.light.event.LightChannel;
 import com.ilm9001.nightclub.light.event.LightSpeedChannel;
 import com.ilm9001.nightclub.util.Location;
 import com.ilm9001.nightclub.util.Util;
+import lombok.Getter;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.awt.*;
+import java.text.ParseException;
 import java.util.List;
 import java.util.*;
 
@@ -20,7 +22,7 @@ import static com.ilm9001.nightclub.util.Util.formatErrors;
 @CommandAlias("light|li")
 @CommandPermission("nightclub.light")
 public class LightCommand extends BaseCommand {
-    private static Light light;
+    @Getter private static Light light;
     
     private static List<CommandError> isUnloaded() {
         List<CommandError> errors = new ArrayList<>();
@@ -49,8 +51,9 @@ public class LightCommand extends BaseCommand {
             return;
         }
         LightData data = LightData.builder()
-                .patternData(new LightPatternData(LightPattern.LINE, 0.3, 5, 0))
-                .secondPatternData(new LightPatternData(LightPattern.LINE, 0.2, 3, 0))
+                .patternData(new LightPatternData(LightPattern.LINE, 0.3, 5, 0, 0))
+                .secondPatternData(new LightPatternData(LightPattern.LINE, 0.2, 3, 0, 0))
+                .lightIDs(new ArrayList<>())
                 .maxLength(15)
                 .onLength(80)
                 .timeToFadeToBlack(45)
@@ -140,7 +143,7 @@ public class LightCommand extends BaseCommand {
         public static void onPattern(CommandSender sender, String[] args) {
             List<CommandError> errors = isUnloaded(args, 1);
             try {
-                LightPattern.valueOf(args[0]);
+                light.getData().getPatternData().setPattern(LightPattern.valueOf(args[0]));
             } catch (IllegalArgumentException e) {
                 errors.add(CommandError.INVALID_ARGUMENT);
             }
@@ -148,7 +151,6 @@ public class LightCommand extends BaseCommand {
                 sender.sendMessage(formatErrors(errors));
                 return;
             }
-            light.getData().getPatternData().setPattern(LightPattern.valueOf(args[0]));
             light.on(new Color(0x0066ff));
         }
         @Subcommand("secondarypattern")
@@ -159,7 +161,7 @@ public class LightCommand extends BaseCommand {
         public static void onSecondPattern(CommandSender sender, String[] args) {
             List<CommandError> errors = isUnloaded(args, 1);
             try {
-                LightPattern.valueOf(args[0]);
+                light.getData().getPatternData().setPattern(LightPattern.valueOf(args[0]));
             } catch (IllegalArgumentException e) {
                 errors.add(CommandError.INVALID_ARGUMENT);
             }
@@ -167,7 +169,6 @@ public class LightCommand extends BaseCommand {
                 sender.sendMessage(formatErrors(errors));
                 return;
             }
-            light.getData().getPatternData().setPattern(LightPattern.valueOf(args[0]));
             light.on(new Color(0x0066ff));
         }
         
@@ -176,11 +177,17 @@ public class LightCommand extends BaseCommand {
         @Description("Alter max length multiplier")
         @CommandPermission("nightclub.light")
         public static void onMaxLength(CommandSender sender, String[] args) {
-            if (isUnloaded(args, 1).stream().anyMatch(error -> error != CommandError.VALID)) {
+            List<CommandError> errors = isUnloaded(args, 1);
+            try {
+                light.getData().setMaxLength(Util.parseNumber(args[0]).doubleValue());
+            } catch (ParseException e) {
+                errors.add(CommandError.INVALID_ARGUMENT);
+            }
+            if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
                 sender.sendMessage(formatErrors(isUnloaded(args, 1)));
                 return;
             }
-            light.getData().setMaxLength(Util.parseNumber(args[0]).doubleValue());
+            
             light.on(new Color(0x0066ff));
         }
         
@@ -189,11 +196,16 @@ public class LightCommand extends BaseCommand {
         @Description("Alter the on length percentage")
         @CommandPermission("nightclub.light")
         public static void onModifyOnLength(CommandSender sender, String[] args) {
-            if (isUnloaded(args, 1).stream().anyMatch(error -> error != CommandError.VALID)) {
+            List<CommandError> errors = isUnloaded(args, 1);
+            try {
+                light.getData().setOnLength(Util.parseNumber(args[0]).doubleValue());
+            } catch (ParseException e) {
+                errors.add(CommandError.INVALID_ARGUMENT);
+            }
+            if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
                 sender.sendMessage(formatErrors(isUnloaded(args, 1)));
                 return;
             }
-            light.getData().setOnLength(Util.parseNumber(args[0]).doubleValue());
             light.on(new Color(0x0066ff));
         }
         
@@ -202,11 +214,16 @@ public class LightCommand extends BaseCommand {
         @Description("Alter the pattern size multiplier")
         @CommandPermission("nightclub.light")
         public static void onModifyPatternMultiplier(CommandSender sender, String[] args) {
-            if (isUnloaded(args, 1).stream().anyMatch(error -> error != CommandError.VALID)) {
+            List<CommandError> errors = isUnloaded(args, 1);
+            try {
+                light.getData().getPatternData().setPatternSizeMultiplier(Util.parseNumber(args[0]).doubleValue());
+            } catch (ParseException e) {
+                errors.add(CommandError.INVALID_ARGUMENT);
+            }
+            if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
                 sender.sendMessage(formatErrors(isUnloaded(args, 1)));
                 return;
             }
-            light.getData().getPatternData().setPatternSizeMultiplier(Util.parseNumber(args[0]).doubleValue());
             light.on(new Color(0x0066ff));
         }
         @Subcommand("secondarypatternmultiplier")
@@ -214,11 +231,16 @@ public class LightCommand extends BaseCommand {
         @Description("Alter the secondary pattern size multiplier")
         @CommandPermission("nightclub.light")
         public static void onModifySecondaryPatternMultiplier(CommandSender sender, String[] args) {
-            if (isUnloaded(args, 1).stream().anyMatch(error -> error != CommandError.VALID)) {
+            List<CommandError> errors = isUnloaded(args, 1);
+            try {
+                light.getData().getSecondPatternData().setPatternSizeMultiplier(Util.parseNumber(args[0]).doubleValue());
+            } catch (ParseException e) {
+                errors.add(CommandError.INVALID_ARGUMENT);
+            }
+            if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
                 sender.sendMessage(formatErrors(isUnloaded(args, 1)));
                 return;
             }
-            light.getData().getSecondPatternData().setPatternSizeMultiplier(Util.parseNumber(args[0]).doubleValue());
             light.on(new Color(0x0066ff));
         }
         
@@ -227,11 +249,15 @@ public class LightCommand extends BaseCommand {
         @Description("Alter speed")
         @CommandPermission("nightclub.light")
         public static void onModifySpeed(CommandSender sender, String[] args) {
-            if (isUnloaded(args, 1).stream().anyMatch(error -> error != CommandError.VALID)) {
-                sender.sendMessage(formatErrors(isUnloaded(args, 1)));
-                return;
+            List<CommandError> errors = isUnloaded(args, 1);
+            try {
+                light.setBaseSpeed(Util.parseNumber(args[0]).doubleValue());
+            } catch (ParseException e) {
+                errors.add(CommandError.INVALID_ARGUMENT);
             }
-            light.setBaseSpeed(Util.parseNumber(args[0]).doubleValue());
+            if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
+                sender.sendMessage(formatErrors(isUnloaded(args, 1)));
+            }
         }
         
         @Subcommand("secondaryspeed")
@@ -239,11 +265,16 @@ public class LightCommand extends BaseCommand {
         @Description("Alter secondary speed")
         @CommandPermission("nightclub.light")
         public static void onModifySecondarySpeed(CommandSender sender, String[] args) {
-            if (isUnloaded(args, 1).stream().anyMatch(error -> error != CommandError.VALID)) {
+            List<CommandError> errors = isUnloaded(args, 1);
+            try {
+                light.setSecondaryBaseSpeed(Util.parseNumber(args[0]).doubleValue());
+            } catch (ParseException e) {
+                errors.add(CommandError.INVALID_ARGUMENT);
+            }
+            if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
                 sender.sendMessage(formatErrors(isUnloaded(args, 1)));
                 return;
             }
-            light.setSecondaryBaseSpeed(Util.parseNumber(args[0]).doubleValue());
         }
         
         @Subcommand("lightcount")
@@ -251,11 +282,16 @@ public class LightCommand extends BaseCommand {
         @Description("Alter the amount of lights")
         @CommandPermission("nightclub.light")
         public static void onModifyLightCount(CommandSender sender, String[] args) {
-            if (isUnloaded(args, 1).stream().anyMatch(error -> error != CommandError.VALID)) {
+            List<CommandError> errors = isUnloaded(args, 1);
+            try {
+                light.getData().setLightCount(Util.parseNumber(args[0]).intValue());
+            } catch (ParseException e) {
+                errors.add(CommandError.INVALID_ARGUMENT);
+            }
+            if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
                 sender.sendMessage(formatErrors(isUnloaded(args, 1)));
                 return;
             }
-            light.getData().setLightCount(Util.parseNumber(args[0]).intValue());
             light.buildLasers();
             light.on(new Color(0x0066ff));
         }
@@ -268,7 +304,7 @@ public class LightCommand extends BaseCommand {
         public static void onModifyType(CommandSender sender, String[] args) {
             List<CommandError> errors = isUnloaded(args, 1);
             try {
-                LightType.valueOf(args[0]);
+                light.setType(LightType.valueOf(args[0]));
             } catch (IllegalArgumentException e) {
                 errors.add(CommandError.INVALID_ARGUMENT);
             }
@@ -276,7 +312,6 @@ public class LightCommand extends BaseCommand {
                 sender.sendMessage(formatErrors(errors));
                 return;
             }
-            light.setType(LightType.valueOf(args[0]));
             light.on(new Color(0x0066ff));
             light.buildLasers();
         }
@@ -286,11 +321,16 @@ public class LightCommand extends BaseCommand {
         @Description("Alter rotation")
         @CommandPermission("nightclub.light")
         public static void onModifyRotation(CommandSender sender, String[] args) {
-            if (isUnloaded(args, 1).stream().anyMatch(error -> error != CommandError.VALID)) {
+            List<CommandError> errors = isUnloaded(args, 1);
+            try {
+                light.getData().getPatternData().setRotation(Math.toRadians(Util.parseNumber(args[0]).doubleValue()));
+            } catch (ParseException e) {
+                errors.add(CommandError.INVALID_ARGUMENT);
+            }
+            if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
                 sender.sendMessage(formatErrors(isUnloaded(args, 1)));
                 return;
             }
-            light.getData().getPatternData().setRotation(Math.toRadians(Util.parseNumber(args[0]).doubleValue()));
             light.buildLasers();
             light.on(new Color(0x0066ff));
         }
@@ -300,11 +340,17 @@ public class LightCommand extends BaseCommand {
         @Description("Alter secondary rotation")
         @CommandPermission("nightclub.light")
         public static void onModifySecondaryRotation(CommandSender sender, String[] args) {
-            if (isUnloaded(args, 1).stream().anyMatch(error -> error != CommandError.VALID)) {
+            List<CommandError> errors = isUnloaded(args, 1);
+            try {
+                light.getData().getSecondPatternData().setRotation(Math.toRadians(Util.parseNumber(args[0]).doubleValue()));
+                
+            } catch (ParseException e) {
+                errors.add(CommandError.INVALID_ARGUMENT);
+            }
+            if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
                 sender.sendMessage(formatErrors(isUnloaded(args, 1)));
                 return;
             }
-            light.getData().getSecondPatternData().setRotation(Math.toRadians(Util.parseNumber(args[0]).doubleValue()));
             light.buildLasers();
             light.on(new Color(0x0066ff));
         }
@@ -317,15 +363,13 @@ public class LightCommand extends BaseCommand {
         public static void onModifyChannel(CommandSender sender, String[] args) {
             List<CommandError> errors = isUnloaded(args, 1);
             try {
-                LightChannel.valueOf(args[0]);
+                light.setChannel(LightChannel.valueOf(args[0]));
             } catch (IllegalArgumentException e) {
                 errors.add(CommandError.INVALID_ARGUMENT);
             }
             if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
                 sender.sendMessage(formatErrors(errors));
-                return;
             }
-            light.setChannel(LightChannel.valueOf(args[0]));
         }
         @Subcommand("speedchannel")
         @CommandAlias("sc")
@@ -335,15 +379,13 @@ public class LightCommand extends BaseCommand {
         public static void onModifySpeedChannel(CommandSender sender, String[] args) {
             List<CommandError> errors = isUnloaded(args, 1);
             try {
-                LightSpeedChannel.valueOf(args[0]);
+                light.setSpeedChannel(LightSpeedChannel.valueOf(args[0]));
             } catch (IllegalArgumentException e) {
                 errors.add(CommandError.INVALID_ARGUMENT);
             }
             if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
                 sender.sendMessage(formatErrors(errors));
-                return;
             }
-            light.setSpeedChannel(LightSpeedChannel.valueOf(args[0]));
         }
         
         @Subcommand("setlocation")
@@ -359,8 +401,14 @@ public class LightCommand extends BaseCommand {
                 return;
             }
             if (args.length >= 5) {
-                light.setLocation(new Location(Util.parseNumber(args[0]), Util.parseNumber(args[1]), Util.parseNumber(args[2]), // x y z
-                        Util.parseNumber(args[3]), Util.parseNumber(args[4]))); // pitch and yaw
+                try {
+                    light.setLocation(new Location(Util.parseNumber(args[0]), Util.parseNumber(args[1]), Util.parseNumber(args[2]), // x y z
+                            Util.parseNumber(args[3]), Util.parseNumber(args[4]))); // pitch and yaw
+                } catch (ParseException e) {
+                    errors.add(CommandError.INVALID_ARGUMENT);
+                    sender.sendMessage(formatErrors(errors));
+                    return;
+                }
             } else {
                 light.setLocation(Location.getFromBukkitLocation(player.getLocation().add(0, 1, 0)));
             }
@@ -380,6 +428,32 @@ public class LightCommand extends BaseCommand {
             light.getData().setFlipStartAndEnd(!light.getData().isFlipStartAndEnd());
             light.buildLasers();
             light.on(new Color(0x000000));
+        }
+        
+        @Subcommand("lightid")
+        @CommandAlias("lid")
+        @Description("Modify a Light's lightID's")
+        @CommandPermission("nightclub.light")
+        public class LightIDcommand extends BaseCommand {
+            
+            @Subcommand("add")
+            @CommandAlias("a")
+            @Description("Add a LightID")
+            @CommandPermission("nightclub.light")
+            public static void onAddLightID(CommandSender sender, String[] args) {
+                List<CommandError> errors = isUnloaded(args, 1);
+                try {
+                    light.getData().getLightIDs().add(Util.parseNumber(args[0]).intValue());
+                } catch (ParseException e) {
+                    errors.add(CommandError.INVALID_ARGUMENT);
+                }
+                if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
+                    sender.sendMessage(formatErrors(isUnloaded(args, 1)));
+                    return;
+                }
+                light.buildLasers();
+                light.on(new Color(0x0066ff));
+            }
         }
     }
     

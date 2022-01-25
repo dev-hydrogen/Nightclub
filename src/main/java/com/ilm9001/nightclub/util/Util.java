@@ -18,13 +18,8 @@ public class Util {
         return 360 * percentage / 100;
     }
     
-    public static Number parseNumber(String number) {
-        try {
-            return NumberFormat.getInstance().parse(number);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return 0;
-        }
+    public static Number parseNumber(String number) throws ParseException {
+        return NumberFormat.getInstance().parse(number);
     }
     
     public static Collection<String> getStringValuesFromArray(Object[] objects) {
