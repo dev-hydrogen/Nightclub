@@ -57,15 +57,24 @@ public class BeatmapParser {
             JsonArray suggestions;
             JsonObject colorLeft;
             JsonObject colorRight;
+            JsonObject envColorLeft;
+            JsonObject envColorRight;
             if (customData != null) {
                 JsonObject customDataObject = customData.getAsJsonObject();
                 requirements = (JsonArray) customDataObject.get("_requirements");
                 suggestions = (JsonArray) customDataObject.get("_suggestions");
                 colorLeft = (JsonObject) customDataObject.get("_colorLeft");
                 colorRight = (JsonObject) customDataObject.get("_colorRight");
+                envColorLeft = (JsonObject) customDataObject.get("_envColorLeft");
+                envColorRight = (JsonObject) customDataObject.get("_envColorRight");
                 if (colorLeft != null && colorRight != null) {
                     primaryColor = new Color(colorLeft.get("r").getAsFloat(), colorLeft.get("g").getAsFloat(), colorLeft.get("b").getAsFloat());
                     secondaryColor = new Color(colorRight.get("r").getAsFloat(), colorRight.get("g").getAsFloat(), colorRight.get("b").getAsFloat());
+                    isChroma = true;
+                }
+                if (envColorLeft != null && envColorRight != null && !isChroma) {
+                    primaryColor = new Color(envColorLeft.get("r").getAsFloat(), envColorLeft.get("g").getAsFloat(), envColorLeft.get("b").getAsFloat());
+                    secondaryColor = new Color(envColorLeft.get("r").getAsFloat(), envColorRight.get("g").getAsFloat(), envColorRight.get("b").getAsFloat());
                     isChroma = true;
                 }
                 if (requirements != null && !isChroma) {
