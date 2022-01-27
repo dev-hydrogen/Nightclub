@@ -72,7 +72,8 @@ public class BeatmapParser {
                     isChroma = requirements.contains(new JsonPrimitive("Chroma"))
                             || requirements.contains(new JsonPrimitive("Chroma Lighting Events"))
                             || requirements.contains(new JsonPrimitive("Chroma Special Events"));
-                } else if (suggestions != null && !isChroma) {
+                }
+                if (suggestions != null && !isChroma) {
                     isChroma = suggestions.contains(new JsonPrimitive("Chroma"))
                             || suggestions.contains(new JsonPrimitive("Chroma Lighting Events"))
                             || suggestions.contains(new JsonPrimitive("Chroma Special Events"));
