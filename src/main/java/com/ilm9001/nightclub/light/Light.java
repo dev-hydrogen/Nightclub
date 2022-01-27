@@ -328,6 +328,7 @@ public class Light implements LightI {
                 secondaryMultipliedSpeed = 40.0;
             }
         }
+        run.run();
     }
     
     private double getMaxLengthPercent() {
