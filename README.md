@@ -71,4 +71,6 @@ If you have any issues, please contact me on the discord (https://discord.gg/3tF
   
 This plugins uses SkytAsul's super useful GuardianBeam resource, available here: https://github.com/SkytAsul/GuardianBeam
 
+This plugin uses my own DebugMarker resource for various "light blocks" for lights: https://github.com/dev-hydrogen/debugmarker
+
 This plugin also uses bStats: https://bstats.org/plugin/bukkit/BeatMapVisualiser/12300
