@@ -1,6 +1,6 @@
 ![NightclubTransparent](https://user-images.githubusercontent.com/54047826/142924925-12f92508-5d89-4724-a9ce-d39fd3d6a539.png)
 
-Music visualiser *plugin* for minecraft which uses beat saber beatmaps for various visuals as well as a resource pack for streaming music for players
+Music visualiser *plugin* for minecraft which uses beat saber beatmaps (including chroma support!) for various visuals as well as a resource pack for streaming music for players
 
 Showcase videos: 
 
