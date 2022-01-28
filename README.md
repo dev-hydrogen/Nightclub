@@ -53,7 +53,7 @@ Update the sounds.json file in \pack\assets\minecraft\ to include your songs wit
 ```
 (further reading: https://minecraft.fandom.com/wiki/Sounds.json)
 
-Then, assuming you havent hit the 100mb limit, you can zip up the resource pack (Remember to zip it so that you dont have an extra folder when zipped, aka no pack.zip\pack\assets\, it should directly be pack.zip\assets\) and upload it to a service like https://mc-packs.net/ (or dropbox for files bigger than 95mb) and then follow the instructions on what to put in your server.properties
+Then, assuming you havent hit the 250mb limit, you can zip up the resource pack (Remember to zip it so that you dont have an extra folder when zipped, aka no pack.zip\pack\assets\, it should directly be pack.zip\assets\) and upload it to a service like https://mc-packs.net/ (or dropbox for files bigger than 95mb) and then follow the instructions on what to put in your server.properties
 
 After thats done, move on to the server side. First i recommend stopping the server, putting the plugin in the plugins folder, starting the server and letting it generate the config, then stopping the server.
 
