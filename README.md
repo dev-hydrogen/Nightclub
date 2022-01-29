@@ -63,6 +63,8 @@ Place your info.dat file and beatmap file (usually named by difficulty, such as 
 
 You can start the server, and create a LightUniverse with /lightuniverse build, then create individual lights for that LightUniverse with /light build. Use /light data to configure a lights variables such as maximum length and pattern 
 
+Once you are happy with your light setup, you can use /beatmap play <songname> to play a song and /beatmap stop if you wish to stop playback of it early
+
 # Troubleshooting
 
 If you have any issues, please contact me on the discord (https://discord.gg/3tFg7RPvJr) and ill try to help if possible, but read all of this first and ensure youre doing it properly before asking for any help.
