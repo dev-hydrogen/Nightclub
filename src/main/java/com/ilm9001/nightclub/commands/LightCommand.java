@@ -146,7 +146,7 @@ public class LightCommand extends BaseCommand {
                 .type(l.getType())
                 .channel(l.getChannel())
                 .speedChannel(l.getSpeedChannel())
-                .data(l.getData()).build();
+                .data(l.getData().clone()).build();
         manager.getLoadedUniverse().addLight(light);
         manager.save();
         light.load();
