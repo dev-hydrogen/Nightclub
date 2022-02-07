@@ -179,7 +179,7 @@ public class LightCommand extends BaseCommand {
         @Subcommand("pattern")
         @CommandAlias("p")
         @Description("Alter pattern")
-        @CommandCompletion("@pattern")
+        @CommandCompletion("@patterns")
         @CommandPermission("nightclub.light")
         public static void onPattern(CommandSender sender, String[] args) {
             List<CommandError> errors = isUnloaded(args, 1);
@@ -197,7 +197,7 @@ public class LightCommand extends BaseCommand {
         @Subcommand("secondarypattern")
         @CommandAlias("sp")
         @Description("Alter secondary pattern")
-        @CommandCompletion("@pattern")
+        @CommandCompletion("@patterns")
         @CommandPermission("nightclub.light")
         public static void onSecondPattern(CommandSender sender, String[] args) {
             List<CommandError> errors = isUnloaded(args, 1);
@@ -340,7 +340,7 @@ public class LightCommand extends BaseCommand {
         @Subcommand("type")
         @CommandAlias("t")
         @Description("Alter the Light's type")
-        @CommandCompletion("@type")
+        @CommandCompletion("@types")
         @CommandPermission("nightclub.light")
         public static void onModifyType(CommandSender sender, String[] args) {
             List<CommandError> errors = isUnloaded(args, 1);

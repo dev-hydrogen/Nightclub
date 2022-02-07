@@ -70,8 +70,8 @@ public final class Nightclub extends JavaPlugin {
         commandManager = new PaperCommandManager(this);
         
         CommandCompletions<BukkitCommandCompletionContext> completions = commandManager.getCommandCompletions();
-        completions.registerCompletion("pattern", c -> getStringValuesFromArray(LightPattern.values()));
-        completions.registerCompletion("type", c -> getStringValuesFromArray(LightType.values()));
+        completions.registerCompletion("patterns", c -> getStringValuesFromArray(LightPattern.values()));
+        completions.registerCompletion("types", c -> getStringValuesFromArray(LightType.values()));
         completions.registerCompletion("channels", c -> getStringValuesFromArray(LightChannel.values()));
         completions.registerCompletion("speedchannels", c -> getStringValuesFromArray(LightSpeedChannel.values()));
         completions.registerCompletion("beatmaps", c -> getStringValuesFromArray(new File(getDataFolder().getAbsolutePath()).listFiles(File::isDirectory)));

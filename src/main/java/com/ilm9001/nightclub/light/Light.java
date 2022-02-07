@@ -322,10 +322,10 @@ public class Light implements LightI {
         }
         this.multipliedSpeed = data.getPatternData().getSpeed() * multiplier;
         this.secondaryMultipliedSpeed = data.getSecondPatternData().getSpeed() * multiplier;
-        if (multipliedSpeed >= 40.0) {
-            multipliedSpeed = 40.0;
-            if (secondaryMultipliedSpeed >= 40.0) {
-                secondaryMultipliedSpeed = 40.0;
+        if (multipliedSpeed >= 20.0) {
+            multipliedSpeed = 20.0;
+            if (secondaryMultipliedSpeed >= 20.0) {
+                secondaryMultipliedSpeed = 20.0;
             }
         }
         run.run();
