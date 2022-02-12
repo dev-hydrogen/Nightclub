@@ -33,11 +33,12 @@ public class BeatmapCommand extends BaseCommand {
         List<CommandError> errors = LightUniverseCommand.isUnloaded(args, 1);
         errors.add(Util.getStringValuesFromArray(new File(Nightclub.getInstance().getDataFolder().getAbsolutePath()).listFiles(File::isDirectory))
                 .stream().noneMatch(beatmap -> args[0].equals(beatmap)) ? CommandError.INVALID_ARGUMENT : CommandError.VALID);
+        errors.add(args.length >= 2 && !(args[1].toLowerCase().contains("true") || args[1].toLowerCase().contains("false")) ? CommandError.INVALID_ARGUMENT : CommandError.VALID);
         if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
             sender.sendMessage(formatErrors(errors));
             return;
         }
-        player = new BeatmapPlayer(args[0]);
+        player = new BeatmapPlayer(args[0], args.length >= 2 && Boolean.parseBoolean(args[1]));
         ArrayList<Player> playTo = new ArrayList<>(Bukkit.getOnlinePlayers());
         InfoData info = player.play(playTo);
         String playBackMessage = ChatColor.GOLD + "Now Playing: " + ChatColor.AQUA + info.getSongAuthorName() + " - " + info.getSongName() + " " + info.getSongSubName() + System.lineSeparator()

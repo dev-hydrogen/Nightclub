@@ -21,7 +21,7 @@ public class BeatmapParser {
      * @return InfoData which includes bpm, artist, song folder and the beatmaps author.
      * Returns null if no info.dat file can be found.
      */
-    public static @Nullable InfoData getInfoData(String folder) {
+    public static @Nullable InfoData getInfoData(String folder, boolean dontUseChroma) {
         File dataFolder = Nightclub.DATA_FOLDER;
         File infoFolder = new File(dataFolder + "/" + folder);
         @SuppressWarnings("ConstantConditions") // compiler warns about "infoFolder.listFiles() might be null". please tell me how.
@@ -77,7 +77,7 @@ public class BeatmapParser {
                     secondaryColor = new Color(envColorLeft.get("r").getAsFloat(), envColorRight.get("g").getAsFloat(), envColorRight.get("b").getAsFloat());
                     isChroma = true;
                 }
-                if (requirements != null && !isChroma) {
+                if (requirements != null) {
                     isChroma = requirements.contains(new JsonPrimitive("Chroma"))
                             || requirements.contains(new JsonPrimitive("Chroma Lighting Events"))
                             || requirements.contains(new JsonPrimitive("Chroma Special Events"));
@@ -102,7 +102,7 @@ public class BeatmapParser {
                 .mapper(info.get("_levelAuthorName").getAsString())
                 .songSubName(info.get("_songSubName").getAsString())
                 .beatmapFileName(filename)
-                .isChroma(isChroma)
+                .isChroma(!dontUseChroma && isChroma)
                 .primaryColor(primaryColor)
                 .secondaryColor(secondaryColor)
                 .build();
@@ -113,11 +113,11 @@ public class BeatmapParser {
      * @param name Folder where beatmap is (/name/ExpertPlus.dat/)
      * @return List of LightEvent's in the beatmap file. Returns an empty list if info file can't be found
      */
-    public static @NotNull List<LightEvent> getEvents(String name) {
+    public static @NotNull List<LightEvent> getEvents(String name, boolean dontUseChroma) {
         File dataFolder = Nightclub.DATA_FOLDER;
         List<LightEvent> events = new ArrayList<>();
         JsonArray eventArray;
-        InfoData info = BeatmapParser.getInfoData(name);
+        InfoData info = BeatmapParser.getInfoData(name, dontUseChroma);
         if (info == null) {
             return new ArrayList<>();
         }

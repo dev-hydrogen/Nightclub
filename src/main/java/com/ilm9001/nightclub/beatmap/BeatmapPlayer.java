@@ -23,14 +23,17 @@ public class BeatmapPlayer {
     private ScheduledExecutorService executorService;
     @Getter private boolean isPlaying;
     
+    public BeatmapPlayer(String name) {
+        this(name, false);
+    }
     /**
      * Constructor that defines a new Beatmap you can play from.
      *
      * @param name name of the folder the beatmap itself resides in (/name/ExpertPlus.dat)
      */
-    public BeatmapPlayer(String name) {
-        info = BeatmapParser.getInfoData(name);
-        events = BeatmapParser.getEvents(name);
+    public BeatmapPlayer(String name, boolean dontUseChroma) {
+        info = BeatmapParser.getInfoData(name, dontUseChroma);
+        events = BeatmapParser.getEvents(name, dontUseChroma);
         this.name = name;
         playTo = new ArrayList<>();
     }
