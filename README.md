@@ -4,7 +4,7 @@ Music visualiser *plugin* for minecraft which uses beat saber beatmaps (includin
 
 Showcase videos: 
 
-![Aiobahn & Vin - About U](https://streamable.com/ou4cdr)
+[Aiobahn & Vin - About U](https://streamable.com/ou4cdr)
 
 # KEY CAVEATS
 
