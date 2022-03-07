@@ -11,6 +11,7 @@ import org.bukkit.command.CommandSender;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
@@ -20,6 +21,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @CommandPermission("nightclub.lightuniverse")
 public class LightUniverseCommand extends BaseCommand {
     private static final LightUniverseManager manager = Nightclub.getLightUniverseManager();
+    private static final boolean debugMode = false;
 
     static List<CommandError> isUnloaded() {
         List<CommandError> errors = new ArrayList<>();
@@ -123,6 +125,18 @@ public class LightUniverseCommand extends BaseCommand {
             return;
         }
         sender.sendMessage("Currently loaded ID: " + manager.getLoadedUniverse().getName());
+    }
+
+    @Subcommand("debug")
+    @Description("Debug channel")
+    @CommandPermission("nightclub.lightuniverse")
+    public static void onToggleDebug(CommandSender sender, String[] args) {
+        List<CommandError> errors = isUnloaded(args, 1);
+        //toggle
+        Arrays.stream(LightChannel.values()).forEach(channel -> channel.debug(!channel.isDebugOn()));
+        if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
+            sender.sendMessage(Util.formatErrors(errors));
+        }
     }
 
     @Subcommand("channel")

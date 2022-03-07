@@ -62,8 +62,7 @@ public class LightUniverse {
         isLoaded = false;
     }
 
-    public @Nullable
-    Light getLight(UUID uuid) {
+    public @Nullable Light getLight(UUID uuid) {
         return lights
                 .stream()
                 .filter(light -> uuid.equals(light.getUniqueID()))
@@ -71,8 +70,7 @@ public class LightUniverse {
                 .orElse(null);
     }
 
-    public @Nullable
-    Light getLight(String name) {
+    public @Nullable Light getLight(String name) {
         return lights
                 .stream()
                 .filter(light -> name.equals(light.getName()))

@@ -149,6 +149,11 @@ public class Light implements LightI {
         isLoaded = false;
     }
 
+    public void debug(boolean on) {
+        marker.setName(on ? this.toString() : "");
+        marker.setDuration(on ? 3600000 : 5000);
+    }
+
     /**
      * Starts the movement runnable of this Light. This Light will be completely stationary if it is not started before being turned on.
      */

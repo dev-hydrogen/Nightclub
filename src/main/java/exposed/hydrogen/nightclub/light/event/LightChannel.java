@@ -20,6 +20,7 @@ public enum LightChannel {
     @Getter private final int type;
     private final List<LightI> lights;
     private final List<LightI> speedListeners;
+    @Getter private boolean debugOn;
 
     LightChannel(int type) {
         this.type = type;
@@ -100,5 +101,10 @@ public enum LightChannel {
                 ((Light) l).setSpeed(multiplier);
             }
         });
+    }
+
+    public void debug(boolean on) {
+        debugOn = on;
+        lights.forEach(l -> l.debug(on));
     }
 }

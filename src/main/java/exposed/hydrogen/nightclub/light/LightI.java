@@ -20,4 +20,6 @@ public interface LightI {
     void load();
 
     void unload();
+
+    void debug(boolean on);
 }
