@@ -1,6 +1,6 @@
 name: Nightclub2.0
 version: '${project.version}'
-main: com.ilm9001.nightclub.Nightclub
+main: exposed.hydrogen.nightclub.Nightclub
 api-version: 1.18
 authors: [ hydrogen ]
 description: Nightclub 2.0

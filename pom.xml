@@ -4,16 +4,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.ilm9001</groupId>
+    <groupId>exposed.hydrogen</groupId>
     <artifactId>Nightclub</artifactId>
     <version>2.0</version>
     <packaging>jar</packaging>
 
     <name>Nightclub</name>
+    <description>Music visualiser plugin for minecraft utilizing beat saber beatmaps</description>
 
-    <description>Nightclub 2.0</description>
     <properties>
-        <java.version>16</java.version>
+        <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -34,7 +34,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.3.0-SNAPSHOT</version>
+                <version>3.3.1-SNAPSHOT</version>
                 <configuration>
                     <minimizeJar>true</minimizeJar>
                     <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml
@@ -42,15 +42,15 @@
                     <relocations>
                         <relocation>
                             <pattern>co.aikar.commands</pattern>
-                            <shadedPattern>com.ilm9001.acf</shadedPattern>
+                            <shadedPattern>exposed.hydrogen.acf</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>co.aikar.locales</pattern>
-                            <shadedPattern>com.ilm9001.locales</shadedPattern>
+                            <shadedPattern>exposed.hydrogen.locales</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>org.bstats</pattern>
-                            <shadedPattern>com.ilm9001.bstats</shadedPattern>
+                            <shadedPattern>exposed.hydrogen.bstats</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>
@@ -129,7 +129,7 @@
         <dependency>
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bukkit</artifactId>
-            <version>2.2.1</version>
+            <version>3.0.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
