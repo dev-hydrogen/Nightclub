@@ -7,7 +7,10 @@ import exposed.hydrogen.nightclub.light.event.LightChannel;
 import exposed.hydrogen.nightclub.light.event.LightSpeedChannel;
 import exposed.hydrogen.nightclub.util.DebugMarker;
 import exposed.hydrogen.nightclub.util.Location;
-import lombok.*;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.math3.geometry.euclidean.threed.Rotation;
 import org.apache.commons.math3.geometry.euclidean.threed.RotationConvention;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
@@ -24,7 +27,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.StreamSupport;
 
-@ToString
 @EqualsAndHashCode
 public class Light implements LightI {
     private transient ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
@@ -355,6 +357,23 @@ public class Light implements LightI {
     public void setType(LightType type) {
         this.type = type;
         buildLasers();
+    }
+
+    public String toString() {
+        return """
+                uniqueID="this.uniqueID
+                ", name="this.name
+                ", location="this.location
+                ", channel="this.channel
+                ", speedChannel="this.speedChannel
+                ", lightIDs="lightid
+                """
+                .replace("this.uniqueID", this.uniqueID.toString())
+                .replace("this.name", "" + this.name)
+                .replace("this.location", "" + this.location)
+                .replace("this.channel", "" + this.channel)
+                .replace("this.speedChannel", "" + this.speedChannel)
+                .replace("lightid", "" + data.getLightIDs());
     }
 
     public static class LightUniverseInstanceCreator implements InstanceCreator<Light> {

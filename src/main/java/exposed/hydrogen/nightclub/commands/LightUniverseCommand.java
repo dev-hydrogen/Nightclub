@@ -154,6 +154,8 @@ public class LightUniverseCommand extends BaseCommand {
                 LightChannel.valueOf(args[0]).on(new Color(0x0066ff), null);
             } catch (IllegalArgumentException e) {
                 errors.add(CommandError.INVALID_ARGUMENT);
+            } catch (ArrayIndexOutOfBoundsException e) {
+                errors.add(CommandError.TOO_LITTLE_ARGUMENTS);
             }
             if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
                 sender.sendMessage(Util.formatErrors(errors));
@@ -170,6 +172,8 @@ public class LightUniverseCommand extends BaseCommand {
                 LightChannel.valueOf(args[0]).off(new Color(0x0066ff), null);
             } catch (IllegalArgumentException e) {
                 errors.add(CommandError.INVALID_ARGUMENT);
+            } catch (ArrayIndexOutOfBoundsException e) {
+                errors.add(CommandError.TOO_LITTLE_ARGUMENTS);
             }
             if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
                 sender.sendMessage(Util.formatErrors(errors));
@@ -186,6 +190,8 @@ public class LightUniverseCommand extends BaseCommand {
                 LightChannel.valueOf(args[0]).flash(new Color(0x0066ff), null);
             } catch (IllegalArgumentException e) {
                 errors.add(CommandError.INVALID_ARGUMENT);
+            } catch (ArrayIndexOutOfBoundsException e) {
+                errors.add(CommandError.TOO_LITTLE_ARGUMENTS);
             }
             if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
                 sender.sendMessage(Util.formatErrors(errors));
@@ -202,6 +208,8 @@ public class LightUniverseCommand extends BaseCommand {
                 LightChannel.valueOf(args[0]).flashOff(new Color(0x0066ff), null);
             } catch (IllegalArgumentException e) {
                 errors.add(CommandError.INVALID_ARGUMENT);
+            } catch (ArrayIndexOutOfBoundsException e) {
+                errors.add(CommandError.TOO_LITTLE_ARGUMENTS);
             }
             if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
                 sender.sendMessage(Util.formatErrors(errors));

@@ -13,8 +13,7 @@ public enum CommandError {
     COMMAND_SENT_FROM_CONSOLE("- Command can only be executed as a player"),
     VALID("");
 
-    @Getter
-    private final String errorMessage;
+    @Getter private final String errorMessage;
 
     CommandError(String errorMessage) {
         this.errorMessage = errorMessage;
