@@ -130,8 +130,8 @@ public class LightUniverseCommand extends BaseCommand {
     @Subcommand("debug")
     @Description("Debug channel")
     @CommandPermission("nightclub.lightuniverse")
-    public static void onToggleDebug(CommandSender sender, String[] args) {
-        List<CommandError> errors = isUnloaded(args, 1);
+    public static void onToggleDebug(CommandSender sender) {
+        List<CommandError> errors = isUnloaded();
         //toggle
         Arrays.stream(LightChannel.values()).forEach(channel -> channel.debug(!channel.isDebugOn()));
         if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
