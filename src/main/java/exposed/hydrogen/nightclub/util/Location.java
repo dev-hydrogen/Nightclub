@@ -17,6 +17,9 @@ public class Location implements Cloneable {
     private double pitch;
     private double yaw;
 
+    /**
+     * GSON no-args constructor
+     */
     public Location() {
         this(0, 0, 0, 0, 0);
     }

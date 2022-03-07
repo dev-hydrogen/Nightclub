@@ -5,9 +5,11 @@ import co.aikar.commands.annotation.*;
 import exposed.hydrogen.nightclub.Nightclub;
 import exposed.hydrogen.nightclub.light.LightUniverse;
 import exposed.hydrogen.nightclub.light.LightUniverseManager;
+import exposed.hydrogen.nightclub.light.event.LightChannel;
 import exposed.hydrogen.nightclub.util.Util;
 import org.bukkit.command.CommandSender;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -121,5 +123,75 @@ public class LightUniverseCommand extends BaseCommand {
             return;
         }
         sender.sendMessage("Currently loaded ID: " + manager.getLoadedUniverse().getName());
+    }
+
+    @Subcommand("channel")
+    @CommandAlias("c")
+    @Description("Control a channel, for example, turn it on or off")
+    @CommandPermission("nightclub.lightuniverse")
+    public class LightControlCommand extends BaseCommand {
+        @Subcommand("on")
+        @Description("Turn channel on")
+        @CommandPermission("nightclub.lightuniverse")
+        @CommandCompletion("@channels")
+        public static void onTurnOn(CommandSender sender, String[] args) {
+            List<CommandError> errors = isUnloaded(args, 1);
+            try {
+                LightChannel.valueOf(args[0]).on(new Color(0x0066ff), null);
+            } catch (IllegalArgumentException e) {
+                errors.add(CommandError.INVALID_ARGUMENT);
+            }
+            if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
+                sender.sendMessage(Util.formatErrors(errors));
+            }
+        }
+
+        @Subcommand("off")
+        @Description("Turn channel off")
+        @CommandPermission("nightclub.lightuniverse")
+        @CommandCompletion("@channels")
+        public static void onTurnOff(CommandSender sender, String[] args) {
+            List<CommandError> errors = isUnloaded(args, 1);
+            try {
+                LightChannel.valueOf(args[0]).off(new Color(0x0066ff), null);
+            } catch (IllegalArgumentException e) {
+                errors.add(CommandError.INVALID_ARGUMENT);
+            }
+            if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
+                sender.sendMessage(Util.formatErrors(errors));
+            }
+        }
+
+        @Subcommand("flash")
+        @Description("Flash channel")
+        @CommandPermission("nightclub.lightuniverse")
+        @CommandCompletion("@channels")
+        public static void onFlash(CommandSender sender, String[] args) {
+            List<CommandError> errors = isUnloaded(args, 1);
+            try {
+                LightChannel.valueOf(args[0]).flash(new Color(0x0066ff), null);
+            } catch (IllegalArgumentException e) {
+                errors.add(CommandError.INVALID_ARGUMENT);
+            }
+            if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
+                sender.sendMessage(Util.formatErrors(errors));
+            }
+        }
+
+        @Subcommand("flashoff")
+        @Description("Flash off channel")
+        @CommandPermission("nightclub.lightuniverse")
+        @CommandCompletion("@channels")
+        public static void onFlashOff(CommandSender sender, String[] args) {
+            List<CommandError> errors = isUnloaded(args, 1);
+            try {
+                LightChannel.valueOf(args[0]).flashOff(new Color(0x0066ff), null);
+            } catch (IllegalArgumentException e) {
+                errors.add(CommandError.INVALID_ARGUMENT);
+            }
+            if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
+                sender.sendMessage(Util.formatErrors(errors));
+            }
+        }
     }
 }

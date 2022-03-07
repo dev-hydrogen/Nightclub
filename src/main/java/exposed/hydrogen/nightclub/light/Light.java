@@ -123,7 +123,6 @@ public class Light implements LightI {
                     } else {
                         laser.setEnd(this.location.clone().add(v4.getX(), v4.getZ(), v4.getY()));
                     }
-                    laser.changeColor();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
