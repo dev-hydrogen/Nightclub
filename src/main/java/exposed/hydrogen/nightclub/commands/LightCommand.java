@@ -3,7 +3,13 @@ package exposed.hydrogen.nightclub.commands;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import exposed.hydrogen.nightclub.Nightclub;
-import exposed.hydrogen.nightclub.light.*;
+import exposed.hydrogen.nightclub.light.Light;
+import exposed.hydrogen.nightclub.light.LightUniverse;
+import exposed.hydrogen.nightclub.light.LightUniverseManager;
+import exposed.hydrogen.nightclub.light.data.LightData;
+import exposed.hydrogen.nightclub.light.data.LightPattern;
+import exposed.hydrogen.nightclub.light.data.LightPatternData;
+import exposed.hydrogen.nightclub.light.data.LightType;
 import exposed.hydrogen.nightclub.light.event.LightChannel;
 import exposed.hydrogen.nightclub.light.event.LightSpeedChannel;
 import exposed.hydrogen.nightclub.util.Location;
@@ -548,7 +554,80 @@ public class LightCommand extends BaseCommand {
                 light.on(new Color(0x0066ff));
             }
         }
+
+        @Subcommand("ringzoom")
+        @CommandAlias("rz")
+        @Description("Modify a Light's ring zoom movement")
+        @CommandPermission("nightclub.light")
+        public class LightRingMoveCommand extends BaseCommand {
+
+            @Subcommand("setlocation")
+            @CommandAlias("sl")
+            @Description("Set the pitch and yaw")
+            @CommandPermission("nightclub.light")
+            public static void onSetLocation(CommandSender sender, Player player, String[] args) {
+                List<CommandError> errors = isUnloaded();
+                errors.add(player == null ? CommandError.COMMAND_SENT_FROM_CONSOLE : CommandError.VALID);
+                errors.add(!(args.length == 2) ? CommandError.TOO_LITTLE_ARGUMENTS : CommandError.VALID);
+                if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
+                    sender.sendMessage(Util.formatErrors(errors));
+                    return;
+                }
+                if (args.length >= 2) {
+                    try {
+                        light.getData().getRingMovementData().setPitchYaw(new Location(0, 0, 0, Util.parseNumber(args[0]), Util.parseNumber(args[1]))); // pitch and yaw
+                    } catch (ParseException e) {
+                        errors.add(CommandError.INVALID_ARGUMENT);
+                        sender.sendMessage(Util.formatErrors(errors));
+                        return;
+                    }
+                } else {
+                    light.getData().getRingMovementData().setPitchYaw(Location.getFromBukkitLocation(player.getLocation().add(0, 1, 0)));
+                }
+                light.buildLasers();
+                light.on(new Color(0x000000));
+            }
+
+            @Subcommand("distance")
+            @CommandAlias("d")
+            @Description("Alter distance")
+            @CommandPermission("nightclub.light")
+            public static void onModifyDistance(CommandSender sender, String[] args) {
+                List<CommandError> errors = isUnloaded(args, 1);
+                try {
+                    light.getData().getRingMovementData().setDistance(Util.parseNumber(args[0]).doubleValue());
+                } catch (ParseException e) {
+                    errors.add(CommandError.INVALID_ARGUMENT);
+                }
+                if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
+                    sender.sendMessage(Util.formatErrors(errors));
+                    return;
+                }
+                light.buildLasers();
+                light.on(new Color(0x0066ff));
+            }
+
+            @Subcommand("time")
+            @CommandAlias("t")
+            @Description("Alter time to move")
+            @CommandPermission("nightclub.light")
+            public static void onModifyTime(CommandSender sender, String[] args) {
+                List<CommandError> errors = isUnloaded(args, 1);
+                try {
+                    light.getData().getRingMovementData().setDuration(Util.parseNumber(args[0]).doubleValue());
+                } catch (ParseException e) {
+                    errors.add(CommandError.INVALID_ARGUMENT);
+                }
+                if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
+                    sender.sendMessage(Util.formatErrors(errors));
+                    return;
+                }
+                light.buildLasers();
+                light.on(new Color(0x0066ff));
+            }
+        }
     }
+
 
     @Subcommand("control")
     @CommandAlias("c")
@@ -599,6 +678,5 @@ public class LightCommand extends BaseCommand {
             }
             light.flashOff(new Color(0x0066ff));
         }
-
     }
 }

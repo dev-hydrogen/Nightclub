@@ -1,4 +1,4 @@
-package exposed.hydrogen.nightclub.light;
+package exposed.hydrogen.nightclub.light.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package exposed.hydrogen.nightclub.light;
+package exposed.hydrogen.nightclub.light.data;
 
 import exposed.hydrogen.nightclub.util.Util;
 import org.apache.commons.math3.geometry.euclidean.threed.Plane;
@@ -19,7 +19,7 @@ public enum LightPattern {
             Math.cos(Math.toRadians(Util.getDegreesFromPercentage(x))))),
     STILL((x) -> new Vector2D(0.0, 0.0).scalarMultiply(0.0));
 
-    Function<Double, Vector2D> pattern;
+    private final Function<Double, Vector2D> pattern;
 
     LightPattern(Function<Double, Vector2D> pattern) {
         this.pattern = pattern;

@@ -1,7 +1,7 @@
 package exposed.hydrogen.nightclub.laser;
 
 import exposed.hydrogen.nightclub.Nightclub;
-import exposed.hydrogen.nightclub.light.LightType;
+import exposed.hydrogen.nightclub.light.data.LightType;
 import exposed.hydrogen.nightclub.util.Location;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;

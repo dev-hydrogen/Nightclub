@@ -12,7 +12,12 @@ import exposed.hydrogen.nightclub.commands.LightCommand;
 import exposed.hydrogen.nightclub.commands.LightUniverseCommand;
 import exposed.hydrogen.nightclub.json.LightJSONReader;
 import exposed.hydrogen.nightclub.json.LightJSONWriter;
-import exposed.hydrogen.nightclub.light.*;
+import exposed.hydrogen.nightclub.light.Light;
+import exposed.hydrogen.nightclub.light.LightUniverse;
+import exposed.hydrogen.nightclub.light.LightUniverseManager;
+import exposed.hydrogen.nightclub.light.data.LightData;
+import exposed.hydrogen.nightclub.light.data.LightPattern;
+import exposed.hydrogen.nightclub.light.data.LightType;
 import exposed.hydrogen.nightclub.light.event.LightChannel;
 import exposed.hydrogen.nightclub.light.event.LightSpeedChannel;
 import lombok.Getter;
@@ -42,10 +47,10 @@ public final class Nightclub extends JavaPlugin {
     @Override
     public void onEnable() {
         GSON = new GsonBuilder()
-                .serializeNulls()
                 .setPrettyPrinting()
                 .registerTypeAdapter(LightUniverse.class, new LightUniverse.LightUniverseInstanceCreator())
-                .registerTypeAdapter(Light.class, new Light.LightUniverseInstanceCreator())
+                .registerTypeAdapter(Light.class, new Light.LightInstanceCreator())
+                .registerTypeAdapter(LightData.class, new LightData.LightDataInstanceCreator())
                 .create();
 
         protocolManager = ProtocolLibrary.getProtocolManager();

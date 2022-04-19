@@ -1,6 +1,7 @@
 package exposed.hydrogen.nightclub.util;
 
 import lombok.Data;
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.bukkit.Bukkit;
 
 // yet another preparation for minestom support, not much reason to use otherwise, but this does also translate
@@ -18,7 +19,7 @@ public class Location implements Cloneable {
     private double yaw;
 
     /**
-     * GSON no-args constructor
+     * No-args constructor, all values are set to 0
      */
     public Location() {
         this(0, 0, 0, 0, 0);
@@ -63,5 +64,13 @@ public class Location implements Cloneable {
         this.y += y.doubleValue();
         this.z += z.doubleValue();
         return this;
+    }
+
+    public static Location fromVector3D(Vector3D vector) {
+        return new Location(vector.getX(), vector.getY(), vector.getZ(), Math.toDegrees(vector.getAlpha()), Math.toDegrees(vector.getDelta()));
+    }
+
+    public Location add(Location loc) {
+        return add(loc.getX(), loc.getY(), loc.getZ());
     }
 }

@@ -3,6 +3,7 @@ package exposed.hydrogen.nightclub.commands;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import exposed.hydrogen.nightclub.Nightclub;
+import exposed.hydrogen.nightclub.light.Light;
 import exposed.hydrogen.nightclub.light.LightUniverse;
 import exposed.hydrogen.nightclub.light.LightUniverseManager;
 import exposed.hydrogen.nightclub.light.event.LightChannel;
@@ -215,5 +216,24 @@ public class LightUniverseCommand extends BaseCommand {
                 sender.sendMessage(Util.formatErrors(errors));
             }
         }
+
+        @Subcommand("ringzoom")
+        @Description("rz")
+        @CommandPermission("nightclub.lightuniverse")
+        public static void onRingZoom(CommandSender sender) {
+            List<CommandError> errors = isUnloaded();
+            try {
+                Nightclub.getLightUniverseManager().getLoadedUniverse().getLights().forEach(Light::ringZoom);
+            } catch (IllegalArgumentException e) {
+                errors.add(CommandError.INVALID_ARGUMENT);
+            } catch (ArrayIndexOutOfBoundsException e) {
+                errors.add(CommandError.TOO_LITTLE_ARGUMENTS);
+            }
+            if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
+                sender.sendMessage(Util.formatErrors(errors));
+            }
+        }
+
+
     }
 }

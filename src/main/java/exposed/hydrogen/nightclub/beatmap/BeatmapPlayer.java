@@ -2,6 +2,7 @@ package exposed.hydrogen.nightclub.beatmap;
 
 import com.google.gson.JsonArray;
 import exposed.hydrogen.nightclub.Nightclub;
+import exposed.hydrogen.nightclub.light.Light;
 import exposed.hydrogen.nightclub.light.event.LightChannel;
 import lombok.Getter;
 import org.bukkit.entity.Player;
@@ -96,7 +97,7 @@ public class BeatmapPlayer {
             // Ring spin
             case 8 -> this.getClass();
             // Toggle ring zoom
-            case 9 -> this.getClass();
+            case 9 -> Nightclub.getLightUniverseManager().getLoadedUniverse().getLights().forEach(Light::ringZoom);
 
             // Rotation speed multiplier for left lasers
             case 12 -> LightChannel.LEFT_ROTATING_LASERS.setSpeed(event.getValue());

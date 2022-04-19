@@ -1,4 +1,4 @@
-package exposed.hydrogen.nightclub.light;
+package exposed.hydrogen.nightclub.light.data;
 
 import exposed.hydrogen.nightclub.laser.Laser;
 import lombok.Getter;
