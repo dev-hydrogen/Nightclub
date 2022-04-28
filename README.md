@@ -2,6 +2,8 @@
 
 ![epilepsywarning](https://user-images.githubusercontent.com/96733109/165861211-71237efe-4218-4480-bd1f-bce3c914e661.png)
 
+[![discord](https://user-images.githubusercontent.com/96733109/165862720-ab34a180-fbf8-41de-a5af-f19f4e29efa6.png)](https://discord.gg/pthYrdPsm6)
+
 ![2022-04-29_01 44 10](https://user-images.githubusercontent.com/96733109/165861247-614dc61d-563f-4d8d-a1a7-513b3a9c763b.png)
 
 ![nightclub2](https://user-images.githubusercontent.com/96733109/165861219-290d0b28-e7d9-46b7-814d-2210fc008645.png)
