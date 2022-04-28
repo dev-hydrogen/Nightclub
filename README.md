@@ -13,19 +13,13 @@
 ![nightclub3](https://user-images.githubusercontent.com/96733109/165861224-12d4419a-76e8-44c3-8403-7e643768a061.png)
 
 
-Music visualiser *plugin* for minecraft which uses beat saber beatmaps (including chroma support!) for various visuals as well as a resource pack for streaming music for players
+Music visualiser *plugin* for vanilla minecraft which uses beat saber beatmaps (including chroma support!) for various visuals as well as a resource pack for streaming music for players
 
 Showcase videos: 
 
-[Aiobahn & Vin - About U](https://streamable.com/ou4cdr)
+https://youtu.be/ry3sRaytVd0
 
-# KEY CAVEATS
-
-THIS PLUGIN USES A RESOURCE PACK FOR THE SOUND. 
-- Viewing the amount of lasers this plugin produces is probably resource-intensive so this will not run on your grandmas computer from 1998. 
-- A lot of guardian beam packets for movement and stopping/starting are being practically spammed to the player every 100ms per laser (and more often depending on beatmap), this may cause ping issues in certain cases but ive tested this with others and it should be fine for a good-average internet connection.
-
-Might lag your server when running, though doesnt for me. Wont otherwise. 
+https://youtu.be/ZyP_koyStgc
 
 # SETUP
 
