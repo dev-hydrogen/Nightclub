@@ -1,4 +1,15 @@
-![NightclubTransparent](https://user-images.githubusercontent.com/54047826/142924925-12f92508-5d89-4724-a9ce-d39fd3d6a539.png)
+![nightclub1](https://user-images.githubusercontent.com/96733109/165861207-e3ffc1db-9059-4d83-805b-8a38c2775081.png)
+
+![epilepsywarning](https://user-images.githubusercontent.com/96733109/165861211-71237efe-4218-4480-bd1f-bce3c914e661.png)
+
+![2022-04-29_01 44 10](https://user-images.githubusercontent.com/96733109/165861247-614dc61d-563f-4d8d-a1a7-513b3a9c763b.png)
+
+![nightclub2](https://user-images.githubusercontent.com/96733109/165861219-290d0b28-e7d9-46b7-814d-2210fc008645.png)
+
+![2022-04-29_01 18 16](https://user-images.githubusercontent.com/96733109/165861265-60f5323f-aa12-4c9d-97f0-665bb334efbf.png)
+
+![nightclub3](https://user-images.githubusercontent.com/96733109/165861224-12d4419a-76e8-44c3-8403-7e643768a061.png)
+
 
 Music visualiser *plugin* for minecraft which uses beat saber beatmaps (including chroma support!) for various visuals as well as a resource pack for streaming music for players
 
