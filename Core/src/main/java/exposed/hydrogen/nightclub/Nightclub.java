@@ -1,6 +1,5 @@
 package exposed.hydrogen.nightclub;
 
-import co.aikar.commands.CommandCompletionContext;
 import co.aikar.commands.CommandCompletions;
 import co.aikar.commands.CommandManager;
 import com.google.gson.Gson;
@@ -21,7 +20,9 @@ import exposed.hydrogen.nightclub.light.data.LightPattern;
 import exposed.hydrogen.nightclub.light.data.LightType;
 import exposed.hydrogen.nightclub.light.event.LightChannel;
 import exposed.hydrogen.nightclub.light.event.LightSpeedChannel;
+import exposed.hydrogen.nightclub.util.CrossCompatUtil;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,6 +43,7 @@ public final class Nightclub extends ChameleonPlugin {
     @Getter private static Gson GSON;
     @Getter private static LightUniverseManager lightUniverseManager;
     @Getter private static final PluginData pluginData;
+    @Getter @Setter private static CrossCompatUtil crossCompatUtil;
 
     public Nightclub(@NotNull Chameleon chameleon) {
         super(chameleon);
@@ -80,7 +82,7 @@ public final class Nightclub extends ChameleonPlugin {
         commandManager.registerCommand(new LightUniverseCommand());
     }
 
-    public void registerCompletions(CommandCompletions<? extends CommandCompletionContext<?>> completions) {
+    public static void registerCompletions(CommandCompletions<?> completions) {
         completions.registerCompletion("patterns", c -> getStringValuesFromArray(LightPattern.values()));
         completions.registerCompletion("types", c -> getStringValuesFromArray(LightType.values()));
         completions.registerCompletion("channels", c -> getStringValuesFromArray(LightChannel.values()));

@@ -10,7 +10,6 @@ import exposed.hydrogen.nightclub.util.Util;
 import lombok.Getter;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 @CommandAlias("beatmap|bp")
@@ -37,8 +36,7 @@ public class BeatmapCommand extends BaseCommand {
             return;
         }
         player = new BeatmapPlayer(args[0], args.length >= 2 && Boolean.parseBoolean(args[1]));
-        ArrayList<Player> playTo = new ArrayList<>(Bukkit.getOnlinePlayers());
-        InfoData info = player.play(playTo);
+        InfoData info = player.play(Nightclub.getCrossCompatUtil().getListOfPlayers());
         String playBackMessage = "\u00A76" + "Now Playing: " + "\u00A7b" + info.getSongAuthorName() + " - " + info.getSongName() + " " + info.getSongSubName() + System.lineSeparator()
                 + "\u00A76" + "Mapped by: " + "\u00A7b" + info.getMapperName();
         sender.sendMessage(playBackMessage);

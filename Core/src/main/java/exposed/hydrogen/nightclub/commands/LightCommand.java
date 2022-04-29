@@ -13,10 +13,10 @@ import exposed.hydrogen.nightclub.light.data.LightPatternData;
 import exposed.hydrogen.nightclub.light.data.LightType;
 import exposed.hydrogen.nightclub.light.event.LightChannel;
 import exposed.hydrogen.nightclub.light.event.LightSpeedChannel;
+import exposed.hydrogen.nightclub.util.CrossCompatPlayer;
 import exposed.hydrogen.nightclub.util.Location;
 import exposed.hydrogen.nightclub.util.Util;
 import lombok.Getter;
-import org.bukkit.entity.Player;
 
 import java.awt.*;
 import java.text.ParseException;
@@ -48,8 +48,9 @@ public class LightCommand extends BaseCommand {
     @CommandAlias("b")
     @Description("Build a new Light!")
     @CommandPermission("nightclub.light")
-    public static void onBuild(Player player, CommandIssuer sender) {
+    public static void onBuild(CommandIssuer sender) {
         LightUniverseManager manager = Nightclub.getLightUniverseManager();
+        CrossCompatPlayer player = Nightclub.getCrossCompatUtil().getPlayer(sender);
 
         List<CommandError> errors = isUnloaded();
         errors.add(player == null ? CommandError.COMMAND_SENT_FROM_CONSOLE : CommandError.VALID);
@@ -65,12 +66,12 @@ public class LightCommand extends BaseCommand {
                 .onLength(80)
                 .timeToFadeToBlack(45)
                 .lightCount(4)
-                .flipStartAndEnd(player.getLocation().getPitch() > -10).build();
+                .flipStartAndEnd(player.getLocation().getPitch() < -10).build();
         UUID uuid = UUID.randomUUID();
         light = Light.builder()
                 .uuid(uuid)
                 .name("Unnamed-Light-" + uuid)
-                .location(Location.getFromBukkitLocation(player.getLocation().add(0, 1, 0)))
+                .location(player.getLocation().add(0, 1, 0))
                 .type(LightType.GUARDIAN_BEAM)
                 .channel(LightChannel.CENTER_LIGHTS)
                 .speedChannel(LightSpeedChannel.RIGHT_ROTATING_LASERS)
@@ -128,11 +129,13 @@ public class LightCommand extends BaseCommand {
     @Description("Clone a Light from currently loaded LightUniverse")
     @CommandCompletion("@lights")
     @CommandPermission("nightclub.light")
-    public static void onClone(Player player, CommandIssuer sender, String[] args) {
+    public static void onClone(CommandIssuer sender, String[] args) {
         LightUniverseManager manager = Nightclub.getLightUniverseManager();
         LightUniverse universe = manager.getLoadedUniverse();
+        CrossCompatPlayer player = Nightclub.getCrossCompatUtil().getPlayer(sender);
 
         List<CommandError> errors = isUnloaded();
+        errors.add(player == null ? CommandError.COMMAND_SENT_FROM_CONSOLE : CommandError.VALID);
         errors.add(args.length < 1 ? CommandError.TOO_LITTLE_ARGUMENTS : CommandError.VALID);
         if (errors.stream().noneMatch(error -> error == CommandError.LIGHTUNIVERSE_UNLOADED)) {
             errors.add(universe.getLight(args[0]) == null ? CommandError.INVALID_ARGUMENT : CommandError.VALID);
@@ -147,7 +150,7 @@ public class LightCommand extends BaseCommand {
         light = Light.builder()
                 .uuid(uuid)
                 .name("Unnamed-Light-" + uuid)
-                .location(Location.getFromBukkitLocation(player.getLocation().add(0, 1, 0)))
+                .location(player.getLocation().add(0, 1, 0))
                 .type(l.getType())
                 .channel(l.getChannel())
                 .speedChannel(l.getSpeedChannel())
@@ -441,8 +444,9 @@ public class LightCommand extends BaseCommand {
         @CommandAlias("sl")
         @Description("Set the lights location to your location, including pitch and yaw")
         @CommandPermission("nightclub.light")
-        public static void onSetLocation(CommandIssuer sender, Player player, String[] args) {
+        public static void onSetLocation(CommandIssuer sender, String[] args) {
             List<CommandError> errors = isUnloaded();
+            CrossCompatPlayer player = Nightclub.getCrossCompatUtil().getPlayer(sender);
             errors.add(player == null ? CommandError.COMMAND_SENT_FROM_CONSOLE : CommandError.VALID);
             errors.add(args.length > 1 && args.length < 5 ? CommandError.TOO_LITTLE_ARGUMENTS : CommandError.VALID);
             if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
@@ -459,7 +463,7 @@ public class LightCommand extends BaseCommand {
                     return;
                 }
             } else {
-                light.setLocation(Location.getFromBukkitLocation(player.getLocation().add(0, 1, 0)));
+                light.setLocation(player.getLocation().add(0, 1, 0));
             }
             light.buildLasers();
             light.on(new Color(0x000000));
@@ -565,8 +569,9 @@ public class LightCommand extends BaseCommand {
             @CommandAlias("sl")
             @Description("Set the pitch and yaw")
             @CommandPermission("nightclub.light")
-            public static void onSetLocation(CommandIssuer sender, Player player, String[] args) {
+            public static void onSetLocation(CommandIssuer sender, String[] args) {
                 List<CommandError> errors = isUnloaded();
+                CrossCompatPlayer player = Nightclub.getCrossCompatUtil().getPlayer(sender);
                 errors.add(player == null ? CommandError.COMMAND_SENT_FROM_CONSOLE : CommandError.VALID);
                 errors.add(!(args.length == 2) ? CommandError.TOO_LITTLE_ARGUMENTS : CommandError.VALID);
                 if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
@@ -582,7 +587,7 @@ public class LightCommand extends BaseCommand {
                         return;
                     }
                 } else {
-                    light.getData().getRingMovementData().setPitchYaw(Location.getFromBukkitLocation(player.getLocation().add(0, 1, 0)));
+                    light.getData().getRingMovementData().setPitchYaw(player.getLocation().add(0, 1, 0));
                 }
                 light.buildLasers();
                 light.on(new Color(0x000000));

@@ -1,11 +1,13 @@
 package exposed.hydrogen.nightclub;
 
+import co.aikar.commands.CommandIssuer;
 import exposed.hydrogen.nightclub.util.CrossCompatPlayer;
 import exposed.hydrogen.nightclub.util.CrossCompatUtil;
 import exposed.hydrogen.nightclub.util.Location;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -22,6 +24,12 @@ public class MinestomUtil implements CrossCompatUtil {
             list.add(new MinestomPlayer(player));
         }
         return list;
+    }
+
+    @Override
+    public @Nullable CrossCompatPlayer getPlayer(CommandIssuer commandIssuer) {
+        if (!commandIssuer.isPlayer()) return null;
+        return new MinestomPlayer(commandIssuer.getIssuer());
     }
 
     public static Location getNightclubLocation(Pos pos) {

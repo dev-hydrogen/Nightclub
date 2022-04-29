@@ -1,10 +1,12 @@
 package exposed.hydrogen.nightclub;
 
+import co.aikar.commands.CommandIssuer;
 import exposed.hydrogen.nightclub.util.CrossCompatPlayer;
 import exposed.hydrogen.nightclub.util.CrossCompatUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -21,6 +23,12 @@ public class SpigotUtil implements CrossCompatUtil {
             list.add(new SpigotPlayer(player));
         }
         return list;
+    }
+
+    @Override
+    public @Nullable CrossCompatPlayer getPlayer(CommandIssuer commandIssuer) {
+        if (!commandIssuer.isPlayer()) return null;
+        return new SpigotPlayer(commandIssuer.getIssuer());
     }
 
     public static exposed.hydrogen.nightclub.util.Location getNightclubLocation(Location location) {
