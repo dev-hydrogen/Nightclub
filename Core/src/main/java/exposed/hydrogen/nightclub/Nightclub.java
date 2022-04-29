@@ -7,6 +7,8 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import dev.hypera.chameleon.core.Chameleon;
+import dev.hypera.chameleon.core.ChameleonPlugin;
 import exposed.hydrogen.nightclub.commands.BeatmapCommand;
 import exposed.hydrogen.nightclub.commands.LightCommand;
 import exposed.hydrogen.nightclub.commands.LightUniverseCommand;
@@ -23,7 +25,7 @@ import exposed.hydrogen.nightclub.light.event.LightSpeedChannel;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.bstats.bukkit.Metrics;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -32,7 +34,7 @@ import java.util.logging.Level;
 import static exposed.hydrogen.nightclub.util.Util.getStringValuesFromArray;
 
 
-public final class Nightclub extends JavaPlugin {
+public final class Nightclub extends ChameleonPlugin {
     public static final String JSON_FILE_NAME = "lights.json";
     public static File DATA_FOLDER;
     @Getter private static Nightclub instance;
@@ -42,6 +44,10 @@ public final class Nightclub extends JavaPlugin {
     @Getter private static LightUniverseManager lightUniverseManager;
     @Getter private static PaperCommandManager commandManager;
     @Getter private static ProtocolManager protocolManager;
+
+    public Nightclub(@NotNull Chameleon chameleon) {
+        super(chameleon);
+    }
 
     @SneakyThrows
     @Override
