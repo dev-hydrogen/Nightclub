@@ -1,4 +1,4 @@
-package exposed.hydrogen.nightclub.laser;
+package exposed.hydrogen.nightclub.Laser;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -154,7 +154,7 @@ public abstract class Laser {
     /**
      * Gets laser status.
      *
-     * @return <code>true</code> if the laser is currently running
+     * @return    <code>true</code> if the laser is currently running
      * (i.e. {@link #start} has been called and the duration is not over)
      */
     public boolean isStarted() {

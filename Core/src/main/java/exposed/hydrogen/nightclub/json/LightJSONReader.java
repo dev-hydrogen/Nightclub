@@ -1,7 +1,7 @@
 package exposed.hydrogen.nightclub.json;
 
-import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import exposed.hydrogen.nightclub.light.LightUniverse;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

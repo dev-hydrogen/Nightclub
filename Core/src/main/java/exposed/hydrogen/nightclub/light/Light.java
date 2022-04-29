@@ -2,12 +2,12 @@ package exposed.hydrogen.nightclub.light;
 
 import com.google.gson.InstanceCreator;
 import com.google.gson.JsonArray;
-import exposed.hydrogen.nightclub.laser.LaserWrapper;
 import exposed.hydrogen.nightclub.light.data.*;
 import exposed.hydrogen.nightclub.light.event.LightChannel;
 import exposed.hydrogen.nightclub.light.event.LightSpeedChannel;
-import exposed.hydrogen.nightclub.util.DebugMarker;
 import exposed.hydrogen.nightclub.util.Location;
+import exposed.hydrogen.nightclub.wrapper.DebugMarkerWrapper;
+import exposed.hydrogen.nightclub.wrapper.LaserWrapper;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -40,7 +40,7 @@ public class Light implements LightI {
     @Getter private LightType type;
     @Getter private LightChannel channel;
     @Getter private LightSpeedChannel speedChannel;
-    @Getter private transient final DebugMarker marker;
+    @Getter private transient final DebugMarkerWrapper marker;
 
     private final transient List<LaserWrapper> lasers = new ArrayList<>();
     private transient double length = 0; // 0 to 100, percentage of maxLength.
@@ -80,7 +80,7 @@ public class Light implements LightI {
         this.channel = channel;
         this.speedChannel = speedChannel;
         this.data = data;
-        this.marker = new DebugMarker(location.getBukkitLocation(), new Color(0, 0, 0), "", 5000);
+        this.marker = new DebugMarkerWrapper(location, new Color(0, 0, 0), "", 5000);
 
         loc = this.location;
 
@@ -231,7 +231,7 @@ public class Light implements LightI {
         length = Math.max(data.getOnLength() * (color.getAlpha() / 255.0), 0.05);
         isOn = true;
         timeToFade = 0;
-        marker.setLocation(loc.getBukkitLocation());
+        marker.setLocation(loc);
         marker.setColor(color);
         marker.start(256);
     }
@@ -271,7 +271,7 @@ public class Light implements LightI {
             length += (100 - data.getOnLength()) / 3;
             timeToFade += 3;
             lasers.forEach(LaserWrapper::changeColor);
-            marker.setLocation(loc.getBukkitLocation());
+            marker.setLocation(loc);
             marker.setColor(color);
             marker.start(256);
         } else {
@@ -293,7 +293,7 @@ public class Light implements LightI {
             return;
         on(color);
         flash(color);
-        marker.setLocation(loc.getBukkitLocation());
+        marker.setLocation(loc);
         marker.setColor(color);
         marker.start(256);
         timeToFade = data.getTimeToFadeToBlack();
@@ -307,7 +307,7 @@ public class Light implements LightI {
         if (!isLoaded) return;
         isZoomed = !isZoomed;
         zoomTime = isZoomed ? 0 : 1;
-        marker.setLocation(loc.getBukkitLocation());
+        marker.setLocation(loc);
         marker.start(256);
     }
 

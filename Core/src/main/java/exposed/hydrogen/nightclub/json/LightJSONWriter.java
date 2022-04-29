@@ -44,7 +44,7 @@ public class LightJSONWriter {
 
         put(new LightUniverse());
 
-        Nightclub.getInstance().getLogger().info("JSON File created at " + Nightclub.DATA_FOLDER + "/" + Nightclub.JSON_FILE_NAME);
+        Nightclub.getChameleon().getLogger().info("JSON File created at " + Nightclub.DATA_FOLDER + "/" + Nightclub.JSON_FILE_NAME);
         return true;
     }
 

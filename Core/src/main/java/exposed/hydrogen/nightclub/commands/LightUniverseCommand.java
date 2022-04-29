@@ -1,6 +1,7 @@
 package exposed.hydrogen.nightclub.commands;
 
 import co.aikar.commands.BaseCommand;
+import co.aikar.commands.CommandIssuer;
 import co.aikar.commands.annotation.*;
 import exposed.hydrogen.nightclub.Nightclub;
 import exposed.hydrogen.nightclub.light.Light;
@@ -8,7 +9,6 @@ import exposed.hydrogen.nightclub.light.LightUniverse;
 import exposed.hydrogen.nightclub.light.LightUniverseManager;
 import exposed.hydrogen.nightclub.light.event.LightChannel;
 import exposed.hydrogen.nightclub.util.Util;
-import org.bukkit.command.CommandSender;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ public class LightUniverseCommand extends BaseCommand {
     @Subcommand("build")
     @Description("Build a new LightUniverse")
     @CommandPermission("nightclub.lightuniverse")
-    public static void onBuild(CommandSender sender, String[] args) {
+    public static void onBuild(CommandIssuer sender, String[] args) {
         if (isUnloaded().stream().anyMatch(error -> error != CommandError.VALID && error != CommandError.LIGHTUNIVERSE_UNLOADED)) {
             sender.sendMessage(Util.formatErrors(isUnloaded()));
             return;
@@ -57,7 +57,7 @@ public class LightUniverseCommand extends BaseCommand {
     @Description("Load a LightUniverse from provided argument")
     @CommandCompletion("@universes")
     @CommandPermission("nightclub.lightuniverse")
-    public static void onLoad(CommandSender sender, String[] args) {
+    public static void onLoad(CommandIssuer sender, String[] args) {
         if (isUnloaded(args, 1).stream().anyMatch(error -> error != CommandError.VALID && error != CommandError.LIGHTUNIVERSE_UNLOADED)) {
             sender.sendMessage(Util.formatErrors(isUnloaded()));
             return;
@@ -95,7 +95,7 @@ public class LightUniverseCommand extends BaseCommand {
     @Subcommand("setname")
     @Description("Set the currently loaded LightUniverses name")
     @CommandPermission("nightclub.lightuniverse")
-    public static void onSetName(CommandSender sender, String[] args) {
+    public static void onSetName(CommandIssuer sender, String[] args) {
         List<CommandError> errors = isUnloaded(args, 1);
         errors.add(Nightclub.getLightUniverseManager().getUniverses().stream().anyMatch(universe -> Objects.equals(universe.getName(), args[0]))
                 ? CommandError.NAME_ALREADY_EXISTS : CommandError.VALID);
@@ -109,7 +109,7 @@ public class LightUniverseCommand extends BaseCommand {
     @Subcommand("getid")
     @Description("Get ID of loaded LightUniverse")
     @CommandPermission("nightclub.lightuniverse")
-    public static void onGetID(CommandSender sender) {
+    public static void onGetID(CommandIssuer sender) {
         if (isUnloaded().stream().anyMatch(error -> error != CommandError.VALID)) {
             sender.sendMessage(Util.formatErrors(isUnloaded()));
             return;
@@ -120,7 +120,7 @@ public class LightUniverseCommand extends BaseCommand {
     @Subcommand("getname")
     @Description("Get name of loaded LightUniverse")
     @CommandPermission("nightclub.lightuniverse")
-    public static void onGetName(CommandSender sender) {
+    public static void onGetName(CommandIssuer sender) {
         if (isUnloaded().stream().anyMatch(error -> error != CommandError.VALID)) {
             sender.sendMessage(Util.formatErrors(isUnloaded()));
             return;
@@ -131,7 +131,7 @@ public class LightUniverseCommand extends BaseCommand {
     @Subcommand("debug")
     @Description("Debug channel")
     @CommandPermission("nightclub.lightuniverse")
-    public static void onToggleDebug(CommandSender sender) {
+    public static void onToggleDebug(CommandIssuer sender) {
         List<CommandError> errors = isUnloaded();
         //toggle
         Arrays.stream(LightChannel.values()).forEach(channel -> channel.debug(!channel.isDebugOn()));
@@ -149,7 +149,7 @@ public class LightUniverseCommand extends BaseCommand {
         @Description("Turn channel on")
         @CommandPermission("nightclub.lightuniverse")
         @CommandCompletion("@channels")
-        public static void onTurnOn(CommandSender sender, String[] args) {
+        public static void onTurnOn(CommandIssuer sender, String[] args) {
             List<CommandError> errors = isUnloaded(args, 1);
             try {
                 LightChannel.valueOf(args[0]).on(new Color(0x0066ff), null);
@@ -167,7 +167,7 @@ public class LightUniverseCommand extends BaseCommand {
         @Description("Turn channel off")
         @CommandPermission("nightclub.lightuniverse")
         @CommandCompletion("@channels")
-        public static void onTurnOff(CommandSender sender, String[] args) {
+        public static void onTurnOff(CommandIssuer sender, String[] args) {
             List<CommandError> errors = isUnloaded(args, 1);
             try {
                 LightChannel.valueOf(args[0]).off(new Color(0x0066ff), null);
@@ -185,7 +185,7 @@ public class LightUniverseCommand extends BaseCommand {
         @Description("Flash channel")
         @CommandPermission("nightclub.lightuniverse")
         @CommandCompletion("@channels")
-        public static void onFlash(CommandSender sender, String[] args) {
+        public static void onFlash(CommandIssuer sender, String[] args) {
             List<CommandError> errors = isUnloaded(args, 1);
             try {
                 LightChannel.valueOf(args[0]).flash(new Color(0x0066ff), null);
@@ -203,7 +203,7 @@ public class LightUniverseCommand extends BaseCommand {
         @Description("Flash off channel")
         @CommandPermission("nightclub.lightuniverse")
         @CommandCompletion("@channels")
-        public static void onFlashOff(CommandSender sender, String[] args) {
+        public static void onFlashOff(CommandIssuer sender, String[] args) {
             List<CommandError> errors = isUnloaded(args, 1);
             try {
                 LightChannel.valueOf(args[0]).flashOff(new Color(0x0066ff), null);
@@ -220,7 +220,7 @@ public class LightUniverseCommand extends BaseCommand {
         @Subcommand("ringzoom")
         @Description("rz")
         @CommandPermission("nightclub.lightuniverse")
-        public static void onRingZoom(CommandSender sender) {
+        public static void onRingZoom(CommandIssuer sender) {
             List<CommandError> errors = isUnloaded();
             try {
                 Nightclub.getLightUniverseManager().getLoadedUniverse().getLights().forEach(Light::ringZoom);

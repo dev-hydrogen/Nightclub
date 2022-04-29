@@ -3,7 +3,6 @@ package exposed.hydrogen.nightclub.util;
 import exposed.hydrogen.nightclub.commands.CommandError;
 import exposed.hydrogen.nightclub.light.Light;
 import exposed.hydrogen.nightclub.light.LightUniverse;
-import org.bukkit.ChatColor;
 
 import java.io.File;
 import java.text.NumberFormat;
@@ -42,12 +41,13 @@ public class Util {
         if (errors.stream().noneMatch(commandError -> commandError != CommandError.VALID)) {
             return "";
         }
-        String formattedErrors = ChatColor.RED + "One or more errors occurred while trying to execute the command:" + System.lineSeparator();
+        String formattedErrors = "\u00A7c" + "One or more errors occurred while trying to execute the command:" + System.lineSeparator();
         for (CommandError error : errors) {
             if (error == CommandError.VALID) {
                 continue;
             }
-            formattedErrors += "" + ChatColor.BLUE + ChatColor.ITALIC + error.getErrorMessage() + System.lineSeparator();
+            // blue + italic
+            formattedErrors += "\u00A79" + "\u00A7o" + error.getErrorMessage() + System.lineSeparator();
         }
         return formattedErrors;
     }

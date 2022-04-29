@@ -103,6 +103,10 @@
             <id>aikar</id>
             <url>https://repo.aikar.co/content/groups/aikar/</url>
         </repository>
+        <repository>
+            <id>hypera-snapshots</id>
+            <url>https://repo.hypera.dev/snapshots/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -111,6 +115,11 @@
             <artifactId>Core</artifactId>
             <version>${revision}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>dev.hypera.chameleon</groupId>
+            <artifactId>platform-minestom</artifactId>
+            <version>0.4.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.github.Minestom</groupId>
@@ -140,17 +149,6 @@
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
             <version>23.0.0</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-math3</artifactId>
-            <version>3.6.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bstats</groupId>
-            <artifactId>bstats-bukkit</artifactId>
-            <version>3.0.0</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

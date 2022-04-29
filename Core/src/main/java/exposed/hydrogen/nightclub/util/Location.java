@@ -2,7 +2,6 @@ package exposed.hydrogen.nightclub.util;
 
 import lombok.Data;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
-import org.bukkit.Bukkit;
 
 // yet another preparation for minestom support, not much reason to use otherwise, but this does also translate
 // MINECRAFTS stupid FUCKING pitch AND yaw systems that DO NOT MAKE ANY SENSE!!!!
@@ -33,21 +32,12 @@ public class Location implements Cloneable {
         this.yaw = yaw.doubleValue() % 360;
     }
 
-    public static Location getFromBukkitLocation(org.bukkit.Location loc) {
-        return new Location(loc.getX(), loc.getY(), loc.getZ(), Location.translateMinecraftsStupidFuckingPitch(loc.getPitch()), Location.translateMinecraftsStupidFuckingYaw(loc.getYaw()));
-    }
-
-    private static double translateMinecraftsStupidFuckingPitch(float pitch) {
+    public static double translateMinecraftsStupidFuckingPitch(float pitch) {
         return -pitch;
     }
 
-    private static double translateMinecraftsStupidFuckingYaw(float yaw) {
+    public static double translateMinecraftsStupidFuckingYaw(float yaw) {
         return yaw - 270;
-    }
-
-    public org.bukkit.Location getBukkitLocation() {
-        return new org.bukkit.Location(Bukkit.getWorlds().get(0), x, y, z, (float) -pitch, (float) yaw + 270);
-        //TODO: fix hardcoded world
     }
 
     public Location clone() {
@@ -64,6 +54,10 @@ public class Location implements Cloneable {
         this.y += y.doubleValue();
         this.z += z.doubleValue();
         return this;
+    }
+
+    public double distanceSquared(Location loc) {
+        return Math.pow(loc.getX() - x, 2) + Math.pow(loc.getY() - y, 2) + Math.pow(loc.getZ() - z, 2);
     }
 
     public static Location fromVector3D(Vector3D vector) {

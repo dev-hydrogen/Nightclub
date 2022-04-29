@@ -4,8 +4,8 @@ import com.google.gson.JsonArray;
 import exposed.hydrogen.nightclub.Nightclub;
 import exposed.hydrogen.nightclub.light.Light;
 import exposed.hydrogen.nightclub.light.event.LightChannel;
+import exposed.hydrogen.nightclub.util.CrossCompatPlayer;
 import lombok.Getter;
-import org.bukkit.entity.Player;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 public class BeatmapPlayer {
     private final List<LightEvent> events;
-    private List<Player> playTo;
+    private List<CrossCompatPlayer> playTo;
     private final InfoData info;
     private final String name;
     private ScheduledExecutorService executorService;
@@ -46,7 +46,7 @@ public class BeatmapPlayer {
      * @param playTo List of Players that should hear the music, lasers will still be shown normally to anyone in range.
      * @return Info of the beatmap file, for example if you wanted to broadcast the song name to all players.
      */
-    public InfoData play(List<Player> playTo) {
+    public InfoData play(List<CrossCompatPlayer> playTo) {
         List<LightChannel> channelList = Arrays.asList(LightChannel.values());
         this.playTo = playTo;
         executorService = Executors.newScheduledThreadPool(1);
@@ -67,7 +67,7 @@ public class BeatmapPlayer {
             channelList.forEach(LightChannel::terminatePlayback);
         };
         executorService.schedule(task, events.get(events.size() - 1).getTime() + 5000000, TimeUnit.MICROSECONDS);
-        Nightclub.getInstance().getLogger().info(info.toString());
+        Nightclub.getChameleon().getLogger().info(info.toString());
         return info;
     }
 

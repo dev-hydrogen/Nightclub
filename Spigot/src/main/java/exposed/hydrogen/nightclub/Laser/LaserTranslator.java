@@ -1,38 +1,31 @@
-package exposed.hydrogen.nightclub.laser;
+package exposed.hydrogen.nightclub.Laser;
 
-import exposed.hydrogen.nightclub.Nightclub;
+import exposed.hydrogen.nightclub.NightclubSpigot;
+import exposed.hydrogen.nightclub.SpigotUtil;
 import exposed.hydrogen.nightclub.light.data.LightType;
 import exposed.hydrogen.nightclub.util.Location;
+import exposed.hydrogen.nightclub.wrapper.LaserWrapper;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
-public class LaserWrapper {
+public class LaserTranslator extends LaserWrapper {
     @Getter private Laser laser;
-    @Getter private Location start;
-    @Getter private Location end;
-    @Getter private int duration;
-    @Getter private int distance;
-    @Getter private Laser.LaserType type;
-    private volatile boolean isStarted;
 
 
-    public LaserWrapper(Location start, Location end, int duration, int distance, LightType type) {
-        this.start = start;
-        this.end = end;
+    public LaserTranslator(Location start, Location end, int duration, int distance, LightType type) {
+        super(start, end, duration, distance, type);
         try {
-            laser = type.getType().create(this.start.getBukkitLocation(), this.end.getBukkitLocation(), duration, distance);
+            Laser.LaserType laserType = type == LightType.GUARDIAN_BEAM ? Laser.LaserType.GUARDIAN : Laser.LaserType.ENDER_CRYSTAL;
+            laser = laserType.create(SpigotUtil.getBukkitLocation(start), SpigotUtil.getBukkitLocation(end), duration, distance);
         } catch (ReflectiveOperationException e) {
             e.printStackTrace();
             return;
         }
-        this.duration = duration;
-        this.distance = distance;
-        this.type = type.getType();
     }
 
     public synchronized void start() {
         if (!isStarted) {
-            laser.start(Nightclub.getInstance());
+            laser.start(NightclubSpigot.getInstance());
         }
         isStarted = true;
     }
@@ -47,7 +40,7 @@ public class LaserWrapper {
     public void setStart(@NotNull Location start) {
         this.start = start;
         try {
-            laser.moveStart(this.start.getBukkitLocation());
+            laser.moveStart(SpigotUtil.getBukkitLocation(start));
         } catch (ReflectiveOperationException e) {
             e.printStackTrace();
         }
@@ -56,7 +49,7 @@ public class LaserWrapper {
     public void setEnd(@NotNull Location end) {
         this.end = end;
         try {
-            laser.moveEnd(this.end.getBukkitLocation());
+            laser.moveEnd(SpigotUtil.getBukkitLocation(end));
         } catch (ReflectiveOperationException e) {
             e.printStackTrace();
         }
