@@ -40,7 +40,7 @@ public class Light implements LightI {
     @Getter private LightType type;
     @Getter private LightChannel channel;
     @Getter private LightSpeedChannel speedChannel;
-    @Getter private transient final DebugMarkerWrapper marker;
+    @Getter private transient final DebugMarkerWrapper marker = null;
 
     private final transient List<LaserWrapper> lasers = new ArrayList<>();
     private transient double length = 0; // 0 to 100, percentage of maxLength.
@@ -80,7 +80,7 @@ public class Light implements LightI {
         this.channel = channel;
         this.speedChannel = speedChannel;
         this.data = data;
-        this.marker = new DebugMarkerWrapper(location, new Color(0, 0, 0), "", 5000);
+        //this.marker = new DebugMarkerWrapper(location, new Color(0, 0, 0), "", 5000);
 
         loc = this.location;
 
@@ -208,11 +208,11 @@ public class Light implements LightI {
             Vector3D v3 = data.getSecondPatternData().getPattern().apply(v, 0.0, r2, data.getSecondPatternData().getPatternSizeMultiplier() * (data.getOnLength() / 100));
             Vector3D v4 = v.add(v3).add(v2);
             if (data.isFlipStartAndEnd()) {
-                laser = new LaserWrapper(loc.clone().add(v4.getX(), v4.getZ(), v4.getY()), loc, -1, 256, type);
+                //laser = new LaserWrapper(loc.clone().add(v4.getX(), v4.getZ(), v4.getY()), loc, -1, 256, type);
             } else {
-                laser = new LaserWrapper(loc, loc.clone().add(v4.getX(), v4.getZ(), v4.getY()), -1, 256, type);
+                //laser = new LaserWrapper(loc, loc.clone().add(v4.getX(), v4.getZ(), v4.getY()), -1, 256, type);
             }
-            lasers.add(laser);
+            //lasers.add(laser);
         }
     }
 

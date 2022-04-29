@@ -21,6 +21,7 @@ public class NightclubMinestom extends Extension {
         Nightclub.registerCommands(commandManager);
         Nightclub.registerCompletions(commandManager.getCommandCompletions());
         Nightclub.setCrossCompatUtil(util);
+
         try {
             chameleon = new MinestomChameleon(Nightclub.class, this, Nightclub.getPluginData());
             chameleon.onEnable();

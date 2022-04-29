@@ -1,6 +1,6 @@
 package exposed.hydrogen.nightclub;
 
-import co.aikar.commands.PaperCommandManager;
+import co.aikar.commands.BukkitCommandManager;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import dev.hypera.chameleon.core.exceptions.instantiation.ChameleonInstantiationException;
@@ -13,14 +13,14 @@ public class NightclubSpigot extends JavaPlugin {
     @Getter private static NightclubSpigot instance;
     @Getter private static ProtocolManager protocolManager;
     @Getter private static SpigotUtil util;
-    @Getter private static PaperCommandManager commandManager;
+    @Getter private static BukkitCommandManager commandManager;
     private SpigotChameleon chameleon;
 
     @Override
     public void onEnable() {
         instance = this;
         util = new SpigotUtil();
-        commandManager = new PaperCommandManager(this);
+        commandManager = new BukkitCommandManager(this);
         Nightclub.registerCommands(commandManager);
         Nightclub.registerCompletions(commandManager.getCommandCompletions());
         Nightclub.setCrossCompatUtil(util);

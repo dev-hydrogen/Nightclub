@@ -76,7 +76,7 @@ public final class Nightclub extends ChameleonPlugin {
         lightUniverseManager.save();
     }
 
-    public static void registerCommands(CommandManager<?, ?, ?, ?, ?, ?> commandManager) {
+    public static <T extends CommandManager<?,?,?,?,?,?>> void registerCommands(T commandManager) {
         commandManager.registerCommand(new LightCommand());
         commandManager.registerCommand(new BeatmapCommand());
         commandManager.registerCommand(new LightUniverseCommand());
