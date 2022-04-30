@@ -16,6 +16,7 @@ public class SpigotUtil implements CrossCompatUtil {
     public SpigotUtil() {
     }
 
+    @Override
     public List<CrossCompatPlayer> getListOfPlayers() {
         Collection<? extends Player> players = Bukkit.getOnlinePlayers();
         List<CrossCompatPlayer> list = new LinkedList<>();

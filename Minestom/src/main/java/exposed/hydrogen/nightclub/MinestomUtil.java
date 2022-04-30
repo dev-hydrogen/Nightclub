@@ -17,6 +17,7 @@ public class MinestomUtil implements CrossCompatUtil {
     public MinestomUtil() {
     }
 
+    @Override
     public List<CrossCompatPlayer> getListOfPlayers() {
         Collection<Player> players = MinecraftServer.getConnectionManager().getOnlinePlayers();
         List<CrossCompatPlayer> list = new LinkedList<>();

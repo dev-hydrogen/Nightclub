@@ -49,10 +49,6 @@
                             <shadedPattern>exposed.hydrogen.acf</shadedPattern>
                         </relocation>
                         <relocation>
-                            <pattern>co.aikar.locales</pattern>
-                            <shadedPattern>exposed.hydrogen.locales</shadedPattern>
-                        </relocation>
-                        <relocation>
                             <pattern>org.bstats</pattern>
                             <shadedPattern>exposed.hydrogen.bstats</shadedPattern>
                         </relocation>

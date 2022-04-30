@@ -19,7 +19,6 @@ public class LaserTranslator extends LaserWrapper {
             laser = laserType.create(SpigotUtil.getBukkitLocation(start), SpigotUtil.getBukkitLocation(end), duration, distance);
         } catch (ReflectiveOperationException e) {
             e.printStackTrace();
-            return;
         }
     }
 
