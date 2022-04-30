@@ -1,4 +1,4 @@
-package exposed.hydrogen.nightclub.Laser;
+package exposed.hydrogen.nightclub.laser;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
