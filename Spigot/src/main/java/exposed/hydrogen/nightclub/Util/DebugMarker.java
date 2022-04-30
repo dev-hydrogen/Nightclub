@@ -9,6 +9,7 @@ import exposed.hydrogen.nightclub.wrapper.DebugMarkerWrapper;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.network.PacketDataSerializer;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.awt.*;
@@ -16,7 +17,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class DebugMarker extends DebugMarkerWrapper {
@@ -24,12 +24,7 @@ public class DebugMarker extends DebugMarkerWrapper {
     private PacketDataSerializer data;
     private final PacketContainer marker;
     private org.bukkit.Location location;
-    private Color color;
-    private String name;
-    private int duration;
-    private int distanceSquared;
     private final List<Player> seen;
-    private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
 
     public DebugMarker(org.bukkit.Location location, Color color, String name, int duration, List<Player> showTo) throws InvocationTargetException {
         this(location, color, name, duration);
@@ -40,10 +35,6 @@ public class DebugMarker extends DebugMarkerWrapper {
 
     public DebugMarker(org.bukkit.Location location, Color color, String name, int duration) {
         super(SpigotUtil.getNightclubLocation(location), color, name, duration);
-        this.location = location;
-        this.color = color;
-        this.name = name;
-        this.duration = duration;
         seen = new ArrayList<>();
         marker = new PacketContainer(PacketType.Play.Server.CUSTOM_PAYLOAD);
         data = new PacketDataSerializer(Unpooled.buffer());
@@ -77,7 +68,7 @@ public class DebugMarker extends DebugMarkerWrapper {
                 executorService.shutdown();
                 return;
             }
-            for (Player p : location.getWorld().getPlayers()) {
+            for (Player p : Bukkit.getOnlinePlayers()) {
                 if (isCloseEnough(p.getLocation()) && !seen.contains(p)) {
                     setData(SpigotUtil.getNightclubLocation(location), color, name, (int) (endTime - System.currentTimeMillis())); // make sure death time is the same for all players
                     try {
@@ -102,7 +93,7 @@ public class DebugMarker extends DebugMarkerWrapper {
 
     public void stop() {
         setData(SpigotUtil.getNightclubLocation(location), new Color(0, 0, 0, 0), "", 0);
-        for (Player p : location.getWorld().getPlayers()) {
+        for (Player p : Bukkit.getOnlinePlayers()) {
             if (distanceSquared == -1 || this.location.distanceSquared(p.getLocation()) <= distanceSquared) {
                 try {
                     ProtocolLibrary.getProtocolManager().sendServerPacket(p, marker);
@@ -118,7 +109,7 @@ public class DebugMarker extends DebugMarkerWrapper {
     public void stopAll(int distance) {
         int distanceSquared = distance < 0 ? -1 : distance * distance;
         // probably not the most efficient way of doing this
-        for (Player p : location.getWorld().getPlayers()) {
+        for (Player p : Bukkit.getOnlinePlayers()) {
             if (distanceSquared == -1 || this.location.distanceSquared(p.getLocation()) <= distanceSquared) {
                 try {
                     ProtocolLibrary.getProtocolManager().sendServerPacket(p, STOP_ALL_MARKERS);
@@ -142,7 +133,7 @@ public class DebugMarker extends DebugMarkerWrapper {
     public void stopAll(Location location, int distance) {
         int distanceSquared = distance < 0 ? -1 : distance * distance;
         // probably not the most efficient way of doing this
-        for (Player p : SpigotUtil.getBukkitLocation(location).getWorld().getPlayers()) {
+        for (Player p : Bukkit.getOnlinePlayers()) {
             if (distanceSquared == -1 || location.distanceSquared(SpigotUtil.getNightclubLocation(p.getLocation())) <= distanceSquared) {
                 try {
                     ProtocolLibrary.getProtocolManager().sendServerPacket(p, STOP_ALL_MARKERS);
