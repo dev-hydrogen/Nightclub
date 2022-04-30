@@ -15,7 +15,7 @@ public abstract class DebugMarkerWrapper {
     protected String name;
     protected int duration;
     protected int distanceSquared;
-    protected final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+    protected ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
 
     public DebugMarkerWrapper(Location location, Color color, String name, int duration) {
         this.location = location;
@@ -72,9 +72,13 @@ public abstract class DebugMarkerWrapper {
         return duration;
     }
 
-    private boolean isCloseEnough(Location location) {
+    protected boolean isCloseEnough(Location location) {
         return distanceSquared == -1 ||
                 this.location.distanceSquared(location) <= distanceSquared;
+    }
+    protected boolean isCloseEnough(Location location1, Location location2) {
+        return distanceSquared == -1 ||
+                location1.distanceSquared(location2) <= distanceSquared;
     }
 
     enum LaserType {
