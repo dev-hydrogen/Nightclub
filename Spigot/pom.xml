@@ -16,72 +16,6 @@
     <name>Nightclub-spigot</name>
     <description>Nightclub spigot implementation</description>
 
-    <properties>
-        <java.version>17</java.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                    <compilerArgs>
-                        <arg>-parameters</arg>
-                    </compilerArgs>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.3.1-SNAPSHOT</version>
-                <configuration>
-                    <minimizeJar>true</minimizeJar>
-                    <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml
-                    </dependencyReducedPomLocation>
-                    <relocations>
-                        <relocation>
-                            <pattern>co.aikar.commands</pattern>
-                            <shadedPattern>exposed.hydrogen.acf</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>org.bstats</pattern>
-                            <shadedPattern>exposed.hydrogen.bstats</shadedPattern>
-                        </relocation>
-                    </relocations>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
-    </build>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>maven-snapshots</id>
-            <url>https://repository.apache.org/content/repositories/snapshots/</url>
-        </pluginRepository>
-    </pluginRepositories>
-
     <repositories>
         <repository>
             <id>spigotmc-repo</id>
@@ -129,18 +63,6 @@
             <groupId>co.aikar</groupId>
             <artifactId>acf-paper</artifactId>
             <version>0.5.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.22</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
-            <version>23.0.0</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.bstats</groupId>
