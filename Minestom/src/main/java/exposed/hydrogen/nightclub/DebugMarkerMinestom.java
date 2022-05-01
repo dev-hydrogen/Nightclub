@@ -20,7 +20,7 @@ public class DebugMarkerMinestom extends DebugMarkerWrapper {
     private Marker marker;
     private final List<Player> seen;
 
-    public DebugMarkerMinestom(Location location, Color color, String name, int duration) {
+    public DebugMarkerMinestom(Location location, Color color, String name, Integer duration) {
         super(location, color, name, duration);
         marker = new Marker(location, color, name, duration);
         seen = new LinkedList<>();

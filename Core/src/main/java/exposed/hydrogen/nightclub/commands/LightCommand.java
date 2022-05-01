@@ -559,7 +559,7 @@ public class LightCommand extends BaseCommand {
             }
         }
 
-        @Subcommand("ringzoom")
+        /*@Subcommand("ringzoom")
         @CommandAlias("rz")
         @Description("Modify a Light's ring zoom movement")
         @CommandPermission("nightclub.light")
@@ -630,7 +630,7 @@ public class LightCommand extends BaseCommand {
                 light.buildLasers();
                 light.on(new Color(0x0066ff));
             }
-        }
+        }*/
     }
 
 

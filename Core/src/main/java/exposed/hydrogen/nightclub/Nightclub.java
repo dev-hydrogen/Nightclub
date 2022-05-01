@@ -10,17 +10,21 @@ import dev.hypera.chameleon.core.data.PluginData;
 import exposed.hydrogen.nightclub.commands.BeatmapCommand;
 import exposed.hydrogen.nightclub.commands.LightCommand;
 import exposed.hydrogen.nightclub.commands.LightUniverseCommand;
+import exposed.hydrogen.nightclub.json.JSONUtils;
 import exposed.hydrogen.nightclub.json.LightJSONReader;
 import exposed.hydrogen.nightclub.json.LightJSONWriter;
 import exposed.hydrogen.nightclub.light.Light;
 import exposed.hydrogen.nightclub.light.LightUniverse;
 import exposed.hydrogen.nightclub.light.LightUniverseManager;
-import exposed.hydrogen.nightclub.light.data.LightData;
 import exposed.hydrogen.nightclub.light.data.LightPattern;
 import exposed.hydrogen.nightclub.light.data.LightType;
 import exposed.hydrogen.nightclub.light.event.LightChannel;
 import exposed.hydrogen.nightclub.light.event.LightSpeedChannel;
 import exposed.hydrogen.nightclub.util.CrossCompatUtil;
+import exposed.hydrogen.nightclub.wrapper.DebugMarkerFactory;
+import exposed.hydrogen.nightclub.wrapper.DebugMarkerWrapper;
+import exposed.hydrogen.nightclub.wrapper.LaserFactory;
+import exposed.hydrogen.nightclub.wrapper.LaserWrapper;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -44,9 +48,12 @@ public final class Nightclub extends ChameleonPlugin {
     @Getter private static LightUniverseManager lightUniverseManager;
     @Getter private static final PluginData pluginData;
     @Getter @Setter private static CrossCompatUtil crossCompatUtil;
+    @Getter @Setter private static DebugMarkerFactory<? extends DebugMarkerWrapper> markerFactory;
+    @Getter @Setter private static LaserFactory<? extends LaserWrapper> laserFactory;
 
-    public Nightclub(@NotNull Chameleon chameleon) {
-        super(chameleon);
+    public Nightclub(@NotNull Chameleon chamel) {
+        super(chamel);
+        chameleon = chamel;
     }
 
 
@@ -56,13 +63,12 @@ public final class Nightclub extends ChameleonPlugin {
         GSON = new GsonBuilder()
                 .setPrettyPrinting()
                 .registerTypeAdapter(LightUniverse.class, new LightUniverse.LightUniverseInstanceCreator())
-                .registerTypeAdapter(Light.class, new Light.LightInstanceCreator())
-                .registerTypeAdapter(LightData.class, new LightData.LightDataInstanceCreator())
                 .create();
 
-        chameleon = getChameleon();
-
         DATA_FOLDER = chameleon.getDataFolder().toFile();
+
+        DATA_FOLDER.mkdir();
+        JSONUtils.LIGHT_JSON.createNewFile();
 
         instance = this;
         JSONreader = new LightJSONReader(GSON);
@@ -117,5 +123,7 @@ public final class Nightclub extends ChameleonPlugin {
                 List.of(PluginData.Platform.MINESTOM, PluginData.Platform.SPIGOT)
         );
     }
+
+    public static void main(String[] args) {}
 
 }

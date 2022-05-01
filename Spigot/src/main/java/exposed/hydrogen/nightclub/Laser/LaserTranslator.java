@@ -12,7 +12,7 @@ public class LaserTranslator extends LaserWrapper {
     @Getter private Laser laser;
 
 
-    public LaserTranslator(Location start, Location end, int duration, int distance, LightType type) {
+    public LaserTranslator(Location start, Location end, Integer duration, Integer distance, LightType type) {
         super(start, end, duration, distance, type);
         try {
             Laser.LaserType laserType = type == LightType.GUARDIAN_BEAM ? Laser.LaserType.GUARDIAN : Laser.LaserType.ENDER_CRYSTAL;

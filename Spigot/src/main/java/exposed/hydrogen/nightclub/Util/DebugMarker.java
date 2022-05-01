@@ -23,22 +23,21 @@ public class DebugMarker extends DebugMarkerWrapper {
     private static final PacketContainer STOP_ALL_MARKERS = new PacketContainer(PacketType.Play.Server.CUSTOM_PAYLOAD);
     private PacketDataSerializer data;
     private final PacketContainer marker;
-    private org.bukkit.Location location;
     private final List<Player> seen;
 
-    public DebugMarker(org.bukkit.Location location, Color color, String name, int duration, List<Player> showTo) throws InvocationTargetException {
+    public DebugMarker(Location location, Color color, String name, Integer duration, List<Player> showTo) throws InvocationTargetException {
         this(location, color, name, duration);
         for (Player player : showTo) {
             ProtocolLibrary.getProtocolManager().sendServerPacket(player, marker);
         }
     }
 
-    public DebugMarker(org.bukkit.Location location, Color color, String name, int duration) {
-        super(SpigotUtil.getNightclubLocation(location), color, name, duration);
+    public DebugMarker(Location location, Color color, String name, int duration) {
+        super(location, color, name, duration);
         seen = new ArrayList<>();
         marker = new PacketContainer(PacketType.Play.Server.CUSTOM_PAYLOAD);
         data = new PacketDataSerializer(Unpooled.buffer());
-        data.a(new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ())); // location
+        data.a(new BlockPosition(location.getX(), location.getY(), location.getZ())); // location
         data.writeInt(color.getRGB()); // color
         data.a(name); // name
         data.writeInt(duration); // lifetime of marker
@@ -69,16 +68,16 @@ public class DebugMarker extends DebugMarkerWrapper {
                 return;
             }
             for (Player p : Bukkit.getOnlinePlayers()) {
-                if (isCloseEnough(p.getLocation()) && !seen.contains(p)) {
-                    setData(SpigotUtil.getNightclubLocation(location), color, name, (int) (endTime - System.currentTimeMillis())); // make sure death time is the same for all players
+                if (isCloseEnough(SpigotUtil.getNightclubLocation(p.getLocation())) && !seen.contains(p)) {
+                    setData(location, color, name, (int) (endTime - System.currentTimeMillis())); // make sure death time is the same for all players
                     try {
                         ProtocolLibrary.getProtocolManager().sendServerPacket(p, marker);
                     } catch (InvocationTargetException e) {
                         e.printStackTrace();
                     }
                     seen.add(p);
-                } else if (!isCloseEnough(p.getLocation()) && seen.contains(p)) {
-                    setData(SpigotUtil.getNightclubLocation(location), new Color(0, 0, 0, 0), "", 0);
+                } else if (!isCloseEnough(SpigotUtil.getNightclubLocation(p.getLocation())) && seen.contains(p)) {
+                    setData(location, new Color(0, 0, 0, 0), "", 0);
                     try {
                         ProtocolLibrary.getProtocolManager().sendServerPacket(p, marker);
                     } catch (InvocationTargetException e) {
@@ -92,9 +91,9 @@ public class DebugMarker extends DebugMarkerWrapper {
     }
 
     public void stop() {
-        setData(SpigotUtil.getNightclubLocation(location), new Color(0, 0, 0, 0), "", 0);
+        setData(location, new Color(0, 0, 0, 0), "", 0);
         for (Player p : Bukkit.getOnlinePlayers()) {
-            if (distanceSquared == -1 || this.location.distanceSquared(p.getLocation()) <= distanceSquared) {
+            if (distanceSquared == -1 || this.location.distanceSquared(SpigotUtil.getNightclubLocation(p.getLocation())) <= distanceSquared) {
                 try {
                     ProtocolLibrary.getProtocolManager().sendServerPacket(p, marker);
                 } catch (InvocationTargetException e) {
@@ -110,7 +109,7 @@ public class DebugMarker extends DebugMarkerWrapper {
         int distanceSquared = distance < 0 ? -1 : distance * distance;
         // probably not the most efficient way of doing this
         for (Player p : Bukkit.getOnlinePlayers()) {
-            if (distanceSquared == -1 || this.location.distanceSquared(p.getLocation()) <= distanceSquared) {
+            if (distanceSquared == -1 || this.location.distanceSquared(SpigotUtil.getNightclubLocation(p.getLocation())) <= distanceSquared) {
                 try {
                     ProtocolLibrary.getProtocolManager().sendServerPacket(p, STOP_ALL_MARKERS);
                 } catch (InvocationTargetException e) {
@@ -154,27 +153,27 @@ public class DebugMarker extends DebugMarkerWrapper {
     }
 
     public void setLocation(Location location) {
-        this.location = SpigotUtil.getBukkitLocation(location);
+        this.location = location;
         setData(location, this.color, this.name, this.duration);
     }
 
     public void setColor(Color color) {
         this.color = color;
-        setData(SpigotUtil.getNightclubLocation(this.location), this.color, this.name, this.duration);
+        setData(this.location, this.color, this.name, this.duration);
     }
 
     public void setName(String name) {
         this.name = name;
-        setData(SpigotUtil.getNightclubLocation(this.location), this.color, this.name, this.duration);
+        setData(this.location, this.color, this.name, this.duration);
     }
 
     public void setDuration(int duration) {
         this.duration = duration;
-        setData(SpigotUtil.getNightclubLocation(this.location), this.color, this.name, this.duration);
+        setData(this.location, this.color, this.name, this.duration);
     }
 
     public Location getLocation() {
-        return SpigotUtil.getNightclubLocation(location);
+        return location;
     }
 
     public Color getColor() {
@@ -187,11 +186,6 @@ public class DebugMarker extends DebugMarkerWrapper {
 
     public int getDuration() {
         return duration;
-    }
-
-    private boolean isCloseEnough(org.bukkit.Location location) {
-        return distanceSquared == -1 ||
-                this.location.distanceSquared(location) <= distanceSquared;
     }
 
     static {
