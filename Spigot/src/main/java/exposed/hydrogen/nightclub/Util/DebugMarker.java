@@ -32,7 +32,7 @@ public class DebugMarker extends DebugMarkerWrapper {
         }
     }
 
-    public DebugMarker(Location location, Color color, String name, int duration) {
+    public DebugMarker(Location location, Color color, String name, Integer duration) {
         super(location, color, name, duration);
         seen = new ArrayList<>();
         marker = new PacketContainer(PacketType.Play.Server.CUSTOM_PAYLOAD);

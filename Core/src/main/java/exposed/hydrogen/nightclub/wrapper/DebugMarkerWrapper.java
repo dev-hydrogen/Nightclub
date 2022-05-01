@@ -20,6 +20,8 @@ public abstract class DebugMarkerWrapper {
     public DebugMarkerWrapper(Location location, Color color, String name, int duration) {
         this.location = location;
         this.duration = duration;
+        this.color = color;
+        this.name = name;
     }
 
     public abstract void start(int distance);

@@ -78,7 +78,7 @@ public class DebugMarkerMinestom extends DebugMarkerWrapper {
     @Override
     public void stopAll(Location location, int distance) {
         distanceSquared = distance < 0 ? -1 : distance * distance;
-        sendPacketToPlayerIfCloseEnough(getMarkerPacket(marker), location);
+        sendPacketToPlayerIfCloseEnough(STOP_ALL_MARKERS, location);
     }
 
     @Override
@@ -102,7 +102,7 @@ public class DebugMarkerMinestom extends DebugMarkerWrapper {
         Collection<Player> players = new LinkedList<>();
         for (Player player : MinecraftServer.getConnectionManager().getOnlinePlayers()) {
             if (isCloseEnough(MinestomUtil.getNightclubLocation(player.getPosition()),location)) {
-                player.sendPacket(getMarkerPacket(marker));
+                player.sendPacket(packet);
                 players.add(player);
             }
         }

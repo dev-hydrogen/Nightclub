@@ -154,7 +154,6 @@ public class Light implements LightI {
         this.marker = Nightclub.getMarkerFactory().build(this.location, new Color(0, 0, 0), "", 5000);
         buildLasers();
         isLoaded = true;
-        Nightclub.getChameleon().getLogger().info("Created new light: " + this.location);
     }
 
     public void unload() {
