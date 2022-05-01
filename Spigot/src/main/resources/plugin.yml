@@ -1,0 +1,32 @@
+name: Nightclub2.0
+version: '${project.version}'
+main: exposed.hydrogen.nightclub.NightclubSpigot
+api-version: 1.18
+authors: [ hydrogen ]
+description: Nightclub 2.0
+depend: [ ProtocolLib ]
+
+commands:
+  light:
+    description: light builder + editor
+    usage: /light
+    permission: nightclub.light
+  lightuniverse:
+    description: light universe builder + editor
+    usage: /lightuniverse
+    permission: nightclub.lightuniverse
+  beatmap:
+    description: beatmap player
+    usage: /beatmap
+    permission: nightclub.beatmap
+
+permissions:
+  nightclub.light:
+    description: Access to /light which is the builder and editor
+    default: op
+  nightclub.lightuniverse:
+    description: Access to /lightuniverse which is the lightuniverse builder and editor
+    default: op
+  nightclub.beatmap:
+    description: Access to /beatmap which is the beatmap player command itself
+    default: op

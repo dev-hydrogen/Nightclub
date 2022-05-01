@@ -1,0 +1,15 @@
+{
+  "entrypoint": "exposed.hydrogen.nightclub.NightclubMinestom",
+  "name": "Nightclub",
+  "version": "2.1.0",
+  "externalDependencies": {
+    "repositories": [
+      {"name": "Central", "url": "https://repo1.maven.org/maven2/"},
+      {"name": "hypera-snapshots", "url": "https://repo.hypera.dev/snapshots/"}
+    ],
+    "artifacts": [
+      "com.google.guava:guava:31.1-jre",
+      "dev.hypera.chameleon:platform-minestom:0.4.0-SNAPSHOT"
+    ]
+  }
+}
