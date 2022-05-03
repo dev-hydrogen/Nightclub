@@ -46,6 +46,7 @@ public class NightclubSpigot extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        Nightclub.getLightUniverseManager().save();
         chameleon.onDisable();
     }
 }

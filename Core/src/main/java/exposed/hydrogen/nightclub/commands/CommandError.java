@@ -3,6 +3,7 @@ package exposed.hydrogen.nightclub.commands;
 import lombok.Getter;
 
 public enum CommandError {
+    RING_UNLOADED("- There is no Ring loaded"),
     LIGHT_UNLOADED("- There is no Light loaded"),
     LIGHTUNIVERSE_UNLOADED("- There is no LightUniverse loaded"),
     BEATMAP_PLAYING("- A beatmap is currently playing"),

@@ -59,7 +59,7 @@ public class DebugMarkerMinestom extends DebugMarkerWrapper {
                 }
             }
         };
-        executorService.scheduleAtFixedRate(run, 0, 200, TimeUnit.MILLISECONDS);
+        executorService.scheduleAtFixedRate(run, 0, 100, TimeUnit.MILLISECONDS);
     }
 
     @Override

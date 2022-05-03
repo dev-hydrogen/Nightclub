@@ -3,16 +3,19 @@ package exposed.hydrogen.nightclub.light.data;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class LightData implements Cloneable {
     private LightPatternData patternData;
     private LightPatternData secondPatternData;
     private ArrayList<Integer> lightIDs;
+    private RingMovementData ringMovementData;
     private double maxLength;
     private double onLength; // 0 to 100, percentage of maxLength
     private int timeToFadeToBlack; // x * 100 ms

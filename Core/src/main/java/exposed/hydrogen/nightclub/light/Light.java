@@ -2,10 +2,8 @@ package exposed.hydrogen.nightclub.light;
 
 import com.google.gson.JsonArray;
 import exposed.hydrogen.nightclub.Nightclub;
-import exposed.hydrogen.nightclub.light.data.LightData;
-import exposed.hydrogen.nightclub.light.data.LightPattern;
-import exposed.hydrogen.nightclub.light.data.LightPatternData;
-import exposed.hydrogen.nightclub.light.data.LightType;
+import exposed.hydrogen.nightclub.json.JSONUtils;
+import exposed.hydrogen.nightclub.light.data.*;
 import exposed.hydrogen.nightclub.light.event.LightChannel;
 import exposed.hydrogen.nightclub.light.event.LightSpeedChannel;
 import exposed.hydrogen.nightclub.util.Location;
@@ -21,10 +19,8 @@ import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -44,9 +40,10 @@ public class Light implements LightI {
     @Getter private LightSpeedChannel speedChannel;
     @Getter private transient DebugMarkerWrapper marker;
 
-    private final transient List<LaserWrapper> lasers = new ArrayList<>();
+    private final transient List<LaserWrapper> lasers = new LinkedList<>();
     private transient double length = 0; // 0 to 100, percentage of maxLength.
     private transient double zoomTime = 0; // 0 to 1, current zoom time. does nothing if <=0
+    private transient Location loc; // current location
     @Getter @Setter private transient double x = 0; // 0 to 100, usually percentage of 360
     @Getter @Setter private transient double x2 = 0; // 0 to 100, usually percentage of 360, secondary pattern
     private transient boolean isOn = false;
@@ -72,7 +69,7 @@ public class Light implements LightI {
     public Light(Location loc, UUID uniqueID, String name, LightPattern pattern, LightType type, LightChannel channel) {
         this(uniqueID, name, loc, type, channel, LightSpeedChannel.DEFAULT, new LightData(
                 new LightPatternData(pattern, 0, 0, 0, 0), new LightPatternData(LightPattern.STILL,
-                0, 0, 0, 0), new ArrayList<>(), /*new RingMovementData(new Location(), 0, 0),*/ 0, 0, 0,
+                0, 0, 0, 0), new ArrayList<>(), new RingMovementData(new Location(), 0, 0), 0, 0, 0,
                 0, false));
     }
 
@@ -88,12 +85,12 @@ public class Light implements LightI {
 
         run = () -> {
             try {
-                /*if (isZoomed ? zoomTime > 0 : zoomTime < 1) {
+                if (isZoomed ? zoomTime > 0 : zoomTime < 1) {
                     double duration = getData().getRingMovementData().getDuration();
                     zoomTime = isZoomed ?
                             zoomTime - duration >= 0 ? duration / 1000 / (DELAY / 10.0) : 1
                             : zoomTime + duration <= 1 ? duration / 1000 / (DELAY / 10.0) : 1;
-                }*/
+                }
                 if (timeToFade > 0 && length > 0) {
                     timeToFade--;
                     length -= 100.0 / this.data.getTimeToFadeToBlack();
@@ -127,15 +124,18 @@ public class Light implements LightI {
                     Vector3D v2 = this.data.getPatternData().getPattern().apply(v, separated, r, this.data.getPatternData().getPatternSizeMultiplier() * (length / 100));
                     // then apply second pattern to all lasers with the same x value
                     Vector3D v3 = this.data.getSecondPatternData().getPattern().apply(v, x2, r2, this.data.getSecondPatternData().getPatternSizeMultiplier() * (length / 100));
-                    Vector3D v4 = v.add(v3).add(v2);
+                    Vector3D v4 = getData().getRingMovementData().calculateMovement(zoomTime);
+                    Vector3D v5 = v.add(v4).add(v3).add(v2);
 
-                    /*Location ringZoomMove = getData().getRingMovementData().calculateMovement(zoomTime);*/
+                    Location result = this.location.clone().add(v5.getX(), v5.getZ(), v5.getY());
+                    Location startResult = this.location.clone().add(v4.getX(), v4.getZ(), v4.getY());
+                    loc = startResult;
                     if (this.data.isFlipStartAndEnd()) {
-                        laser.setStart(this.location.clone().add(v4.getX(), v4.getZ(), v4.getY())/*.add(ringZoomMove)*/);
-                        laser.setEnd(this.location.clone()/*.add(ringZoomMove)*/);
+                        laser.setStart(result);
+                        laser.setEnd(startResult);
                     } else {
-                        laser.setEnd(this.location.clone().add(v4.getX(), v4.getZ(), v4.getY())/*.add(ringZoomMove)*/);
-                        laser.setStart(this.location.clone()/*.add(ringZoomMove)*/);
+                        laser.setEnd(result);
+                        laser.setStart(startResult);
                     }
                 }
             } catch (Exception e) {
@@ -145,13 +145,16 @@ public class Light implements LightI {
     }
 
     public void load() {
+        this.setData(JSONUtils.addNewDataIfNull(this.getData()));
         this.channel.removeListener(this);
         this.speedChannel.getChannel().removeSpeedListener(this);
         this.channel.addListener(this);
         this.speedChannel.getChannel().addSpeedListener(this);
         this.multipliedSpeed = data.getPatternData().getSpeed();
         this.secondaryMultipliedSpeed = data.getSecondPatternData().getSpeed();
-        this.marker = Nightclub.getMarkerFactory().build(this.location, new Color(0, 0, 0), "", 5000);
+        this.loc = location.clone();
+        this.marker = Nightclub.getMarkerFactory().build(this.location, new Color(0, 0, 0), "", 500);
+        isZoomed = false;
         buildLasers();
         isLoaded = true;
     }
@@ -228,7 +231,7 @@ public class Light implements LightI {
         length = Math.max(data.getOnLength() * (color.getAlpha() / 255.0), 0.05);
         isOn = true;
         timeToFade = 0;
-        marker.setLocation(location);
+        marker.setLocation(loc);
         marker.setColor(color);
         marker.start(256);
     }
@@ -268,7 +271,7 @@ public class Light implements LightI {
             length += (100 - data.getOnLength()) / 3;
             timeToFade += 3;
             lasers.forEach(LaserWrapper::changeColor);
-            marker.setLocation(location);
+            marker.setLocation(loc);
             marker.setColor(color);
             marker.start(256);
         } else {
@@ -290,7 +293,7 @@ public class Light implements LightI {
             return;
         on(color);
         flash(color);
-        marker.setLocation(location);
+        marker.setLocation(loc);
         marker.setColor(color);
         marker.start(256);
         timeToFade = data.getTimeToFadeToBlack();
@@ -302,10 +305,10 @@ public class Light implements LightI {
 
     public void ringZoom() {
         if (!isLoaded) return;
-        /*isZoomed = !isZoomed;
-        zoomTime = isZoomed ? 0 : 1;
+        isZoomed = !isZoomed;
+        zoomTime = isZoomed ? 1 : 0;
         marker.setLocation(loc);
-        marker.start(256);*/
+        marker.start(256);
     }
 
     /**

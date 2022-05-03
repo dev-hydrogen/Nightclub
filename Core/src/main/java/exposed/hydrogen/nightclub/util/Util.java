@@ -3,6 +3,7 @@ package exposed.hydrogen.nightclub.util;
 import exposed.hydrogen.nightclub.commands.CommandError;
 import exposed.hydrogen.nightclub.light.Light;
 import exposed.hydrogen.nightclub.light.LightUniverse;
+import exposed.hydrogen.nightclub.light.Ring;
 
 import java.io.File;
 import java.text.NumberFormat;
@@ -30,6 +31,8 @@ public class Util {
             collection.forEach((light) -> strings.add(((Light) light).getName()));
         } else if (objects instanceof LightUniverse[]) {
             collection.forEach((universe) -> strings.add(((LightUniverse) universe).getName()));
+        } else if (objects instanceof Ring[]) {
+            collection.forEach((ring) -> strings.add(((Ring) ring).getName()));
         } else {
             collection.forEach(object -> strings.add(object.toString()));
         }
@@ -51,5 +54,4 @@ public class Util {
         }
         return formattedErrors;
     }
-
 }

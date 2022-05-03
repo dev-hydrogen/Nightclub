@@ -30,3 +30,6 @@ permissions:
   nightclub.beatmap:
     description: Access to /beatmap which is the beatmap player command itself
     default: op
+  nightclub.ring:
+    description: Access to /ring which is the ring builder and editor
+    default: op

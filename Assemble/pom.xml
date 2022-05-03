@@ -4,12 +4,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>exposed.hydrogen</groupId>
+        <groupId>exposed.hydrogen.nightclub</groupId>
         <artifactId>Nightclub</artifactId>
         <version>${revision}</version>
     </parent>
 
-    <groupId>exposed.hydrogen.nightclub</groupId>
     <artifactId>Nightclub-all</artifactId>
     <packaging>jar</packaging>
 

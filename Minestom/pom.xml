@@ -6,11 +6,10 @@
 
     <parent>
         <artifactId>Nightclub</artifactId>
-        <groupId>exposed.hydrogen</groupId>
+        <groupId>exposed.hydrogen.nightclub</groupId>
         <version>${revision}</version>
     </parent>
 
-    <groupId>exposed.hydrogen.nightclub</groupId>
     <artifactId>Minestom</artifactId>
 
     <name>Nightclub-minestom</name>

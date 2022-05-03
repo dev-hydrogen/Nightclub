@@ -559,7 +559,7 @@ public class LightCommand extends BaseCommand {
             }
         }
 
-        /*@Subcommand("ringzoom")
+        @Subcommand("ringzoom")
         @CommandAlias("rz")
         @Description("Modify a Light's ring zoom movement")
         @CommandPermission("nightclub.light")
@@ -573,7 +573,7 @@ public class LightCommand extends BaseCommand {
                 List<CommandError> errors = isUnloaded();
                 CrossCompatPlayer player = Nightclub.getCrossCompatUtil().getPlayer(sender);
                 errors.add(player == null ? CommandError.COMMAND_SENT_FROM_CONSOLE : CommandError.VALID);
-                errors.add(!(args.length == 2) ? CommandError.TOO_LITTLE_ARGUMENTS : CommandError.VALID);
+                errors.add(args.length > 0 && args.length < 3 ? CommandError.TOO_LITTLE_ARGUMENTS : CommandError.VALID);
                 if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
                     sender.sendMessage(Util.formatErrors(errors));
                     return;
@@ -630,7 +630,7 @@ public class LightCommand extends BaseCommand {
                 light.buildLasers();
                 light.on(new Color(0x0066ff));
             }
-        }*/
+        }
     }
 
 

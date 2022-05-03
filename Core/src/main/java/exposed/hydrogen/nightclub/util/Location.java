@@ -28,16 +28,8 @@ public class Location implements Cloneable {
         this.x = x.doubleValue();
         this.y = y.doubleValue();
         this.z = z.doubleValue();
-        this.pitch = pitch.doubleValue() % 360;
+        this.pitch = pitch.doubleValue() % 90;
         this.yaw = yaw.doubleValue() % 360;
-    }
-
-    public static double translateMinecraftsStupidFuckingPitch(float pitch) {
-        return -pitch;
-    }
-
-    public static double translateMinecraftsStupidFuckingYaw(float yaw) {
-        return yaw - 270;
     }
 
     public Location clone() {
@@ -61,7 +53,11 @@ public class Location implements Cloneable {
     }
 
     public static Location fromVector3D(Vector3D vector) {
-        return new Location(vector.getX(), vector.getY(), vector.getZ(), Math.toDegrees(vector.getAlpha()), Math.toDegrees(vector.getDelta()));
+        return new Location(vector.getX(), vector.getZ(), vector.getY(), 0, 0);
+    }
+
+    public Vector3D toVector3D() {
+        return new Vector3D(x, z, y);
     }
 
     public Location add(Location loc) {

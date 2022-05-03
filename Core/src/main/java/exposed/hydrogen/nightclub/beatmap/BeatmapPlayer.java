@@ -3,6 +3,7 @@ package exposed.hydrogen.nightclub.beatmap;
 import com.google.gson.JsonArray;
 import exposed.hydrogen.nightclub.Nightclub;
 import exposed.hydrogen.nightclub.light.Light;
+import exposed.hydrogen.nightclub.light.Ring;
 import exposed.hydrogen.nightclub.light.event.LightChannel;
 import exposed.hydrogen.nightclub.util.CrossCompatPlayer;
 import lombok.Getter;
@@ -33,9 +34,9 @@ public class BeatmapPlayer {
      *
      * @param name name of the folder the beatmap itself resides in (/name/ExpertPlus.dat)
      */
-    public BeatmapPlayer(String name, boolean dontUseChroma) {
-        info = BeatmapParser.getInfoData(name, dontUseChroma);
-        events = BeatmapParser.getEvents(name, dontUseChroma);
+    public BeatmapPlayer(String name, boolean useChroma) {
+        info = BeatmapParser.getInfoData(name, useChroma);
+        events = BeatmapParser.getEvents(name, useChroma);
         this.name = name;
         playTo = new ArrayList<>();
     }
@@ -52,6 +53,7 @@ public class BeatmapPlayer {
         executorService = Executors.newScheduledThreadPool(1);
         playTo.forEach((player) -> player.playSound(player.getLocation(), name, 1, 1));
         isPlaying = true;
+        Nightclub.getLightUniverseManager().getLoadedUniverse().getRings().forEach(Ring::start);
 
         //start all channels up and then turn them off to wait for beatmap instructions
         channelList.forEach(LightChannel::initializePlayback);
@@ -65,6 +67,7 @@ public class BeatmapPlayer {
         Runnable task = () -> {
             isPlaying = false;
             channelList.forEach(LightChannel::terminatePlayback);
+            Nightclub.getLightUniverseManager().getLoadedUniverse().getRings().forEach(Ring::stop);
         };
         executorService.schedule(task, events.get(events.size() - 1).getTime() + 5000000, TimeUnit.MICROSECONDS);
         Nightclub.getChameleon().getLogger().info(info.toString());
@@ -95,9 +98,12 @@ public class BeatmapPlayer {
             channel.ifPresent(lightChannel -> handleValue(lightChannel, event.getValue(), event.getColor(), event.getLightID()));
         } else switch (event.getType()) {
             // Ring spin
-            case 8 -> this.getClass();
+            case 8 -> Nightclub.getLightUniverseManager().getLoadedUniverse().getRings().forEach(Ring::spin);
             // Toggle ring zoom
-            case 9 -> Nightclub.getLightUniverseManager().getLoadedUniverse().getLights().forEach(Light::ringZoom);
+            case 9 -> {
+                Nightclub.getLightUniverseManager().getLoadedUniverse().getLights().forEach(Light::ringZoom);
+                Nightclub.getLightUniverseManager().getLoadedUniverse().getRings().forEach(Ring::ringZoom);
+            }
 
             // Rotation speed multiplier for left lasers
             case 12 -> LightChannel.LEFT_ROTATING_LASERS.setSpeed(event.getValue());

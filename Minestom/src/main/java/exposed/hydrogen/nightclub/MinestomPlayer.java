@@ -13,7 +13,7 @@ public record MinestomPlayer(Player player) implements CrossCompatPlayer {
     @Override
     public Location getLocation() {
         Pos pos = player.getPosition();
-        return new Location(pos.x(), pos.y(), pos.z(), Location.translateMinecraftsStupidFuckingPitch(pos.pitch()), Location.translateMinecraftsStupidFuckingYaw(pos.yaw()));
+        return new Location(pos.x(), pos.y(), pos.z(), -pos.pitch(), pos.yaw() - 270);
     }
 
     @Override

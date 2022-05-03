@@ -10,12 +10,14 @@ import dev.hypera.chameleon.core.data.PluginData;
 import exposed.hydrogen.nightclub.commands.BeatmapCommand;
 import exposed.hydrogen.nightclub.commands.LightCommand;
 import exposed.hydrogen.nightclub.commands.LightUniverseCommand;
+import exposed.hydrogen.nightclub.commands.RingCommand;
 import exposed.hydrogen.nightclub.json.JSONUtils;
 import exposed.hydrogen.nightclub.json.LightJSONReader;
 import exposed.hydrogen.nightclub.json.LightJSONWriter;
 import exposed.hydrogen.nightclub.light.Light;
 import exposed.hydrogen.nightclub.light.LightUniverse;
 import exposed.hydrogen.nightclub.light.LightUniverseManager;
+import exposed.hydrogen.nightclub.light.Ring;
 import exposed.hydrogen.nightclub.light.data.LightPattern;
 import exposed.hydrogen.nightclub.light.data.LightType;
 import exposed.hydrogen.nightclub.light.event.LightChannel;
@@ -86,6 +88,7 @@ public final class Nightclub extends ChameleonPlugin {
         commandManager.registerCommand(new LightCommand());
         commandManager.registerCommand(new BeatmapCommand());
         commandManager.registerCommand(new LightUniverseCommand());
+        commandManager.registerCommand(new RingCommand());
     }
 
     public static void registerCompletions(CommandCompletions<?> completions) {
@@ -103,6 +106,11 @@ public final class Nightclub extends ChameleonPlugin {
         completions.registerCompletion("lights", c -> {
             if (getLightUniverseManager().getLoadedUniverse() != null) {
                 return getStringValuesFromArray(getLightUniverseManager().getLoadedUniverse().getLights().toArray(new Light[0]));
+            } else return new ArrayList<>();
+        });
+        completions.registerCompletion("rings", c -> {
+            if (getLightUniverseManager().getLoadedUniverse() != null) {
+                return getStringValuesFromArray(getLightUniverseManager().getLoadedUniverse().getRings().toArray(new Ring[0]));
             } else return new ArrayList<>();
         });
         completions.registerCompletion("lightids", c -> {

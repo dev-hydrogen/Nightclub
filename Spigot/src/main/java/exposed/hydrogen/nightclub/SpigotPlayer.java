@@ -10,7 +10,7 @@ public record SpigotPlayer(Player player) implements CrossCompatPlayer {
     @Override
     public Location getLocation() {
         org.bukkit.Location location = player.getLocation();
-        return new Location(location.getX(), location.getY(), location.getZ(), Location.translateMinecraftsStupidFuckingPitch(location.getPitch()), Location.translateMinecraftsStupidFuckingYaw(location.getYaw()));
+        return new Location(location.getX(), location.getY(), location.getZ(), -location.getPitch(), location.getYaw()-270);
     }
 
     @Override

@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import java.awt.*;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,6 +23,7 @@ public class LightUniverse {
     @Getter private final int id;
     @Getter @Setter private String name;
     @Getter private final List<Light> lights;
+    @Getter @Setter private List<Ring> rings;
     @Getter private boolean isLoaded;
 
     public LightUniverse() {
@@ -35,7 +37,18 @@ public class LightUniverse {
     }
 
     public LightUniverse(List<Light> lights, UUID uniqueID, int id, String name) {
+        this(
+                lights,
+                new LinkedList<>(),
+                uniqueID,
+                id,
+                name
+        );
+    }
+
+    public LightUniverse(List<Light> lights, List<Ring> rings, UUID uniqueID, int id, String name) {
         this.lights = lights;
+        this.rings = rings;
         this.uniqueID = uniqueID;
         this.id = id;
         if (name.equals("Unnamed-Universe")) {
@@ -50,6 +63,8 @@ public class LightUniverse {
             light.load();
             light.on(new Color(0x0066ff));
         });
+        this.rings.forEach(Ring::buildLasers);
+        this.rings.forEach(Ring::start);
         isLoaded = true;
     }
 
@@ -59,6 +74,7 @@ public class LightUniverse {
             light.off(new Color(0x000000));
             light.stop();
         });
+        this.rings.forEach(Ring::stop);
         isLoaded = false;
     }
 
@@ -84,6 +100,22 @@ public class LightUniverse {
 
     public void removeLight(Light light) {
         this.lights.remove(light);
+    }
+
+    public void addRing(Ring ring) {
+        this.rings.add(ring);
+    }
+
+    public void removeRing(Ring ring) {
+        this.rings.remove(ring);
+    }
+
+    public @Nullable Ring getRing(String name) {
+        return rings
+                .stream()
+                .filter(light -> name.equals(light.getName()))
+                .findFirst()
+                .orElse(null);
     }
 
     public static class LightUniverseInstanceCreator implements InstanceCreator<LightUniverse> {

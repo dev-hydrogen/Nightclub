@@ -1,6 +1,7 @@
 package exposed.hydrogen.nightclub.light.data;
 
 import exposed.hydrogen.nightclub.util.Util;
+import lombok.Getter;
 import org.apache.commons.math3.geometry.euclidean.threed.Plane;
 import org.apache.commons.math3.geometry.euclidean.threed.Rotation;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
@@ -19,7 +20,7 @@ public enum LightPattern {
             Math.cos(Math.toRadians(Util.getDegreesFromPercentage(x))))),
     STILL((x) -> new Vector2D(0.0, 0.0).scalarMultiply(0.0));
 
-    private final Function<Double, Vector2D> pattern;
+    @Getter private final Function<Double, Vector2D> pattern;
 
     LightPattern(Function<Double, Vector2D> pattern) {
         this.pattern = pattern;

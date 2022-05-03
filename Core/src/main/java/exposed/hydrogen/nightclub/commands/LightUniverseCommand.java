@@ -7,6 +7,7 @@ import exposed.hydrogen.nightclub.Nightclub;
 import exposed.hydrogen.nightclub.light.Light;
 import exposed.hydrogen.nightclub.light.LightUniverse;
 import exposed.hydrogen.nightclub.light.LightUniverseManager;
+import exposed.hydrogen.nightclub.light.Ring;
 import exposed.hydrogen.nightclub.light.event.LightChannel;
 import exposed.hydrogen.nightclub.util.Util;
 
@@ -234,6 +235,21 @@ public class LightUniverseCommand extends BaseCommand {
             }
         }
 
-
+        @Subcommand("ringspin")
+        @Description("rs")
+        @CommandPermission("nightclub.lightuniverse")
+        public static void onRingSpin(CommandIssuer sender) {
+            List<CommandError> errors = isUnloaded();
+            try {
+                Nightclub.getLightUniverseManager().getLoadedUniverse().getRings().forEach(Ring::spin);
+            } catch (IllegalArgumentException e) {
+                errors.add(CommandError.INVALID_ARGUMENT);
+            } catch (ArrayIndexOutOfBoundsException e) {
+                errors.add(CommandError.TOO_LITTLE_ARGUMENTS);
+            }
+            if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
+                sender.sendMessage(Util.formatErrors(errors));
+            }
+        }
     }
 }

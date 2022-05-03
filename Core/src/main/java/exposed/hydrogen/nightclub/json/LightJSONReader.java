@@ -2,6 +2,8 @@ package exposed.hydrogen.nightclub.json;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import exposed.hydrogen.nightclub.Nightclub;
+import exposed.hydrogen.nightclub.light.Light;
 import exposed.hydrogen.nightclub.light.LightUniverse;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -9,10 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Reader for lights.json where LightUniverses and Lights are stored through restarts.
@@ -32,23 +31,34 @@ public class LightJSONReader {
             e.printStackTrace();
         }
         if (universes.isEmpty()) {
-            return new LightUniverse(new ArrayList<>(), UUID.randomUUID(), 0, "Unnamed-Universe");
+            LightUniverse universe = new LightUniverse(new ArrayList<>(), UUID.randomUUID(), 0, "Unnamed-Universe");
+            Nightclub.getLightUniverseManager().add(universe);
+            return universe;
         }
         return universes.get(universes.size() - 1);
     }
 
-    @SuppressWarnings({"UnstableApiUsage"}) // suppress warnings about TypeToken being in beta
     public @NotNull List<LightUniverse> getUniverses() throws IOException {
         Reader reader = JSONUtils.getReader(JSONUtils.LIGHT_JSON);
         if (reader == null) {
             return new ArrayList<>();
         }
 
-        Type lightUniverseType = new TypeToken<List<LightUniverse>>() {
-        }.getType();
+        Type lightUniverseType = new TypeToken<List<LightUniverse>>() {}.getType();
         ArrayList<LightUniverse> universes = gson.fromJson(reader, lightUniverseType);
         if (universes == null) {
             universes = new ArrayList<>();
+        }
+
+        // If some data does not exist, add it
+        for (LightUniverse universe : universes) {
+            List<Light> lights = universe.getLights();
+            for (Light light : lights) {
+                light.setData(JSONUtils.addNewDataIfNull(light.getData()));
+            }
+            if(universe.getRings() == null) {
+                universe.setRings(new LinkedList<>());
+            }
         }
 
         reader.close();
