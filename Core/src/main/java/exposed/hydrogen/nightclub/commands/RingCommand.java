@@ -56,10 +56,10 @@ public class RingCommand extends BaseCommand {
         }
         UUID uuid = UUID.randomUUID();
         RingData ringData = RingData.builder()
-                .linkedRingUUID("")
                 .ringMovementData(new RingMovementData())
                 .ringCount(4)
-                .ringOffset(3)
+                .ringLightCount(3)
+                .ringOffset(0.8)
                 .ringRotation(6)
                 .ringSize(15)
                 .ringSpacing(8)
@@ -105,7 +105,7 @@ public class RingCommand extends BaseCommand {
         List<CommandError> errors = isUnloaded();
         errors.add(args.length < 1 ? CommandError.TOO_LITTLE_ARGUMENTS : CommandError.VALID);
         if (errors.stream().noneMatch(error -> error == CommandError.LIGHTUNIVERSE_UNLOADED)) {
-            errors.add(universe.getLight(args[0]) == null ? CommandError.INVALID_ARGUMENT : CommandError.VALID);
+            errors.add(universe.getRing(args[0]) == null ? CommandError.INVALID_ARGUMENT : CommandError.VALID);
         }
         if (errors.stream().anyMatch(error -> error != CommandError.VALID && error != CommandError.RING_UNLOADED)) {
             sender.sendMessage(Util.formatErrors(errors));
@@ -132,7 +132,7 @@ public class RingCommand extends BaseCommand {
         if (errors.stream().noneMatch(error -> error == CommandError.LIGHTUNIVERSE_UNLOADED)) {
             errors.add(universe.getLight(args[0]) == null ? CommandError.INVALID_ARGUMENT : CommandError.VALID);
         }
-        if (errors.stream().anyMatch(error -> error != CommandError.VALID && error != CommandError.LIGHT_UNLOADED)) {
+        if (errors.stream().anyMatch(error -> error != CommandError.VALID && error != CommandError.RING_UNLOADED)) {
             sender.sendMessage(Util.formatErrors(errors));
             return;
         }
@@ -222,28 +222,6 @@ public class RingCommand extends BaseCommand {
             ring.start();
         }
 
-        @Subcommand("link")
-        @Description("Link this ring to another ring")
-        @CommandCompletion("@rings")
-        @CommandPermission("nightclub.ring")
-        public static void onSetLinkedRing(CommandIssuer sender, String[] args) {
-            LightUniverseManager manager = Nightclub.getLightUniverseManager();
-            LightUniverse universe = manager.getLoadedUniverse();
-
-            List<CommandError> errors = isUnloaded();
-            errors.add(args.length < 1 ? CommandError.TOO_LITTLE_ARGUMENTS : CommandError.VALID);
-            if (errors.stream().noneMatch(error -> error == CommandError.LIGHTUNIVERSE_UNLOADED)) {
-                errors.add(universe.getLight(args[0]) == null ? CommandError.INVALID_ARGUMENT : CommandError.VALID);
-            }
-            if (errors.stream().anyMatch(error -> error != CommandError.VALID && error != CommandError.LIGHT_UNLOADED)) {
-                sender.sendMessage(Util.formatErrors(errors));
-                return;
-            }
-
-            ring.getRingData().setLinkedRingUUID(universe.getRing(args[0]).getUniqueId().toString());
-            ring.start();
-        }
-
         @Subcommand("count")
         @CommandAlias("rc")
         @Description("Set ring count")
@@ -258,8 +236,28 @@ public class RingCommand extends BaseCommand {
             if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
                 sender.sendMessage(Util.formatErrors(errors));
             }
+            ring.buildLasers();
             ring.start();
         }
+
+        @Subcommand("lightcount")
+        @CommandAlias("lc")
+        @Description("Set ring count")
+        @CommandPermission("nightclub.ring")
+        public static void onRingLightCount(CommandIssuer sender, String[] args) {
+            List<CommandError> errors = isUnloaded(args, 1);
+            try {
+                ring.getRingData().setRingLightCount(Util.parseNumber(args[0]).intValue());
+            } catch (ParseException e) {
+                errors.add(CommandError.INVALID_ARGUMENT);
+            }
+            if (errors.stream().anyMatch(error -> error != CommandError.VALID)) {
+                sender.sendMessage(Util.formatErrors(errors));
+            }
+            ring.buildLasers();
+            ring.start();
+        }
+
         @Subcommand("size")
         @CommandAlias("sz")
         @Description("Set ring size")
@@ -276,6 +274,7 @@ public class RingCommand extends BaseCommand {
             }
             ring.start();
         }
+
         @Subcommand("offset")
         @CommandAlias("os")
         @Description("Set ring offset from linked ring")

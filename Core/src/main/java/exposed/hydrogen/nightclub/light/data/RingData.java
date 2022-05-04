@@ -17,15 +17,15 @@ import java.util.List;
 @Builder
 public class RingData implements Cloneable{
     private RingMovementData ringMovementData;
-    private String linkedRingUUID;
     private int ringCount;
+    private int ringLightCount;
     private double ringSize;
     private double ringOffset;
     private double ringSpacing;
     private double ringRotation;
 
     public RingData() {
-        this(new RingMovementData(),"",0,0,0,0,0);
+        this(new RingMovementData(),0,0,0,0,0,0);
     }
 
     /**
@@ -35,7 +35,7 @@ public class RingData implements Cloneable{
      * @param rotation The rotation of the ring
      * @return A list of the edge points of the ring
      */
-    public List<Vector3D> calculateRingEdgePoints(Vector3D center, double rotation) {
+    public static List<Vector3D> calculateRingEdgePoints(Vector3D center, double rotation, int ringCount, double ringSize) {
         List<Vector3D> ringEdgePoints = new LinkedList<>();
         for (int i = 0; i < ringCount; i++) {
             Vector2D ringEdgePoint = LightPattern.CIRCLE.getPattern().apply(i*(100.0/ringCount)).scalarMultiply(ringSize);

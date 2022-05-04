@@ -8,10 +8,7 @@ import exposed.hydrogen.nightclub.wrapper.LaserWrapper;
 import lombok.*;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -27,7 +24,7 @@ public class Ring {
     @Getter @Setter private RingData ringData;
     @Getter @Setter private LightType lightType;
 
-    private final transient List<LaserWrapper> lasers = new LinkedList<>();
+    private final transient LinkedHashMap<Integer,List<LaserWrapper>> lasers;
     private transient double zoomTime = 0; // 0 to 1, current zoom time. does nothing if <=0
     private transient double rotationTime = 0; // current rotation time
     @Getter @Setter private transient double rotation = 0; // 0 to 360, degrees rotation
@@ -46,51 +43,81 @@ public class Ring {
         this.location = location;
         this.ringData = ringData;
         this.lightType = lightType;
+        lasers = new LinkedHashMap<>();
         this.run = () -> {
-            // Do nothing if no need to rotate
-            if (rotationTime > 0) {
-                double duration = getRingData().getRingRotation();
-                zoomTime = zoomTime - duration/10;
-            }
-            if (isZoomed ? zoomTime > 0 : zoomTime < 1) {
+            if (isZoomed ? zoomTime < 1 : zoomTime > 0) {
                 double duration = getRingData().getRingMovementData().getDuration();
                 zoomTime = isZoomed ?
-                        zoomTime - duration >= 0 ? duration / 1000 / (DELAY / 10.0) : 1
-                        : zoomTime + duration <= 1 ? duration / 1000 / (DELAY / 10.0) : 1;
+                        zoomTime + duration / 1000 / (DELAY / 10.0)
+                        : zoomTime - duration / 1000 / (DELAY / 10.0);
             }
+            zoomTime = zoomTime < 0 && !isZoomed ? 0 : zoomTime;
+            zoomTime = zoomTime > 1 && isZoomed ? 1 : zoomTime;
+
+            rotationTime = rotationTime > 45 ? 45 : rotationTime;
+            rotationTime = rotationTime < -45 ? -45 : rotationTime;
+
+            if (rotationTime < 0.5 && rotationTime > -0.5) {
+                rotationTime = 0;
+            }
+            if(rotationTime > 0.5 || rotationTime < -0.5) {
+                rotationTime -= rotationTime/10;
+            } else if(rotationTime < 0.5 && rotationTime > -0.5) {
+                rotationTime += rotationTime/10;
+            }
+
             rotation = rotation + rotationTime;
             rotation = rotation % 360;
-            List<Vector3D> ringEdgePoints = getRingData().calculateRingEdgePoints(this.location.toVector3D(), Math.toRadians(rotation));
-            for (int i = 0; i < lasers.size(); i++) {
-                LaserWrapper laser = lasers.get(i);
-                Vector3D ringedgePoint = ringEdgePoints.get(i);
-                Vector3D nextRingEdgePoint = ringEdgePoints.get((i + 1) % ringEdgePoints.size());
-                Vector3D v1 = getRingData().getRingMovementData().calculateMovement(zoomTime);
-                laser.setStart(this.location.clone().add(Location.fromVector3D(ringedgePoint.add(v1))));
-                laser.setEnd(this.location.clone().add(Location.fromVector3D(nextRingEdgePoint.add(v1))));
+            for (int ring = 0; ring < this.ringData.getRingCount(); ring++) {
+                // a (invisible) "ray" the size of length, pointing towards the set pitch and yaw
+                Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch()))
+                        .normalize().scalarMultiply((ring * this.ringData.getRingSpacing()) / (zoomTime+1));
+
+                List<Vector3D> ringEdgePoints = RingData.calculateRingEdgePoints(this.location.toVector3D().add(v),
+                        Math.toRadians(rotation*(this.ringData.getRingOffset()+ring)), this.ringData.getRingLightCount(), this.ringData.getRingSize());
+
+                List<LaserWrapper> laserWrappers = lasers.get(ring);
+
+                for (int i = 0; i < laserWrappers.size(); i++) {
+                    LaserWrapper laser = laserWrappers.get(i);
+                    Vector3D ringedgePoint = ringEdgePoints.get(i);
+                    Vector3D nextRingEdgePoint = ringEdgePoints.get((i + 1) % ringEdgePoints.size());
+                    Vector3D v1 = getRingData().getRingMovementData().calculateMovement(zoomTime);
+
+                    laser.setStart(this.location.clone().add(Location.fromVector3D(ringedgePoint.add(v1).add(v))));
+                    laser.setEnd(this.location.clone().add(Location.fromVector3D(nextRingEdgePoint.add(v1).add(v))));
+                }
             }
         };
     }
 
     public void buildLasers() {
-        for(LaserWrapper laser : lasers) {
-            laser.stop();
+        for(List<LaserWrapper> laserWrappers : lasers.values()) {
+            for(LaserWrapper laserWrapper : laserWrappers) {
+                laserWrapper.stop();
+            }
         }
         lasers.clear();
-        List<Vector3D> ringEdgePoints = getRingData().calculateRingEdgePoints(this.location.toVector3D(), Math.toRadians(rotation));
-        for (int i = 0; i < getRingData().getRingCount(); i++) {
-            LaserWrapper laser;
-            Vector3D ringedgePoint = ringEdgePoints.get(i);
-            Vector3D nextRingEdgePoint = ringEdgePoints.get((i + 1) % ringEdgePoints.size());
-            laser = Nightclub.getLaserFactory().build(Location.fromVector3D(ringedgePoint),Location.fromVector3D(nextRingEdgePoint), -1, 256, lightType);
-            lasers.add(laser);
+        for (int ring = 0; ring < this.ringData.getRingCount(); ring++) {
+            List<Vector3D> ringEdgePoints = RingData.calculateRingEdgePoints(this.location.toVector3D(),
+                    Math.toRadians(rotation*(ring+1)), this.ringData.getRingLightCount(), this.ringData.getRingSize());
+            List<LaserWrapper> laserWrappers = new LinkedList<>();
+            for (int i = 0; i < ringData.getRingLightCount(); i++) {
+                Vector3D ringedgePoint = ringEdgePoints.get(i);
+                Vector3D nextRingEdgePoint = ringEdgePoints.get((i + 1) % ringEdgePoints.size());
+                LaserWrapper laser = Nightclub.getLaserFactory().build(Location.fromVector3D(ringedgePoint),Location.fromVector3D(nextRingEdgePoint), -1, 256, lightType);
+                laserWrappers.add(laser);
+            }
+            lasers.put(ring, laserWrappers);
         }
     }
 
     public void start() {
         stop();
-        for(LaserWrapper laser : lasers) {
-            laser.start();
+        for(List<LaserWrapper> laserWrappers : lasers.values()) {
+            for(LaserWrapper laserWrapper : laserWrappers) {
+                laserWrapper.start();
+            }
         }
         executorService = Executors.newScheduledThreadPool(1);
         executorService.scheduleAtFixedRate(run, 0, DELAY, java.util.concurrent.TimeUnit.MILLISECONDS);
@@ -98,18 +125,24 @@ public class Ring {
 
     public void stop() {
         executorService.shutdown();
-        for(LaserWrapper laser : lasers) {
-            laser.stop();
+        for(List<LaserWrapper> laserWrappers : lasers.values()) {
+            for(LaserWrapper laserWrapper : laserWrappers) {
+                laserWrapper.stop();
+            }
         }
     }
 
     public void spin() {
         // Replicates beat sabers ring system which is random, TODO: Implement chroma support of customizable ring direction
-        rotationTime = Math.min(random.nextBoolean() ? rotationTime + Math.sqrt(ringData.getRingRotation()) : rotationTime - Math.sqrt(ringData.getRingRotation()),45);
+        rotationTime = random.nextBoolean() ? rotationTime + Math.sqrt(ringData.getRingRotation()) : rotationTime - Math.sqrt(ringData.getRingRotation());
+        for(List<LaserWrapper> laserWrappers : lasers.values()) {
+            for(LaserWrapper laserWrapper : laserWrappers) {
+                laserWrapper.changeColor();
+            }
+        }
     }
 
     public void ringZoom() {
         isZoomed = !isZoomed;
-        zoomTime = isZoomed ? 1 : 0;
     }
 }

@@ -28,7 +28,7 @@ public class Location implements Cloneable {
         this.x = x.doubleValue();
         this.y = y.doubleValue();
         this.z = z.doubleValue();
-        this.pitch = pitch.doubleValue() % 90;
+        this.pitch = pitch.doubleValue();
         this.yaw = yaw.doubleValue() % 360;
     }
 

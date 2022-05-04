@@ -2,7 +2,6 @@ package exposed.hydrogen.nightclub.light;
 
 import com.google.gson.JsonArray;
 import exposed.hydrogen.nightclub.Nightclub;
-import exposed.hydrogen.nightclub.json.JSONUtils;
 import exposed.hydrogen.nightclub.light.data.*;
 import exposed.hydrogen.nightclub.light.event.LightChannel;
 import exposed.hydrogen.nightclub.light.event.LightSpeedChannel;
@@ -85,11 +84,17 @@ public class Light implements LightI {
 
         run = () -> {
             try {
-                if (isZoomed ? zoomTime > 0 : zoomTime < 1) {
+                if (isZoomed ? zoomTime < 1 : zoomTime > 0) {
                     double duration = getData().getRingMovementData().getDuration();
                     zoomTime = isZoomed ?
-                            zoomTime - duration >= 0 ? duration / 1000 / (DELAY / 10.0) : 1
-                            : zoomTime + duration <= 1 ? duration / 1000 / (DELAY / 10.0) : 1;
+                            zoomTime + duration / 1000 / (DELAY / 10.0)
+                            : zoomTime - duration / 1000 / (DELAY / 10.0);
+                }
+                if(zoomTime < 0 && !isZoomed) {
+                    zoomTime = 0;
+                }
+                if(zoomTime > 1 && isZoomed) {
+                    zoomTime = 1;
                 }
                 if (timeToFade > 0 && length > 0) {
                     timeToFade--;
@@ -145,7 +150,6 @@ public class Light implements LightI {
     }
 
     public void load() {
-        this.setData(JSONUtils.addNewDataIfNull(this.getData()));
         this.channel.removeListener(this);
         this.speedChannel.getChannel().removeSpeedListener(this);
         this.channel.addListener(this);
@@ -306,7 +310,6 @@ public class Light implements LightI {
     public void ringZoom() {
         if (!isLoaded) return;
         isZoomed = !isZoomed;
-        zoomTime = isZoomed ? 1 : 0;
         marker.setLocation(loc);
         marker.start(256);
     }
