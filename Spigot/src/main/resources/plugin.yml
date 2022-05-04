@@ -1,5 +1,5 @@
 name: Nightclub2.0
-version: '${project.version}'
+version: ${revision}
 main: exposed.hydrogen.nightclub.NightclubSpigot
 api-version: 1.18
 authors: [ hydrogen ]
