@@ -19,6 +19,10 @@ commands:
     description: beatmap player
     usage: /beatmap
     permission: nightclub.beatmap
+  ring:
+    description: ring builder + editor
+    usage: /ring
+    permission: nightclub.ring
 
 permissions:
   nightclub.light:

@@ -225,6 +225,7 @@ public class LightUniverseCommand extends BaseCommand {
             List<CommandError> errors = isUnloaded();
             try {
                 Nightclub.getLightUniverseManager().getLoadedUniverse().getLights().forEach(Light::ringZoom);
+                Nightclub.getLightUniverseManager().getLoadedUniverse().getRings().forEach(Ring::ringZoom);
             } catch (IllegalArgumentException e) {
                 errors.add(CommandError.INVALID_ARGUMENT);
             } catch (ArrayIndexOutOfBoundsException e) {

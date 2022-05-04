@@ -71,9 +71,9 @@ public class Ring {
             for (int ring = 0; ring < this.ringData.getRingCount(); ring++) {
                 // a (invisible) "ray" the size of length, pointing towards the set pitch and yaw
                 Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch()))
-                        .normalize().scalarMultiply((ring * this.ringData.getRingSpacing()) / (zoomTime+1));
+                        .normalize().scalarMultiply(((ring+1) * this.ringData.getRingSpacing()) / (zoomTime+1));
 
-                List<Vector3D> ringEdgePoints = RingData.calculateRingEdgePoints(this.location.toVector3D().add(v),
+                List<Vector3D> ringEdgePoints = RingData.calculateRingEdgePoints(v,
                         Math.toRadians(rotation*(this.ringData.getRingOffset()+ring)), this.ringData.getRingLightCount(), this.ringData.getRingSize());
 
                 List<LaserWrapper> laserWrappers = lasers.get(ring);
@@ -99,13 +99,23 @@ public class Ring {
         }
         lasers.clear();
         for (int ring = 0; ring < this.ringData.getRingCount(); ring++) {
-            List<Vector3D> ringEdgePoints = RingData.calculateRingEdgePoints(this.location.toVector3D(),
-                    Math.toRadians(rotation*(ring+1)), this.ringData.getRingLightCount(), this.ringData.getRingSize());
+            // a (invisible) "ray" the size of length, pointing towards the set pitch and yaw
+            Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch()))
+                    .normalize().scalarMultiply(((ring+1) * this.ringData.getRingSpacing()) / (zoomTime+1));
+
+            List<Vector3D> ringEdgePoints = RingData.calculateRingEdgePoints(v,
+                    Math.toRadians(rotation*(this.ringData.getRingOffset()+ring)), this.ringData.getRingLightCount(), this.ringData.getRingSize());
+
             List<LaserWrapper> laserWrappers = new LinkedList<>();
+
             for (int i = 0; i < ringData.getRingLightCount(); i++) {
                 Vector3D ringedgePoint = ringEdgePoints.get(i);
                 Vector3D nextRingEdgePoint = ringEdgePoints.get((i + 1) % ringEdgePoints.size());
-                LaserWrapper laser = Nightclub.getLaserFactory().build(Location.fromVector3D(ringedgePoint),Location.fromVector3D(nextRingEdgePoint), -1, 256, lightType);
+                Vector3D v1 = getRingData().getRingMovementData().calculateMovement(zoomTime);
+                LaserWrapper laser = Nightclub.getLaserFactory().build(
+                        this.location.clone().add(Location.fromVector3D(ringedgePoint.add(v1).add(v))),
+                        this.location.clone().add(Location.fromVector3D(nextRingEdgePoint.add(v1).add(v))),
+                        -1, 256, lightType);
                 laserWrappers.add(laser);
             }
             lasers.put(ring, laserWrappers);
