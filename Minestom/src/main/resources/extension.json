@@ -1,7 +1,7 @@
 {
   "entrypoint": "exposed.hydrogen.nightclub.NightclubMinestom",
   "name": "Nightclub",
-  "version": "2.2.0",
+  "version": "2.2.1",
 
   "repositories": [
     {"id": "mavencentral", "url": "https://repo.maven.apache.org/maven2/"}

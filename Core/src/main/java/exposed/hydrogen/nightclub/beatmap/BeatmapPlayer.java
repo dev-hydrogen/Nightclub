@@ -53,6 +53,7 @@ public class BeatmapPlayer {
         executorService = Executors.newScheduledThreadPool(1);
         playTo.forEach((player) -> player.playSound(player.getLocation(), name, 1, 1));
         isPlaying = true;
+        Nightclub.getLightUniverseManager().getLoadedUniverse().getRings().forEach(Ring::reset);
         Nightclub.getLightUniverseManager().getLoadedUniverse().getRings().forEach(Ring::start);
 
         //start all channels up and then turn them off to wait for beatmap instructions
@@ -68,6 +69,7 @@ public class BeatmapPlayer {
             isPlaying = false;
             channelList.forEach(LightChannel::terminatePlayback);
             Nightclub.getLightUniverseManager().getLoadedUniverse().getRings().forEach(Ring::stop);
+            Nightclub.getLightUniverseManager().getLoadedUniverse().getRings().forEach(Ring::reset);
         };
         executorService.schedule(task, events.get(events.size() - 1).getTime() + 5000000, TimeUnit.MICROSECONDS);
         Nightclub.getChameleon().getLogger().info(info.toString());
@@ -83,6 +85,8 @@ public class BeatmapPlayer {
         isPlaying = false;
         if (executorService != null) {
             executorService.shutdownNow();
+            Nightclub.getLightUniverseManager().getLoadedUniverse().getRings().forEach(Ring::stop);
+            Nightclub.getLightUniverseManager().getLoadedUniverse().getRings().forEach(Ring::reset);
         }
         playTo.forEach(player -> player.stopSound(name));
     }

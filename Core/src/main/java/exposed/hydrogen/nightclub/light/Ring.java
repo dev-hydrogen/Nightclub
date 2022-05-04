@@ -30,7 +30,7 @@ public class Ring {
     @Getter @Setter private transient double rotation = 0; // 0 to 360, degrees rotation
     private transient boolean isZoomed = false;
     private final transient Runnable run;
-    private final transient Random random = new Random();
+    private final transient Random random = new Random(56789);
 
     private Ring() {
         this(UUID.randomUUID(),"",new Location(),new RingData(),LightType.GUARDIAN_BEAM);
@@ -54,27 +54,29 @@ public class Ring {
             zoomTime = zoomTime < 0 && !isZoomed ? 0 : zoomTime;
             zoomTime = zoomTime > 1 && isZoomed ? 1 : zoomTime;
 
-            rotationTime = rotationTime > 45 ? 45 : rotationTime;
-            rotationTime = rotationTime < -45 ? -45 : rotationTime;
+            rotationTime = rotationTime > 360 ? 360 : rotationTime;
+            rotationTime = rotationTime < -360 ? -360 : rotationTime;
 
-            if (rotationTime < 0.5 && rotationTime > -0.5) {
+            if (rotationTime < 2 && rotationTime > -2) {
                 rotationTime = 0;
             }
             if(rotationTime > 0.5 || rotationTime < -0.5) {
-                rotationTime -= rotationTime/10;
+                rotationTime -= rotationTime/15;
             } else if(rotationTime < 0.5 && rotationTime > -0.5) {
-                rotationTime += rotationTime/10;
+                rotationTime += rotationTime/15;
             }
 
             rotation = rotation + rotationTime;
-            rotation = rotation % 360;
+            rotation = rotation % (360*this.ringData.getRingCount());
             for (int ring = 0; ring < this.ringData.getRingCount(); ring++) {
                 // a (invisible) "ray" the size of length, pointing towards the set pitch and yaw
                 Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch()))
                         .normalize().scalarMultiply(((ring+1) * this.ringData.getRingSpacing()) / (zoomTime+1));
 
+                double ringRotation = (rotation*(this.ringData.getRingOffset()+ring))/this.ringData.getRingCount();
+
                 List<Vector3D> ringEdgePoints = RingData.calculateRingEdgePoints(v,
-                        Math.toRadians(rotation*(this.ringData.getRingOffset()+ring)), this.ringData.getRingLightCount(), this.ringData.getRingSize());
+                        Math.toRadians(ringRotation), this.ringData.getRingLightCount(), this.ringData.getRingSize());
 
                 List<LaserWrapper> laserWrappers = lasers.get(ring);
 
@@ -140,6 +142,13 @@ public class Ring {
                 laserWrapper.stop();
             }
         }
+    }
+
+    public void reset() {
+        this.zoomTime = 0;
+        this.isZoomed = false;
+        this.rotation = 0;
+        this.rotationTime = 0;
     }
 
     public void spin() {
