@@ -7,6 +7,7 @@ import exposed.hydrogen.nightclub.light.Ring;
 import exposed.hydrogen.nightclub.light.event.LightChannel;
 import exposed.hydrogen.nightclub.util.CrossCompatPlayer;
 import lombok.Getter;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -59,12 +60,16 @@ public class BeatmapPlayer {
         //start all channels up and then turn them off to wait for beatmap instructions
         channelList.forEach(LightChannel::initializePlayback);
 
-        events.forEach((event) -> {
-            Runnable task = () -> handle(event, events);
+        for (int i = 0; i < events.size(); i++) {
+            LightEvent event = events.get(i);
+            List<LightEvent> filteredEvents = events.parallelStream().filter(e -> e.getType().equals(event.getType())).toList();
+            int nextIndex = filteredEvents.indexOf(event) + 1;
+            LightEvent nextEvent = nextIndex < filteredEvents.size() ? filteredEvents.get(nextIndex) : null;
+            Runnable task = () -> handle(event, nextEvent);
             executorService.schedule(task, event.getTime(), TimeUnit.MICROSECONDS);
-        });
+        }
 
-        //schedule turn off after the show is over
+        //schedule turn off 5s after the show is over
         Runnable task = () -> {
             isPlaying = false;
             channelList.forEach(LightChannel::terminatePlayback);
@@ -95,11 +100,12 @@ public class BeatmapPlayer {
      * https://bsmg.wiki/mapping/map-format.html
      * Internal handler of LightEvents.
      */
-    private void handle(LightEvent event, List<LightEvent> events) {
+    private void handle(LightEvent event, @Nullable LightEvent nextEvent) {
         // shorter way of handling events than using a switch case
         if (event.getType() >= 0 && event.getType() < 5) {
             Optional<LightChannel> channel = Arrays.stream(LightChannel.values()).filter((lc) -> event.getType() == lc.getType()).findFirst();
-            channel.ifPresent(lightChannel -> handleValue(lightChannel, event.getValue(), event.getColor(), event.getLightID()));
+            channel.ifPresent(lightChannel -> handleValue(lightChannel, event.getValue(), event.getColor(), event.getLightID(),
+                    nextEvent != null ? (int) (nextEvent.getTime() - event.getTime()) / 1000 : 500));
         } else switch (event.getType()) {
             // Ring spin
             case 8 -> Nightclub.getLightUniverseManager().getLoadedUniverse().getRings().forEach(Ring::spin);
@@ -116,12 +122,12 @@ public class BeatmapPlayer {
         }
     }
 
-    private void handleValue(LightChannel handler, int value, Color color, JsonArray lightIDs) {
+    private void handleValue(LightChannel handler, int value, Color color, JsonArray lightIDs, int duration) {
         switch (value) {
-            case 0 -> handler.off(color, lightIDs);
-            case 1, 5 -> handler.on(color, lightIDs);
-            case 2, 6 -> handler.flash(color, lightIDs);
-            case 3, 7 -> handler.flashOff(color, lightIDs);
+            case 0 -> handler.off(color, lightIDs,duration);
+            case 1, 5 -> handler.on(color, lightIDs,duration);
+            case 2, 6 -> handler.flash(color, lightIDs,duration);
+            case 3, 7 -> handler.flashOff(color, lightIDs,duration);
         }
     }
 }

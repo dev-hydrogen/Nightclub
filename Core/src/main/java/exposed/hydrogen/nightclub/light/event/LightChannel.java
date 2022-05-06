@@ -2,7 +2,6 @@ package exposed.hydrogen.nightclub.light.event;
 
 import com.google.gson.JsonArray;
 import exposed.hydrogen.nightclub.light.Light;
-import exposed.hydrogen.nightclub.light.LightI;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,8 +17,8 @@ public enum LightChannel {
     CENTER_LIGHTS(4);
 
     @Getter private final int type;
-    private final List<LightI> lights;
-    private final List<LightI> speedListeners;
+    private final List<Light> lights;
+    private final List<Light> speedListeners;
     @Getter private boolean debugOn;
 
     LightChannel(int type) {
@@ -30,76 +29,70 @@ public enum LightChannel {
 
     public void initializePlayback() {
         start();
-        off(new Color(0, 0, 0), null);
+        off(new Color(0, 0, 0), null,0);
         reset();
     }
 
     public void terminatePlayback() {
-        off(new Color(0, 0, 0), null);
+        off(new Color(0, 0, 0), null,0);
         stop();
         reset();
     }
 
     public void reset() {
         lights.forEach(light -> {
-            if (light instanceof Light) {
-                ((Light) light).setX(((Light) light).getData().getPatternData().getStartX());
-                ((Light) light).setX2(((Light) light).getData().getSecondPatternData().getStartX());
-                ((Light) light).setSpeed(1);
-            }
+            light.setX(light.getData().getPatternData().getStartX());
+            light.setX2(light.getData().getSecondPatternData().getStartX());
+            light.setSpeed(1);
         });
     }
 
-    public void addListener(LightI light) {
+    public void addListener(Light light) {
         lights.add(light);
     }
 
-    public void removeListener(LightI light) {
+    public void removeListener(Light light) {
         lights.remove(light);
     }
 
-    public void addSpeedListener(LightI light) {
+    public void addSpeedListener(Light light) {
         speedListeners.add(light);
     }
 
-    public void removeSpeedListener(LightI light) {
+    public void removeSpeedListener(Light light) {
         speedListeners.remove(light);
     }
 
-    public void on(Color color, @Nullable JsonArray lightIDs) {
-        lights.forEach(l -> l.on(color, lightIDs));
+    public void on(Color color, @Nullable JsonArray lightIDs, int duration) {
+        lights.forEach(l -> l.on(color, lightIDs,duration));
     }
 
-    public void off(Color color, @Nullable JsonArray lightIDs) {
-        lights.forEach(l -> l.off(color, lightIDs));
+    public void off(Color color, @Nullable JsonArray lightIDs, int duration) {
+        lights.forEach(l -> l.off(color, lightIDs,duration));
     }
 
-    public void flash(Color color, @Nullable JsonArray lightIDs) {
-        lights.forEach(l -> l.flash(color, lightIDs));
+    public void flash(Color color, @Nullable JsonArray lightIDs, int duration) {
+        lights.forEach(l -> l.flash(color, lightIDs,duration));
     }
 
-    public void flashOff(Color color, @Nullable JsonArray lightIDs) {
-        lights.forEach(l -> l.flashOff(color, lightIDs));
+    public void flashOff(Color color, @Nullable JsonArray lightIDs, int duration) {
+        lights.forEach(l -> l.flashOff(color, lightIDs,duration));
     }
 
     public void start() {
-        lights.forEach(LightI::start);
+        lights.forEach(Light::start);
     }
 
     public void stop() {
-        lights.forEach(LightI::stop);
+        lights.forEach(Light::stop);
     }
 
     public void setSpeed(double multiplier) {
         lights.forEach(l -> {
-            if (l instanceof Light) {
-                ((Light) l).setSpeed(multiplier);
-            }
+            l.setSpeed(multiplier);
         });
         speedListeners.forEach(l -> {
-            if (l instanceof Light) {
-                ((Light) l).setSpeed(multiplier);
-            }
+            l.setSpeed(multiplier);
         });
     }
 

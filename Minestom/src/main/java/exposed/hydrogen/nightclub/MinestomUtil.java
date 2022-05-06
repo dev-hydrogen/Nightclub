@@ -40,6 +40,6 @@ public class MinestomUtil implements CrossCompatUtil {
 
     public static Pos getMinestomPos(exposed.hydrogen.nightclub.util.Location location) {
         return new Pos(location.getX(), location.getY(), location.getZ(),
-                (float) -location.getPitch(), (float) location.getYaw() + 270);
+                (float) location.getYaw() + 270, (float) -location.getPitch());
     }
 }

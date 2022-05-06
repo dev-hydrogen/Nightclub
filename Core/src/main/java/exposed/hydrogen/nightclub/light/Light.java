@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.StreamSupport;
 
 @EqualsAndHashCode
-public class Light implements LightI {
+public class Light {
     private transient ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
     private static final transient int DELAY = 100; // run every x ms
     // annotations lol
@@ -41,10 +41,14 @@ public class Light implements LightI {
 
     private final transient List<LaserWrapper> lasers = new LinkedList<>();
     private transient double length = 0; // 0 to 100, percentage of maxLength.
+    private transient double lastLength = 0;
     private transient double zoomTime = 0; // 0 to 1, current zoom time. does nothing if <=0
     private transient Location loc; // current location
     @Getter @Setter private transient double x = 0; // 0 to 100, usually percentage of 360
     @Getter @Setter private transient double x2 = 0; // 0 to 100, usually percentage of 360, secondary pattern
+    @Getter private transient Color color; // current color
+    private transient int duration; // unused, but current duration
+    private transient int durationStart; // unused but unix time since last event
     private transient boolean isOn = false;
     private transient boolean isZoomed = false;
     private transient double multipliedSpeed; // speed, but when internally multiplied by events
@@ -108,9 +112,19 @@ public class Light implements LightI {
                 if (length > 100) {
                     length = 100.0;
                 }
+                if(multipliedSpeed == 0 && secondaryMultipliedSpeed == 0 && lastLength == length &&
+                        (isZoomed ? zoomTime >= 1 : zoomTime <= 0)) {
+                    // do nothing if no movement or zooming needs to be happening
+                    return;
+                }
                 x = (x + multipliedSpeed) % 100;
                 x2 = (x2 + secondaryMultipliedSpeed) % 100;
+                lastLength = length;
 
+                // a (invisible) "ray", pointing towards the set pitch and yaw, length is set later
+                Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize();
+                // make v the size of length
+                Vector3D v1 = v.scalarMultiply(getMaxLengthPercent());
                 for (int i = 0; i < lasers.size(); i++) {
                     LaserWrapper laser = lasers.get(i);
                     /*
@@ -120,17 +134,16 @@ public class Light implements LightI {
                     */
                     // x position evenly separated for each laser
                     double separated = x + (100.0 / lasers.size()) * i;
-                    // a (invisible) "ray" the size of length, pointing towards the set pitch and yaw
-                    Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize().scalarMultiply(getMaxLengthPercent());
+
                     // rotation for first and second patterns, determines "start position" when pattern is a circle
-                    Rotation r = new Rotation(v, this.data.getPatternData().getRotation(), RotationConvention.FRAME_TRANSFORM);
-                    Rotation r2 = new Rotation(v, this.data.getSecondPatternData().getRotation(), RotationConvention.FRAME_TRANSFORM);
+                    Rotation r = new Rotation(v1, this.data.getPatternData().getRotation(), RotationConvention.FRAME_TRANSFORM);
+                    Rotation r2 = new Rotation(v1, this.data.getSecondPatternData().getRotation(), RotationConvention.FRAME_TRANSFORM);
                     // apply first pattern (separated evenly for each laser) to our ray
-                    Vector3D v2 = this.data.getPatternData().getPattern().apply(v, separated, r, this.data.getPatternData().getPatternSizeMultiplier() * (length / 100));
+                    Vector3D v2 = this.data.getPatternData().getPattern().apply(v1, separated, r, this.data.getPatternData().getPatternSizeMultiplier() * (length / 100));
                     // then apply second pattern to all lasers with the same x value
-                    Vector3D v3 = this.data.getSecondPatternData().getPattern().apply(v, x2, r2, this.data.getSecondPatternData().getPatternSizeMultiplier() * (length / 100));
+                    Vector3D v3 = this.data.getSecondPatternData().getPattern().apply(v1, x2, r2, this.data.getSecondPatternData().getPatternSizeMultiplier() * (length / 100));
                     Vector3D v4 = getData().getRingMovementData().calculateMovement(zoomTime);
-                    Vector3D v5 = v.add(v4).add(v3).add(v2);
+                    Vector3D v5 = v1.add(v4).add(v3).add(v2);
 
                     Location result = this.location.clone().add(v5.getX(), v5.getZ(), v5.getY());
                     Location startResult = this.location.clone().add(v4.getX(), v4.getZ(), v4.getY());
@@ -223,7 +236,7 @@ public class Light implements LightI {
     /**
      * Turns Light on, sets length to onLength and sets timeToFade to 0
      */
-    public void on(Color color, @Nullable JsonArray lightIDs) {
+    public void on(Color color, @Nullable JsonArray lightIDs, int duration) {
         if (!isLoaded) return;
         // check if light event is referencing any light ids in the lightid list
         if (lightIDs != null && !data.getLightIDs().isEmpty() && StreamSupport.stream(lightIDs.spliterator(), true).noneMatch(id -> data.getLightIDs().contains(id.getAsInt())))
@@ -235,19 +248,23 @@ public class Light implements LightI {
         length = Math.max(data.getOnLength() * (color.getAlpha() / 255.0), 0.05);
         isOn = true;
         timeToFade = 0;
+        this.color = color;
+        this.duration = duration + 2;
+        this.durationStart = (int) System.currentTimeMillis();
         marker.setLocation(loc);
-        marker.setColor(color);
+        marker.setColor(this.color);
+        marker.setDuration(this.duration);
         marker.start(256);
     }
 
     public void on(Color color) {
-        on(color, null);
+        on(color, null,0);
     }
 
     /**
      * Turns Light off, sets length to 0.1 and sets timeToFade to 0
      */
-    public void off(Color color, @Nullable JsonArray lightIDs) {
+    public void off(Color color, @Nullable JsonArray lightIDs, int duration) {
         if (!isLoaded) return;
         // check if light event is referencing any light ids in the lightid list
         if (lightIDs != null && !data.getLightIDs().isEmpty() && StreamSupport.stream(lightIDs.spliterator(), true).noneMatch(id -> data.getLightIDs().contains(id.getAsInt())))
@@ -259,13 +276,13 @@ public class Light implements LightI {
     }
 
     public void off(Color color) {
-        off(color, null);
+        off(color, null,0);
     }
 
     /**
      * Flashes light in a similar way to beat saber, simulating brightness with a longer beam
      */
-    public void flash(Color color, @Nullable JsonArray lightIDs) {
+    public void flash(Color color, @Nullable JsonArray lightIDs, int duration) {
         if (!isLoaded) return;
         // check if light event is referencing any light ids in the lightid list
         if (lightIDs != null && !data.getLightIDs().isEmpty() && StreamSupport.stream(lightIDs.spliterator(), true).noneMatch(id -> data.getLightIDs().contains(id.getAsInt())))
@@ -275,8 +292,12 @@ public class Light implements LightI {
             length += (100 - data.getOnLength()) / 3;
             timeToFade += 3;
             lasers.forEach(LaserWrapper::changeColor);
+            this.color = color;
+            this.duration = duration + 2;
+            this.durationStart = (int) System.currentTimeMillis();
+            marker.setDuration(this.duration);
             marker.setLocation(loc);
-            marker.setColor(color);
+            marker.setColor(this.color);
             marker.start(256);
         } else {
             flashOff(color);
@@ -284,27 +305,31 @@ public class Light implements LightI {
     }
 
     public void flash(Color color) {
-        flash(color, null);
+        flash(color, null,0);
     }
 
     /**
      * Flashes light in a similar way to beat saber, simulating brightness with a longer beam and then fades to black
      */
-    public void flashOff(Color color, @Nullable JsonArray lightIDs) {
+    public void flashOff(Color color, @Nullable JsonArray lightIDs, int duration) {
         if (!isLoaded) return;
         // check if light event is referencing any light ids in the lightid list
         if (lightIDs != null && !data.getLightIDs().isEmpty() && StreamSupport.stream(lightIDs.spliterator(), true).noneMatch(id -> data.getLightIDs().contains(id.getAsInt())))
             return;
         on(color);
         flash(color);
+        this.color = color;
+        this.duration = duration + 2;
+        this.durationStart = (int) System.currentTimeMillis();
         marker.setLocation(loc);
-        marker.setColor(color);
+        marker.setDuration(this.duration);
+        marker.setColor(this.color);
         marker.start(256);
         timeToFade = data.getTimeToFadeToBlack();
     }
 
     public void flashOff(Color color) {
-        flashOff(color, null);
+        flashOff(color, null,0);
     }
 
     public void ringZoom() {
@@ -359,8 +384,8 @@ public class Light implements LightI {
             x2 = data.getSecondPatternData().getStartX() * 1.2 + 10;
         }
         if (this.multipliedSpeed == data.getPatternData().getSpeed() * multiplier) { // laser "reset"
-            x = (x + 12) % 100;
-            x2 = (x2 + 12) % 100;
+            x = (x + 18) % 100;
+            x2 = (x2 + 18) % 100;
         }
         if (multiplier == 0) {
             x = data.getPatternData().getStartX();

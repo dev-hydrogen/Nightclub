@@ -10,8 +10,6 @@ import org.jetbrains.annotations.NotNull;
 
 public class LaserTranslator extends LaserWrapper {
     @Getter private Laser laser;
-
-
     public LaserTranslator(Location start, Location end, Integer duration, Integer distance, LightType type) {
         super(start, end, duration, distance, type);
         try {
@@ -37,6 +35,9 @@ public class LaserTranslator extends LaserWrapper {
     }
 
     public void setStart(@NotNull Location start) {
+        if(start.equals(this.start)) {
+            return;
+        }
         this.start = start;
         try {
             laser.moveStart(SpigotUtil.getBukkitLocation(start));
@@ -46,6 +47,9 @@ public class LaserTranslator extends LaserWrapper {
     }
 
     public void setEnd(@NotNull Location end) {
+        if(end.equals(this.end)) {
+            return;
+        }
         this.end = end;
         try {
             laser.moveEnd(SpigotUtil.getBukkitLocation(end));

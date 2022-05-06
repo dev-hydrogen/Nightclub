@@ -153,7 +153,7 @@ public class LightUniverseCommand extends BaseCommand {
         public static void onTurnOn(CommandIssuer sender, String[] args) {
             List<CommandError> errors = isUnloaded(args, 1);
             try {
-                LightChannel.valueOf(args[0]).on(new Color(0x0066ff), null);
+                LightChannel.valueOf(args[0]).on(new Color(0x0066ff), null,0);
             } catch (IllegalArgumentException e) {
                 errors.add(CommandError.INVALID_ARGUMENT);
             } catch (ArrayIndexOutOfBoundsException e) {
@@ -171,7 +171,7 @@ public class LightUniverseCommand extends BaseCommand {
         public static void onTurnOff(CommandIssuer sender, String[] args) {
             List<CommandError> errors = isUnloaded(args, 1);
             try {
-                LightChannel.valueOf(args[0]).off(new Color(0x0066ff), null);
+                LightChannel.valueOf(args[0]).off(new Color(0x0066ff), null,0);
             } catch (IllegalArgumentException e) {
                 errors.add(CommandError.INVALID_ARGUMENT);
             } catch (ArrayIndexOutOfBoundsException e) {
@@ -189,7 +189,7 @@ public class LightUniverseCommand extends BaseCommand {
         public static void onFlash(CommandIssuer sender, String[] args) {
             List<CommandError> errors = isUnloaded(args, 1);
             try {
-                LightChannel.valueOf(args[0]).flash(new Color(0x0066ff), null);
+                LightChannel.valueOf(args[0]).flash(new Color(0x0066ff), null,0);
             } catch (IllegalArgumentException e) {
                 errors.add(CommandError.INVALID_ARGUMENT);
             } catch (ArrayIndexOutOfBoundsException e) {
@@ -207,7 +207,7 @@ public class LightUniverseCommand extends BaseCommand {
         public static void onFlashOff(CommandIssuer sender, String[] args) {
             List<CommandError> errors = isUnloaded(args, 1);
             try {
-                LightChannel.valueOf(args[0]).flashOff(new Color(0x0066ff), null);
+                LightChannel.valueOf(args[0]).flashOff(new Color(0x0066ff), null,0);
             } catch (IllegalArgumentException e) {
                 errors.add(CommandError.INVALID_ARGUMENT);
             } catch (ArrayIndexOutOfBoundsException e) {

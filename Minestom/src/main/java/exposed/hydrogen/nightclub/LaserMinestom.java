@@ -56,6 +56,9 @@ public class LaserMinestom extends LaserWrapper {
 
     @Override
     public void setStart(@NotNull Location start) {
+        if(start.equals(this.start)) {
+            return;
+        }
         this.start = start;
         if(type == LightType.GUARDIAN_BEAM) {
             guardian.teleport(MinestomUtil.getMinestomPos(this.start));
@@ -66,6 +69,9 @@ public class LaserMinestom extends LaserWrapper {
 
     @Override
     public void setEnd(@NotNull Location end) {
+        if(end.equals(this.end)) {
+            return;
+        }
         this.end = end;
         if(type == LightType.GUARDIAN_BEAM) {
             squid.teleport(MinestomUtil.getMinestomPos(this.end));

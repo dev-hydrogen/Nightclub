@@ -31,6 +31,7 @@ public class Ring {
     private transient boolean isZoomed = false;
     private final transient Runnable run;
     private final transient Random random = new Random(56789);
+    private transient boolean isBuilt;
 
     private Ring() {
         this(UUID.randomUUID(),"",new Location(),new RingData(),LightType.GUARDIAN_BEAM);
@@ -54,18 +55,25 @@ public class Ring {
             zoomTime = zoomTime < 0 && !isZoomed ? 0 : zoomTime;
             zoomTime = zoomTime > 1 && isZoomed ? 1 : zoomTime;
 
-            rotationTime = rotationTime > 360 ? 360 : rotationTime;
-            rotationTime = rotationTime < -360 ? -360 : rotationTime;
+            if(rotationTime == 0 && (isZoomed ? zoomTime >= 1 : zoomTime <= 0)) {
+                // do nothing if no rotation or zooming needs to be happening
+                return;
+            }
+            rotationTime = rotationTime > 120 ? 120 : rotationTime;
+            rotationTime = rotationTime < -120 ? -120 : rotationTime;
+
+            // if rotation time is more than 2, then we need to slow down rotation until its 0
+            // if rotation time is less than -2, then we need to speed up rotation until it is 0
+            if (rotationTime > 2) {
+                rotationTime -= (rotationTime/15)+1;
+            }
+            if (rotationTime < -2) {
+                rotationTime += (-rotationTime/15)+1;
+            }
 
             if (rotationTime < 2 && rotationTime > -2) {
                 rotationTime = 0;
             }
-            if(rotationTime > 0.5 || rotationTime < -0.5) {
-                rotationTime -= rotationTime/15;
-            } else if(rotationTime < 0.5 && rotationTime > -0.5) {
-                rotationTime += rotationTime/15;
-            }
-
             rotation = rotation + rotationTime;
             rotation = rotation % (360*this.ringData.getRingCount());
             for (int ring = 0; ring < this.ringData.getRingCount(); ring++) {
@@ -98,6 +106,7 @@ public class Ring {
             for(LaserWrapper laserWrapper : laserWrappers) {
                 laserWrapper.stop();
             }
+            laserWrappers.clear();
         }
         lasers.clear();
         for (int ring = 0; ring < this.ringData.getRingCount(); ring++) {
@@ -105,8 +114,10 @@ public class Ring {
             Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch()))
                     .normalize().scalarMultiply(((ring+1) * this.ringData.getRingSpacing()) / (zoomTime+1));
 
+            double ringRotation = (rotation*(this.ringData.getRingOffset()+ring))/this.ringData.getRingCount();
+
             List<Vector3D> ringEdgePoints = RingData.calculateRingEdgePoints(v,
-                    Math.toRadians(rotation*(this.ringData.getRingOffset()+ring)), this.ringData.getRingLightCount(), this.ringData.getRingSize());
+                    Math.toRadians(ringRotation), this.ringData.getRingLightCount(), this.ringData.getRingSize());
 
             List<LaserWrapper> laserWrappers = new LinkedList<>();
 
@@ -122,6 +133,10 @@ public class Ring {
             }
             lasers.put(ring, laserWrappers);
         }
+        isZoomed = true;
+        run.run();
+        isZoomed = false;
+        isBuilt = true;
     }
 
     public void start() {
@@ -146,14 +161,17 @@ public class Ring {
 
     public void reset() {
         this.zoomTime = 0;
-        this.isZoomed = false;
         this.rotation = 0;
         this.rotationTime = 0;
+        this.isZoomed = true;
+        run.run();
+        this.isZoomed = false;
     }
 
     public void spin() {
         // Replicates beat sabers ring system which is random, TODO: Implement chroma support of customizable ring direction
-        rotationTime = random.nextBoolean() ? rotationTime + Math.sqrt(ringData.getRingRotation()) : rotationTime - Math.sqrt(ringData.getRingRotation());
+        rotationTime = random.nextBoolean() ? rotationTime + ringData.getRingRotation() + Math.abs(rotation/getRingData().getRingCount())
+                : rotationTime - ringData.getRingRotation() - Math.abs(rotation/getRingData().getRingCount());
         for(List<LaserWrapper> laserWrappers : lasers.values()) {
             for(LaserWrapper laserWrapper : laserWrappers) {
                 laserWrapper.changeColor();
