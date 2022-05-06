@@ -2,7 +2,6 @@ package exposed.hydrogen.nightclub;
 
 import exposed.hydrogen.nightclub.util.CrossCompatPlayer;
 import exposed.hydrogen.nightclub.util.Location;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public record SpigotPlayer(Player player) implements CrossCompatPlayer {
@@ -15,7 +14,7 @@ public record SpigotPlayer(Player player) implements CrossCompatPlayer {
 
     @Override
     public void playSound(Location location, String sound, float volume, float pitch) {
-        player.playSound(new org.bukkit.Location(Bukkit.getWorlds().get(0), location.getX(), location.getY(), location.getZ()), sound, volume, pitch);
+        player.playSound(SpigotUtil.getBukkitLocation(location), sound, volume, pitch);
     }
 
     @Override

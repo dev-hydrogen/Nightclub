@@ -96,11 +96,12 @@ public class BeatmapParser {
         }
 
         return InfoData.builder()
-                .bpm(info.get("_beatsPerMinute").getAsNumber())
-                .author(info.get("_songAuthorName").getAsString())
-                .song(info.get("_songName").getAsString())
-                .mapper(info.get("_levelAuthorName").getAsString())
+                .beatsPerMinute(info.get("_beatsPerMinute").getAsNumber())
+                .songAuthorName(info.get("_songAuthorName").getAsString())
+                .songName(info.get("_songName").getAsString())
+                .mapperName(info.get("_levelAuthorName").getAsString())
                 .songSubName(info.get("_songSubName").getAsString())
+                .songFileName(info.get("_songFilename").getAsString())
                 .beatmapFileName(filename)
                 .isChroma(useChroma || isChroma)
                 .primaryColor(primaryColor)

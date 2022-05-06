@@ -23,21 +23,19 @@ public class BeatmapPlayer {
     private List<CrossCompatPlayer> playTo;
     private final InfoData info;
     private final String name;
+    private final String sound;
     private ScheduledExecutorService executorService;
     @Getter private boolean isPlaying;
-
-    public BeatmapPlayer(String name) {
-        this(name, false);
-    }
 
     /**
      * Constructor that defines a new Beatmap you can play from.
      *
      * @param name name of the folder the beatmap itself resides in (/name/ExpertPlus.dat)
      */
-    public BeatmapPlayer(String name, boolean useChroma) {
+    public BeatmapPlayer(String sound, String name, boolean useChroma) {
         info = BeatmapParser.getInfoData(name, useChroma);
         events = BeatmapParser.getEvents(name, useChroma);
+        this.sound = sound;
         this.name = name;
         playTo = new ArrayList<>();
     }
@@ -52,7 +50,7 @@ public class BeatmapPlayer {
         List<LightChannel> channelList = Arrays.asList(LightChannel.values());
         this.playTo = playTo;
         executorService = Executors.newScheduledThreadPool(1);
-        playTo.forEach((player) -> player.playSound(player.getLocation(), name, 1, 1));
+        playTo.forEach((player) -> player.playSound(player.getLocation(), sound, 1, 1));
         isPlaying = true;
         Nightclub.getLightUniverseManager().getLoadedUniverse().getRings().forEach(Ring::reset);
         Nightclub.getLightUniverseManager().getLoadedUniverse().getRings().forEach(Ring::start);
@@ -93,7 +91,7 @@ public class BeatmapPlayer {
             Nightclub.getLightUniverseManager().getLoadedUniverse().getRings().forEach(Ring::stop);
             Nightclub.getLightUniverseManager().getLoadedUniverse().getRings().forEach(Ring::reset);
         }
-        playTo.forEach(player -> player.stopSound(name));
+        playTo.forEach(player -> player.stopSound(sound));
     }
 
     /**

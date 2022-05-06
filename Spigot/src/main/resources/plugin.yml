@@ -1,10 +1,10 @@
 name: Nightclub2.0
-version: ${revision}
+version: 2.3.0
 main: exposed.hydrogen.nightclub.NightclubSpigot
 api-version: 1.18
 authors: [ hydrogen ]
 description: Nightclub 2.0
-depend: [ ProtocolLib ]
+depend: [ ProtocolLib, Resources ]
 
 commands:
   light:

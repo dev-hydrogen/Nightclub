@@ -4,10 +4,11 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandIssuer;
 import co.aikar.commands.annotation.*;
 import exposed.hydrogen.nightclub.Nightclub;
+import exposed.hydrogen.nightclub.beatmap.BeatmapParser;
 import exposed.hydrogen.nightclub.beatmap.BeatmapPlayer;
-import exposed.hydrogen.nightclub.beatmap.InfoData;
 import exposed.hydrogen.nightclub.util.Util;
 import lombok.Getter;
+import team.unnamed.creative.sound.Sound;
 
 import java.io.File;
 import java.util.List;
@@ -35,8 +36,12 @@ public class BeatmapCommand extends BaseCommand {
             sender.sendMessage(Util.formatErrors(errors));
             return;
         }
-        player = new BeatmapPlayer(args[0], args.length >= 2 && Boolean.parseBoolean(args[1]));
-        InfoData info = player.play(Nightclub.getCrossCompatUtil().getListOfPlayers());
+        var info = BeatmapParser.getInfoData(args[0], true);
+        var sounds = Util.getSounds(new File(Nightclub.DATA_FOLDER.getAbsolutePath()));
+        var sound = (Sound.File) sounds.get(info).values().toArray()[0];
+        player = new BeatmapPlayer(sound.key().asString(), args[0], args.length >= 2 && Boolean.parseBoolean(args[1]));
+
+        player.play(Nightclub.getCrossCompatUtil().getListOfPlayers());
         String playBackMessage = "\u00A76" + "Now Playing: " + "\u00A7b" + info.getSongAuthorName() + " - " + info.getSongName() + " " + info.getSongSubName() + System.lineSeparator()
                 + "\u00A76" + "Mapped by: " + "\u00A7b" + info.getMapperName();
         sender.sendMessage(playBackMessage);
