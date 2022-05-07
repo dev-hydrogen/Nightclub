@@ -13,6 +13,8 @@
 ![nightclub3](https://user-images.githubusercontent.com/96733109/165861224-12d4419a-76e8-44c3-8403-7e643768a061.png)
 
 # Please view the new [WIKI](https://github.com/dev-hydrogen/Nightclub/wiki) for set-up instructions!
+# Please view the new [WIKI](https://github.com/dev-hydrogen/Nightclub/wiki) for set-up instructions!
+# Please view the new [WIKI](https://github.com/dev-hydrogen/Nightclub/wiki) for set-up instructions!
 
 Music visualiser *plugin* for vanilla minecraft which uses beat saber beatmaps (including chroma support!) for various visuals as well as a resource pack for streaming music for players
 
