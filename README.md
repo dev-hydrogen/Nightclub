@@ -12,6 +12,7 @@
 
 ![nightclub3](https://user-images.githubusercontent.com/96733109/165861224-12d4419a-76e8-44c3-8403-7e643768a061.png)
 
+# Please view the new [WIKI](https://github.com/dev-hydrogen/Nightclub/wiki) for set-up instructions!
 
 Music visualiser *plugin* for vanilla minecraft which uses beat saber beatmaps (including chroma support!) for various visuals as well as a resource pack for streaming music for players
 
@@ -21,7 +22,7 @@ https://youtu.be/ry3sRaytVd0
 
 https://youtu.be/ZyP_koyStgc
 
-# SETUP
+# Old setup instructions
 
 
 IMPORTANT: Server resource packs only support packs up to 250mb in size as of 1.18.1!! If you want to have a resource pack with more than 250mb of music files, you will have to convince all the players on your server to download and apply a resource pack seperately!
