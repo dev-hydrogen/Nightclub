@@ -18,9 +18,9 @@ Music visualiser *plugin* for vanilla minecraft which uses beat saber beatmaps (
 
 Showcase videos: 
 
-![https://youtu.be/ry3sRaytVd0](https://youtu.be/ry3sRaytVd0)
+[![Video 1](https://img.youtube.com/vi/dz9uMqrcbec/0.jpg)](https://youtu.be/ry3sRaytVd0)
 
-![https://youtu.be/ZyP_koyStgc](https://youtu.be/ZyP_koyStgc)
+[![Video 2](https://img.youtube.com/vi/U-vX8qi9YqA/0.jpg)](https://youtu.be/ZyP_koyStgc)
 
 # Dependencies
 
