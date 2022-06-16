@@ -8,6 +8,7 @@ import exposed.hydrogen.nightclub.commands.CommandError;
 import exposed.hydrogen.nightclub.light.Light;
 import exposed.hydrogen.nightclub.light.LightUniverse;
 import exposed.hydrogen.nightclub.light.Ring;
+import exposed.hydrogen.resources.CustomResource;
 import exposed.hydrogen.resources.ResourcePackHandler;
 import exposed.hydrogen.resources.Resources;
 import net.kyori.adventure.key.Key;
@@ -24,6 +25,23 @@ import java.util.List;
 import java.util.*;
 
 public class Util {
+    private static List<String> resources = List.of(
+            "assets/minecraft/textures/entity/guardian.png",
+            "assets/minecraft/textures/entity/guardian_beam.png",
+            "assets/minecraft/textures/entity/squid/squid.png",
+            "assets/minecraft/textures/entity/enderdragon/dragon.png",
+            "assets/minecraft/textures/entity/enderdragon/dragon_exploding.png",
+            "assets/minecraft/textures/entity/enderdragon/dragon_eyes.png",
+            "assets/minecraft/textures/entity/end_crystal/end_crystal.png",
+            "assets/minecraft/textures/entity/end_crystal/end_crystal_beam.png",
+            "assets/minecraft/textures/particle/bubble.png"
+    );
+    private static List<String> shaders = List.of(
+            "assets/minecraft/shaders/core/position_color.fsh",
+            "assets/minecraft/shaders/core/position_color.vsh",
+            "assets/minecraft/shaders/core/position_color.json"
+    );
+
     public static double getDegreesFromPercentage(double percentage) {
         return 360 * percentage / 100;
     }
@@ -146,6 +164,14 @@ public class Util {
                 var soundRegistry = Nightclub.getSoundRegistry();
 
                 ResourcePackHandler resourcePackHandler = Resources.getResourcePackHandler();
+                if(Nightclub.getConfig().getBoolean("addDebugMarkerShader")) {
+                    shaders.forEach(resource -> resourcePackHandler.addCustomResource(
+                            new CustomResource(resource, Writable.resource(Nightclub.getInstance().getClass().getClassLoader(), resource))));
+                }
+                if(Nightclub.getConfig().getBoolean("addTextures")) {
+                    resources.forEach(resource -> resourcePackHandler.addCustomResource(
+                            new CustomResource(resource, Writable.resource(Nightclub.getInstance().getClass().getClassLoader(), resource))));
+                }
 
                 resourcePackHandler.addResources(Util.getSoundFiles(new File(Nightclub.DATA_FOLDER.getAbsolutePath())), false);
                 resourcePackHandler.addCredit("Nightclub - Hydrogen");

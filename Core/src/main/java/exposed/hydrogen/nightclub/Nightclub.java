@@ -7,6 +7,7 @@ import com.google.gson.GsonBuilder;
 import dev.hypera.chameleon.core.Chameleon;
 import dev.hypera.chameleon.core.ChameleonPlugin;
 import dev.hypera.chameleon.core.data.PluginData;
+import dev.hypera.chameleon.features.configuration.impl.YamlConfiguration;
 import exposed.hydrogen.nightclub.commands.BeatmapCommand;
 import exposed.hydrogen.nightclub.commands.LightCommand;
 import exposed.hydrogen.nightclub.commands.LightUniverseCommand;
@@ -53,6 +54,7 @@ public final class Nightclub extends ChameleonPlugin {
     @Getter private static LightUniverseManager lightUniverseManager;
     @Getter private static final PluginData pluginData;
     @Getter private static SoundRegistry soundRegistry;
+    @Getter @NotNull private static YamlConfiguration config;
     @Getter @Setter private static CrossCompatUtil crossCompatUtil;
     @Getter @Setter private static DebugMarkerFactory<? extends DebugMarkerWrapper> markerFactory;
     @Getter @Setter private static LaserFactory<? extends LaserWrapper> laserFactory;
@@ -75,7 +77,7 @@ public final class Nightclub extends ChameleonPlugin {
 
         DATA_FOLDER.mkdir();
         JSONUtils.LIGHT_JSON.createNewFile();
-
+        config = new YamlConfiguration(chameleon.getDataFolder(),"config.yml",true);
         instance = this;
         JSONreader = new LightJSONReader(GSON);
         JSONwriter = new LightJSONWriter(GSON);
