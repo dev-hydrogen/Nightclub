@@ -1,6 +1,7 @@
 package exposed.hydrogen.nightclub.light.event;
 
 import com.google.gson.JsonArray;
+import exposed.hydrogen.nightclub.beatmap.GradientEvent;
 import exposed.hydrogen.nightclub.light.Light;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
@@ -29,12 +30,12 @@ public enum LightChannel {
 
     public void initializePlayback() {
         start();
-        off(new Color(0, 0, 0), null,0);
+        off(new Color(0, 0, 0), null,0,null);
         reset();
     }
 
     public void terminatePlayback() {
-        off(new Color(0, 0, 0), null,0);
+        off(new Color(0, 0, 0), null,0,null);
         stop();
         reset();
     }
@@ -63,20 +64,20 @@ public enum LightChannel {
         speedListeners.remove(light);
     }
 
-    public void on(Color color, @Nullable JsonArray lightIDs, int duration) {
-        lights.forEach(l -> l.on(color, lightIDs,duration));
+    public void on(Color color, @Nullable JsonArray lightIDs, int duration, @Nullable GradientEvent gradientEvent) {
+        lights.forEach(l -> l.on(color, lightIDs,duration,gradientEvent));
     }
 
-    public void off(Color color, @Nullable JsonArray lightIDs, int duration) {
-        lights.forEach(l -> l.off(color, lightIDs,duration));
+    public void off(Color color, @Nullable JsonArray lightIDs, int duration, @Nullable GradientEvent gradientEvent) {
+        lights.forEach(l -> l.off(color, lightIDs,duration,gradientEvent));
     }
 
-    public void flash(Color color, @Nullable JsonArray lightIDs, int duration) {
-        lights.forEach(l -> l.flash(color, lightIDs,duration));
+    public void flash(Color color, @Nullable JsonArray lightIDs, int duration, @Nullable GradientEvent gradientEvent) {
+        lights.forEach(l -> l.flash(color, lightIDs,duration,gradientEvent));
     }
 
-    public void flashOff(Color color, @Nullable JsonArray lightIDs, int duration) {
-        lights.forEach(l -> l.flashOff(color, lightIDs,duration));
+    public void flashOff(Color color, @Nullable JsonArray lightIDs, int duration, @Nullable GradientEvent gradientEvent) {
+        lights.forEach(l -> l.flashOff(color, lightIDs,duration,gradientEvent));
     }
 
     public void start() {

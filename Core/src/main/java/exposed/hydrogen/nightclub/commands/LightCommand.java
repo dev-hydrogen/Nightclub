@@ -7,10 +7,7 @@ import exposed.hydrogen.nightclub.Nightclub;
 import exposed.hydrogen.nightclub.light.Light;
 import exposed.hydrogen.nightclub.light.LightUniverse;
 import exposed.hydrogen.nightclub.light.LightUniverseManager;
-import exposed.hydrogen.nightclub.light.data.LightData;
-import exposed.hydrogen.nightclub.light.data.LightPattern;
-import exposed.hydrogen.nightclub.light.data.LightPatternData;
-import exposed.hydrogen.nightclub.light.data.LightType;
+import exposed.hydrogen.nightclub.light.data.*;
 import exposed.hydrogen.nightclub.light.event.LightChannel;
 import exposed.hydrogen.nightclub.light.event.LightSpeedChannel;
 import exposed.hydrogen.nightclub.util.CrossCompatPlayer;
@@ -31,6 +28,7 @@ public class LightCommand extends BaseCommand {
     @Getter private static Light light;
 
     private static List<CommandError> isUnloaded() {
+        Nightclub.getLightUniverseManager().save();
         List<CommandError> errors = new ArrayList<>();
         errors.add(light == null ? CommandError.LIGHT_UNLOADED : CommandError.VALID);
         errors.add(Nightclub.getLightUniverseManager().getLoadedUniverse() == null ? CommandError.LIGHTUNIVERSE_UNLOADED : CommandError.VALID);
@@ -61,6 +59,7 @@ public class LightCommand extends BaseCommand {
         LightData data = LightData.builder()
                 .patternData(new LightPatternData(LightPattern.LINE, 0.3, 5, 0, 0))
                 .secondPatternData(new LightPatternData(LightPattern.LINE, 0.2, 3, 0, 0))
+                .ringMovementData(new RingMovementData(player.getLocation(),0,0))
                 .lightIDs(new ArrayList<>())
                 .maxLength(15)
                 .onLength(80)

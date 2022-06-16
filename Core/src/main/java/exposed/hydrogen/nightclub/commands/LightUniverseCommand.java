@@ -26,6 +26,7 @@ public class LightUniverseCommand extends BaseCommand {
     private static final boolean debugMode = false;
 
     static List<CommandError> isUnloaded() {
+        Nightclub.getLightUniverseManager().save();
         List<CommandError> errors = new ArrayList<>();
         errors.add(Nightclub.getLightUniverseManager().getLoadedUniverse() == null ? CommandError.LIGHTUNIVERSE_UNLOADED : CommandError.VALID);
         errors.add(BeatmapCommand.getPlayer() != null && BeatmapCommand.getPlayer().isPlaying() ? CommandError.BEATMAP_PLAYING : CommandError.VALID);
@@ -153,7 +154,7 @@ public class LightUniverseCommand extends BaseCommand {
         public static void onTurnOn(CommandIssuer sender, String[] args) {
             List<CommandError> errors = isUnloaded(args, 1);
             try {
-                LightChannel.valueOf(args[0]).on(new Color(0x0066ff), null,0);
+                LightChannel.valueOf(args[0]).on(new Color(0x0066ff), null,0,null);
             } catch (IllegalArgumentException e) {
                 errors.add(CommandError.INVALID_ARGUMENT);
             } catch (ArrayIndexOutOfBoundsException e) {
@@ -171,7 +172,7 @@ public class LightUniverseCommand extends BaseCommand {
         public static void onTurnOff(CommandIssuer sender, String[] args) {
             List<CommandError> errors = isUnloaded(args, 1);
             try {
-                LightChannel.valueOf(args[0]).off(new Color(0x0066ff), null,0);
+                LightChannel.valueOf(args[0]).off(new Color(0x0066ff), null,0,null);
             } catch (IllegalArgumentException e) {
                 errors.add(CommandError.INVALID_ARGUMENT);
             } catch (ArrayIndexOutOfBoundsException e) {
@@ -189,7 +190,7 @@ public class LightUniverseCommand extends BaseCommand {
         public static void onFlash(CommandIssuer sender, String[] args) {
             List<CommandError> errors = isUnloaded(args, 1);
             try {
-                LightChannel.valueOf(args[0]).flash(new Color(0x0066ff), null,0);
+                LightChannel.valueOf(args[0]).flash(new Color(0x0066ff), null,0,null);
             } catch (IllegalArgumentException e) {
                 errors.add(CommandError.INVALID_ARGUMENT);
             } catch (ArrayIndexOutOfBoundsException e) {
@@ -207,7 +208,7 @@ public class LightUniverseCommand extends BaseCommand {
         public static void onFlashOff(CommandIssuer sender, String[] args) {
             List<CommandError> errors = isUnloaded(args, 1);
             try {
-                LightChannel.valueOf(args[0]).flashOff(new Color(0x0066ff), null,0);
+                LightChannel.valueOf(args[0]).flashOff(new Color(0x0066ff), null,0,null);
             } catch (IllegalArgumentException e) {
                 errors.add(CommandError.INVALID_ARGUMENT);
             } catch (ArrayIndexOutOfBoundsException e) {

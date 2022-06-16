@@ -27,6 +27,7 @@ public class RingCommand extends BaseCommand {
     @Getter private static Ring ring;
 
     private static List<CommandError> isUnloaded() {
+        Nightclub.getLightUniverseManager().save();
         List<CommandError> errors = new ArrayList<>();
         errors.add(ring == null ? CommandError.RING_UNLOADED : CommandError.VALID);
         errors.add(Nightclub.getLightUniverseManager().getLoadedUniverse() == null ? CommandError.LIGHTUNIVERSE_UNLOADED : CommandError.VALID);

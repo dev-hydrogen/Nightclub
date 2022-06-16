@@ -2,6 +2,7 @@ package exposed.hydrogen.nightclub.light;
 
 import com.google.gson.JsonArray;
 import exposed.hydrogen.nightclub.Nightclub;
+import exposed.hydrogen.nightclub.beatmap.GradientEvent;
 import exposed.hydrogen.nightclub.light.data.*;
 import exposed.hydrogen.nightclub.light.event.LightChannel;
 import exposed.hydrogen.nightclub.light.event.LightSpeedChannel;
@@ -40,6 +41,8 @@ public class Light {
     @Getter private transient DebugMarkerWrapper marker;
 
     private final transient List<LaserWrapper> lasers = new LinkedList<>();
+    private transient GradientEvent currentGradient;
+    private transient Long startTime;
     private transient double length = 0; // 0 to 100, percentage of maxLength.
     private transient double lastLength = 0;
     private transient double zoomTime = 0; // 0 to 1, current zoom time. does nothing if <=0
@@ -47,8 +50,7 @@ public class Light {
     @Getter @Setter private transient double x = 0; // 0 to 100, usually percentage of 360
     @Getter @Setter private transient double x2 = 0; // 0 to 100, usually percentage of 360, secondary pattern
     @Getter private transient Color color; // current color
-    private transient int duration; // unused, but current duration
-    private transient int durationStart; // unused but unix time since last event
+    private transient int duration; // duration to next event
     private transient boolean isOn = false;
     private transient boolean isZoomed = false;
     private transient double multipliedSpeed; // speed, but when internally multiplied by events
@@ -120,6 +122,26 @@ public class Light {
                 x = (x + multipliedSpeed) % 100;
                 x2 = (x2 + secondaryMultipliedSpeed) % 100;
                 lastLength = length;
+                // do chroma gradient
+                if(currentGradient != null && length > 0.1) {
+                    long gradientEndMillis = startTime + currentGradient.getEndTime();
+                    long gradientStartMillis = startTime + currentGradient.getStartTime();
+                    if(System.currentTimeMillis() < gradientEndMillis && System.currentTimeMillis() > gradientStartMillis) {
+                        long fraction = System.currentTimeMillis() / gradientEndMillis;
+                        color = currentGradient.getLerpType().lerp(
+                                currentGradient.getLerpType(),
+                                currentGradient.getStartColor(),
+                                currentGradient.getEndColor(),
+                                fraction,
+                                currentGradient.getEasing());
+                        marker.setColor(color);
+                        marker.setDuration(DELAY+10);
+                        marker.start(256);
+                    }
+                    if(System.currentTimeMillis() > gradientEndMillis) {
+                        currentGradient = null;
+                    }
+                }
 
                 // a (invisible) "ray", pointing towards the set pitch and yaw, length is set later
                 Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize();
@@ -194,6 +216,7 @@ public class Light {
      */
     public void start() {
         stop();
+        startTime = System.currentTimeMillis();
         executorService = Executors.newScheduledThreadPool(1);
         executorService.scheduleAtFixedRate(run, 1, DELAY, TimeUnit.MILLISECONDS);
     }
@@ -236,11 +259,16 @@ public class Light {
     /**
      * Turns Light on, sets length to onLength and sets timeToFade to 0
      */
-    public void on(Color color, @Nullable JsonArray lightIDs, int duration) {
-        if (!isLoaded) return;
+    public void on(Color color, @Nullable JsonArray lightIDs, int duration, @Nullable GradientEvent gradientEvent) {
         // check if light event is referencing any light ids in the lightid list
-        if (lightIDs != null && !data.getLightIDs().isEmpty() && StreamSupport.stream(lightIDs.spliterator(), true).noneMatch(id -> data.getLightIDs().contains(id.getAsInt())))
+        if (!isLoaded
+                || (lightIDs != null
+                && !data.getLightIDs().isEmpty()
+                && StreamSupport.stream(lightIDs.spliterator(), true).noneMatch(id -> data.getLightIDs().contains(id.getAsInt()))))
             return;
+        if(gradientEvent != null) {
+            currentGradient = gradientEvent;
+        }
         lasers.forEach(LaserWrapper::start);
         if (length < data.getOnLength() && !isOn) {
             length = data.getOnLength();
@@ -249,8 +277,7 @@ public class Light {
         isOn = true;
         timeToFade = 0;
         this.color = color;
-        this.duration = duration + 2;
-        this.durationStart = (int) System.currentTimeMillis();
+        this.duration = duration + 10;
         marker.setLocation(loc);
         marker.setColor(this.color);
         marker.setDuration(this.duration);
@@ -258,17 +285,21 @@ public class Light {
     }
 
     public void on(Color color) {
-        on(color, null,0);
+        on(color, null,0,null);
     }
 
     /**
      * Turns Light off, sets length to 0.1 and sets timeToFade to 0
      */
-    public void off(Color color, @Nullable JsonArray lightIDs, int duration) {
-        if (!isLoaded) return;
-        // check if light event is referencing any light ids in the lightid list
-        if (lightIDs != null && !data.getLightIDs().isEmpty() && StreamSupport.stream(lightIDs.spliterator(), true).noneMatch(id -> data.getLightIDs().contains(id.getAsInt())))
+    public void off(Color color, @Nullable JsonArray lightIDs, int duration, @Nullable GradientEvent gradientEvent) {
+        if (!isLoaded
+                || (lightIDs != null
+                && !data.getLightIDs().isEmpty()
+                && StreamSupport.stream(lightIDs.spliterator(), true).noneMatch(id -> data.getLightIDs().contains(id.getAsInt()))))
             return;
+        if(gradientEvent != null) {
+            currentGradient = gradientEvent;
+        }
         marker.stop();
         lasers.forEach(LaserWrapper::stop);
         isOn = false;
@@ -276,25 +307,28 @@ public class Light {
     }
 
     public void off(Color color) {
-        off(color, null,0);
+        off(color, null,0,null);
     }
 
     /**
      * Flashes light in a similar way to beat saber, simulating brightness with a longer beam
      */
-    public void flash(Color color, @Nullable JsonArray lightIDs, int duration) {
-        if (!isLoaded) return;
-        // check if light event is referencing any light ids in the lightid list
-        if (lightIDs != null && !data.getLightIDs().isEmpty() && StreamSupport.stream(lightIDs.spliterator(), true).noneMatch(id -> data.getLightIDs().contains(id.getAsInt())))
+    public void flash(Color color, @Nullable JsonArray lightIDs, int duration, @Nullable GradientEvent gradientEvent) {
+        if (!isLoaded
+                || (lightIDs != null
+                && !data.getLightIDs().isEmpty()
+                && StreamSupport.stream(lightIDs.spliterator(), true).noneMatch(id -> data.getLightIDs().contains(id.getAsInt()))))
             return;
+        if(gradientEvent != null) {
+            currentGradient = gradientEvent;
+        }
         if (isOn) {
             length = data.getOnLength() * (color.getAlpha() / 255.0);
             length += (100 - data.getOnLength()) / 3;
             timeToFade += 3;
             lasers.forEach(LaserWrapper::changeColor);
             this.color = color;
-            this.duration = duration + 2;
-            this.durationStart = (int) System.currentTimeMillis();
+            this.duration = duration + 10;
             marker.setDuration(this.duration);
             marker.setLocation(loc);
             marker.setColor(this.color);
@@ -305,22 +339,25 @@ public class Light {
     }
 
     public void flash(Color color) {
-        flash(color, null,0);
+        flash(color, null,0,null);
     }
 
     /**
      * Flashes light in a similar way to beat saber, simulating brightness with a longer beam and then fades to black
      */
-    public void flashOff(Color color, @Nullable JsonArray lightIDs, int duration) {
-        if (!isLoaded) return;
-        // check if light event is referencing any light ids in the lightid list
-        if (lightIDs != null && !data.getLightIDs().isEmpty() && StreamSupport.stream(lightIDs.spliterator(), true).noneMatch(id -> data.getLightIDs().contains(id.getAsInt())))
+    public void flashOff(Color color, @Nullable JsonArray lightIDs, int duration, @Nullable GradientEvent gradientEvent) {
+        if (!isLoaded
+                || (lightIDs != null
+                && !data.getLightIDs().isEmpty()
+                && StreamSupport.stream(lightIDs.spliterator(), true).noneMatch(id -> data.getLightIDs().contains(id.getAsInt()))))
             return;
+        if(gradientEvent != null) {
+            currentGradient = gradientEvent;
+        }
         on(color);
         flash(color);
         this.color = color;
-        this.duration = duration + 2;
-        this.durationStart = (int) System.currentTimeMillis();
+        this.duration = duration + 10;
         marker.setLocation(loc);
         marker.setDuration(this.duration);
         marker.setColor(this.color);
@@ -329,7 +366,7 @@ public class Light {
     }
 
     public void flashOff(Color color) {
-        flashOff(color, null,0);
+        flashOff(color, null,0,null);
     }
 
     public void ringZoom() {

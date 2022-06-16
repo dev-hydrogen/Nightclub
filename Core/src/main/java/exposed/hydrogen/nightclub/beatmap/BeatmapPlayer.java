@@ -58,13 +58,18 @@ public class BeatmapPlayer {
         //start all channels up and then turn them off to wait for beatmap instructions
         channelList.forEach(LightChannel::initializePlayback);
 
+        long startTime = System.currentTimeMillis();
         for (int i = 0; i < events.size(); i++) {
+            // account for the time it takes to parse the beatmap in the first place
+            Long diff = System.currentTimeMillis()-startTime;
+
             LightEvent event = events.get(i);
             List<LightEvent> filteredEvents = events.parallelStream().filter(e -> e.getType().equals(event.getType())).toList();
             int nextIndex = filteredEvents.indexOf(event) + 1;
             LightEvent nextEvent = nextIndex < filteredEvents.size() ? filteredEvents.get(nextIndex) : null;
+
             Runnable task = () -> handle(event, nextEvent);
-            executorService.schedule(task, event.getTime(), TimeUnit.MICROSECONDS);
+            executorService.schedule(task, event.getTime()-diff, TimeUnit.MICROSECONDS);
         }
 
         //schedule turn off 5s after the show is over
@@ -103,7 +108,7 @@ public class BeatmapPlayer {
         if (event.getType() >= 0 && event.getType() < 5) {
             Optional<LightChannel> channel = Arrays.stream(LightChannel.values()).filter((lc) -> event.getType() == lc.getType()).findFirst();
             channel.ifPresent(lightChannel -> handleValue(lightChannel, event.getValue(), event.getColor(), event.getLightID(),
-                    nextEvent != null ? (int) (nextEvent.getTime() - event.getTime()) / 1000 : 500));
+                    nextEvent != null ? (int) (nextEvent.getTime() - event.getTime()) / 1000 : 500,event.getGradientEvent()));
         } else switch (event.getType()) {
             // Ring spin
             case 8 -> Nightclub.getLightUniverseManager().getLoadedUniverse().getRings().forEach(Ring::spin);
@@ -120,12 +125,12 @@ public class BeatmapPlayer {
         }
     }
 
-    private void handleValue(LightChannel handler, int value, Color color, JsonArray lightIDs, int duration) {
+    private void handleValue(LightChannel handler, int value, Color color, JsonArray lightIDs, int duration, @Nullable GradientEvent gradientEvent) {
         switch (value) {
-            case 0 -> handler.off(color, lightIDs,duration);
-            case 1, 5 -> handler.on(color, lightIDs,duration);
-            case 2, 6 -> handler.flash(color, lightIDs,duration);
-            case 3, 7 -> handler.flashOff(color, lightIDs,duration);
+            case 0 -> handler.off(color, lightIDs, duration,gradientEvent);
+            case 1, 5 -> handler.on(color, lightIDs, duration,gradientEvent);
+            case 2, 6 -> handler.flash(color, lightIDs, duration,gradientEvent);
+            case 3, 7 -> handler.flashOff(color, lightIDs, duration,gradientEvent);
         }
     }
 }

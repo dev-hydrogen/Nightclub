@@ -7,7 +7,8 @@
     {"id": "mavencentral", "url": "https://repo.maven.apache.org/maven2/"}
   ],
   "dependencies": [
-    "com.google.guava:guava:31.1-jre"
+    "com.google.guava:guava:31.1-jre",
+    "Resources"
   ]
 
 }

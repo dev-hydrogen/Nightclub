@@ -28,8 +28,6 @@ import exposed.hydrogen.nightclub.wrapper.DebugMarkerFactory;
 import exposed.hydrogen.nightclub.wrapper.DebugMarkerWrapper;
 import exposed.hydrogen.nightclub.wrapper.LaserFactory;
 import exposed.hydrogen.nightclub.wrapper.LaserWrapper;
-import exposed.hydrogen.resources.ResourcePackHandler;
-import exposed.hydrogen.resources.Resources;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -81,16 +79,8 @@ public final class Nightclub extends ChameleonPlugin {
         instance = this;
         JSONreader = new LightJSONReader(GSON);
         JSONwriter = new LightJSONWriter(GSON);
-        Thread asyncLoadPack = new Thread(() -> {
-            soundRegistry = Util.getSoundRegistry(new File(Nightclub.DATA_FOLDER.getAbsolutePath()));
-
-            ResourcePackHandler resourcePackHandler = Resources.getResourcePackHandler();
-            resourcePackHandler.addResources(Util.getSoundFiles(new File(Nightclub.DATA_FOLDER.getAbsolutePath())), false);
-            resourcePackHandler.addCredit("Nightclub - Hydrogen");
-            resourcePackHandler.addResource(soundRegistry, true);
-            getChameleon().getLogger().info("Done compiling pack");
-        });
-        asyncLoadPack.start();
+        soundRegistry = Util.getSoundRegistry(new File(Nightclub.DATA_FOLDER.getAbsolutePath()));
+        Util.addResources();
 
         lightUniverseManager = new LightUniverseManager();
     }

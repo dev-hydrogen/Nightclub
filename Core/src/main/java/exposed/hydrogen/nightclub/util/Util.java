@@ -1,5 +1,6 @@
 package exposed.hydrogen.nightclub.util;
 
+import com.google.gson.JsonArray;
 import exposed.hydrogen.nightclub.Nightclub;
 import exposed.hydrogen.nightclub.beatmap.BeatmapParser;
 import exposed.hydrogen.nightclub.beatmap.InfoData;
@@ -7,20 +8,29 @@ import exposed.hydrogen.nightclub.commands.CommandError;
 import exposed.hydrogen.nightclub.light.Light;
 import exposed.hydrogen.nightclub.light.LightUniverse;
 import exposed.hydrogen.nightclub.light.Ring;
+import exposed.hydrogen.resources.ResourcePackHandler;
+import exposed.hydrogen.resources.Resources;
 import net.kyori.adventure.key.Key;
 import team.unnamed.creative.base.Writable;
 import team.unnamed.creative.sound.Sound;
 import team.unnamed.creative.sound.SoundEvent;
 import team.unnamed.creative.sound.SoundRegistry;
 
+import java.awt.*;
 import java.io.File;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.List;
 import java.util.*;
 
 public class Util {
     public static double getDegreesFromPercentage(double percentage) {
         return 360 * percentage / 100;
+    }
+
+    public static double lerp(Number start, Number end, Number fraction, Easing easing) {
+        Number easedFraction = easing.getFunction().apply(fraction.doubleValue());
+        return start.doubleValue() + (end.doubleValue() - start.doubleValue()) * easedFraction.doubleValue();
     }
 
     public static Number parseNumber(String number) throws ParseException {
@@ -116,5 +126,35 @@ public class Util {
             eventMap.put(event.sounds().get(0).key().value(), event);
         }
         return SoundRegistry.of(Nightclub.NAMESPACE, eventMap);
+    }
+
+    public static Color translateBeatSaberColor(JsonArray colorArray) {
+        float r = colorArray.get(0).getAsFloat();
+        float g = colorArray.get(1).getAsFloat();
+        float b = colorArray.get(2).getAsFloat();
+        float a = 1.0F;
+        if (colorArray.size() >= 4 && colorArray.get(3) != null) {
+            a = colorArray.get(3).getAsFloat();
+        }
+        float divisor = Math.max(Math.max(r, g), Math.max(Math.max(b, a), 1F)); // Beat saber color system is utter fucking dogshit.
+        return new Color(r/divisor,g/divisor,b/divisor,a/divisor);
+    }
+
+    public static void addResources() {
+        Thread asyncLoadPack = new Thread(() -> {
+            try {
+                var soundRegistry = Nightclub.getSoundRegistry();
+
+                ResourcePackHandler resourcePackHandler = Resources.getResourcePackHandler();
+
+                resourcePackHandler.addResources(Util.getSoundFiles(new File(Nightclub.DATA_FOLDER.getAbsolutePath())), false);
+                resourcePackHandler.addCredit("Nightclub - Hydrogen");
+                resourcePackHandler.addResource(soundRegistry, true);
+                Nightclub.getChameleon().getLogger().info("Done compiling pack");
+            } catch (Exception e) {
+                Nightclub.getChameleon().getLogger().error("Failed to compile pack", e);
+            }
+        });
+        asyncLoadPack.start();
     }
 }

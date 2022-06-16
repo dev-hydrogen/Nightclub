@@ -2,6 +2,7 @@ package exposed.hydrogen.nightclub.beatmap;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import exposed.hydrogen.nightclub.util.Util;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,7 +18,9 @@ public final class LightEvent {
     @Getter private final Long time;
     @Getter private final Color color;
     @Getter @Nullable private final JsonObject customData;
+    @Getter @Nullable private final GradientEvent gradientEvent;
     @Getter @Nullable private final JsonArray lightID;
+    @Getter private final Number speed;
     @Getter private final boolean isChroma;
 
     public LightEvent(JsonObject event, double bpm, boolean isChroma, InfoData info) {
@@ -26,41 +29,42 @@ public final class LightEvent {
         time = Math.round(event.get("_time").getAsDouble() * 1000.0 * 1000.0 * 60.0 / bpm); // THIS IS MICROSECONDS!
         customData = (JsonObject) event.get("_customData");
         this.isChroma = isChroma;
-        lightID = isChroma && customData != null && customData.get("_lightID") != null
-                ? customData.get("_lightID") instanceof JsonArray
-                ? customData.get("_lightID").getAsJsonArray()
-                : newArray(customData.get("_lightID").getAsInt())
-                : null;
-        if (isChroma && customData != null && customData.get("_color") != null) {
-            JsonArray color = customData.get("_color").getAsJsonArray();
-            float r = color.get(0).getAsFloat();
-            float g = color.get(1).getAsFloat();
-            float b = color.get(2).getAsFloat();
-            float a = 1.0F;
-            if (color.size() >= 4 && color.get(3) != null) {
-                a = color.get(3).getAsFloat();
-            }
-            float divisor = Math.max(Math.max(r, g), Math.max(Math.max(b, a), 1F)); // Beat saber color system is utter fucking dogshit.
-            this.color = new Color(r / divisor, g / divisor, b / divisor, a / divisor);
-        } else {
-            if (value < 4 && value != 0) {
-                color = info.getPrimaryColor();
-            } else if (value > 4) {
-                color = info.getSecondaryColor();
+        if(isChroma && customData != null) {
+            lightID = customData.get("_lightID") != null
+                    ? customData.get("_lightID") instanceof JsonArray
+                    ? customData.get("_lightID").getAsJsonArray()
+                    : newArray(customData.get("_lightID").getAsInt())
+                    : null;
+            speed = customData.get("_speed") != null
+                    ? customData.get("_speed").getAsNumber()
+                    : customData.get("_preciseSpeed") != null
+                    ? customData.get("_preciseSpeed").getAsNumber()
+                    : value;
+            gradientEvent = customData.get("_lightGradient") != null
+                    ? new GradientEvent(customData.get("_lightGradient"),Math.round(event.get("_time").getAsDouble() * 1000.0 * 60.0 / bpm),bpm)
+                    : null;
+            if (customData.get("_color") != null) {
+                JsonArray color = customData.get("_color").getAsJsonArray();
+                this.color = Util.translateBeatSaberColor(color);
             } else {
-                color = new Color(0x000000);
+                color = getColorFromValue(value, info);
             }
+        } else {
+            speed = value;
+            lightID = null;
+            color = getColorFromValue(value, info);
+            gradientEvent = null;
         }
     }
 
-    public LightEvent(int type, int value, long time, Color color, boolean isChroma) {
-        this.type = type;
-        this.value = value;
-        this.time = time;
-        this.color = color;
-        this.isChroma = isChroma;
-        this.customData = null;
-        this.lightID = null;
+    private Color getColorFromValue(int value, InfoData info) {
+        if (value < 4 && value != 0) {
+            return info.getPrimaryColor();
+        } else if (value > 4) {
+            return info.getSecondaryColor();
+        } else {
+            return new Color(0x000000);
+        }
     }
 
     private JsonArray newArray(int i) {
