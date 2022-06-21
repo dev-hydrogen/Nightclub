@@ -24,6 +24,7 @@ public class DebugMarker extends DebugMarkerWrapper {
     private PacketDataSerializer data;
     private final PacketContainer marker;
     private final List<Player> seen;
+    long endTime;
 
     public DebugMarker(Location location, Color color, String name, Integer duration, List<Player> showTo) throws InvocationTargetException {
         this(location, color, name, duration);
@@ -53,11 +54,12 @@ public class DebugMarker extends DebugMarkerWrapper {
 
     public void start(int distance, Runnable callback) {
         if (!executorService.isShutdown()) {
-            stop();
+            seen.clear();
+            executorService.shutdownNow();
         }
         distanceSquared = distance < 0 ? -1 : distance * distance;
         long startTime = System.currentTimeMillis();
-        long endTime = System.currentTimeMillis() + duration;
+        endTime = System.currentTimeMillis() + duration;
         executorService = Executors.newScheduledThreadPool(1);
         // probably not the most efficient way of doing this
         Runnable run = () -> {
@@ -150,6 +152,10 @@ public class DebugMarker extends DebugMarkerWrapper {
         data.a(name);
         data.writeInt(duration);
         marker.getSpecificModifier(PacketDataSerializer.class).write(0, data);
+    }
+
+    public boolean isOn() {
+        return !executorService.isShutdown();
     }
 
     public void setLocation(Location location) {

@@ -38,6 +38,8 @@ public abstract class DebugMarkerWrapper {
 
     public abstract void setData(Location location, Color color, String name, int duration);
 
+    public abstract boolean isOn();
+
     public void setLocation(Location location) {
         this.location = location;
         setData(this.location, this.color, this.name, this.duration);

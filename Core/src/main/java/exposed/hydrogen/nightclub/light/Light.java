@@ -106,11 +106,6 @@ public class Light {
                     timeToFade--;
                     length -= 100.0 / this.data.getTimeToFadeToBlack();
                 }
-                if (length < 0.1) {
-                    off(new Color(0x000000));
-                    timeToFade = 0;
-                    length = 0.1;
-                }
                 if (length > 100) {
                     length = 100.0;
                 }
@@ -119,34 +114,39 @@ public class Light {
                     // do nothing if no movement or zooming needs to be happening
                     return;
                 }
-                x = (x + multipliedSpeed) % 100;
-                x2 = (x2 + secondaryMultipliedSpeed) % 100;
-                lastLength = length;
-                // do chroma gradient
                 if(currentGradient != null && length > 0.1) {
                     long gradientEndMillis = startTime + currentGradient.getEndTime();
                     long gradientStartMillis = startTime + currentGradient.getStartTime();
                     if(System.currentTimeMillis() < gradientEndMillis && System.currentTimeMillis() > gradientStartMillis) {
                         long fraction = System.currentTimeMillis() / gradientEndMillis;
                         color = currentGradient.getLerpType().lerp(
-                                currentGradient.getLerpType(),
                                 currentGradient.getStartColor(),
                                 currentGradient.getEndColor(),
                                 fraction,
                                 currentGradient.getEasing());
                         marker.setColor(color);
-                        marker.setDuration(DELAY+10);
+                        marker.setDuration(DELAY+20);
                         marker.start(256);
                     }
                     if(System.currentTimeMillis() > gradientEndMillis) {
                         currentGradient = null;
                     }
                 }
+                x = (x + multipliedSpeed) % 100;
+                x2 = (x2 + secondaryMultipliedSpeed) % 100;
+                // do chroma gradient
+                if (length < 0.1) {
+                    off(new Color(0x000000));
+                    timeToFade = 0;
+                    length = 0.1;
+                }
+                lastLength = length;
+                double l = (length + this.data.getOnLength() * (color.getAlpha() / 255.0))/2;
 
                 // a (invisible) "ray", pointing towards the set pitch and yaw, length is set later
                 Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize();
                 // make v the size of length
-                Vector3D v1 = v.scalarMultiply(getMaxLengthPercent());
+                Vector3D v1 = v.scalarMultiply(getMaxLengthPercent(l));
                 for (int i = 0; i < lasers.size(); i++) {
                     LaserWrapper laser = lasers.get(i);
                     /*
@@ -161,9 +161,9 @@ public class Light {
                     Rotation r = new Rotation(v1, this.data.getPatternData().getRotation(), RotationConvention.FRAME_TRANSFORM);
                     Rotation r2 = new Rotation(v1, this.data.getSecondPatternData().getRotation(), RotationConvention.FRAME_TRANSFORM);
                     // apply first pattern (separated evenly for each laser) to our ray
-                    Vector3D v2 = this.data.getPatternData().getPattern().apply(v1, separated, r, this.data.getPatternData().getPatternSizeMultiplier() * (length / 100));
+                    Vector3D v2 = this.data.getPatternData().getPattern().apply(v1, separated, r, this.data.getPatternData().getPatternSizeMultiplier() * (l / 100));
                     // then apply second pattern to all lasers with the same x value
-                    Vector3D v3 = this.data.getSecondPatternData().getPattern().apply(v1, x2, r2, this.data.getSecondPatternData().getPatternSizeMultiplier() * (length / 100));
+                    Vector3D v3 = this.data.getSecondPatternData().getPattern().apply(v1, x2, r2, this.data.getSecondPatternData().getPatternSizeMultiplier() * (l / 100));
                     Vector3D v4 = getData().getRingMovementData().calculateMovement(zoomTime);
                     Vector3D v5 = v1.add(v4).add(v3).add(v2);
 
@@ -226,6 +226,7 @@ public class Light {
      */
     public void stop() {
         executorService.shutdownNow();
+        currentGradient = null;
     }
 
     /**
@@ -276,12 +277,14 @@ public class Light {
         length = Math.max(data.getOnLength() * (color.getAlpha() / 255.0), 0.05);
         isOn = true;
         timeToFade = 0;
-        this.color = color;
         this.duration = duration + 10;
-        marker.setLocation(loc);
-        marker.setColor(this.color);
-        marker.setDuration(this.duration);
-        marker.start(256);
+        if(currentGradient == null) {
+            this.color = color;
+            marker.setLocation(loc);
+            marker.setColor(this.color);
+            marker.setDuration(this.duration);
+            marker.start(256);
+        }
     }
 
     public void on(Color color) {
@@ -327,12 +330,14 @@ public class Light {
             length += (100 - data.getOnLength()) / 3;
             timeToFade += 3;
             lasers.forEach(LaserWrapper::changeColor);
-            this.color = color;
             this.duration = duration + 10;
-            marker.setDuration(this.duration);
-            marker.setLocation(loc);
-            marker.setColor(this.color);
-            marker.start(256);
+            if(currentGradient == null) {
+                this.color = color;
+                marker.setLocation(loc);
+                marker.setColor(this.color);
+                marker.setDuration(this.duration);
+                marker.start(256);
+            }
         } else {
             flashOff(color);
         }
@@ -356,12 +361,14 @@ public class Light {
         }
         on(color);
         flash(color);
-        this.color = color;
         this.duration = duration + 10;
-        marker.setLocation(loc);
-        marker.setDuration(this.duration);
-        marker.setColor(this.color);
-        marker.start(256);
+        if(currentGradient == null) {
+            this.color = color;
+            marker.setLocation(loc);
+            marker.setColor(this.color);
+            marker.setDuration(this.duration);
+            marker.start(256);
+        }
         timeToFade = data.getTimeToFadeToBlack();
     }
 
@@ -439,7 +446,7 @@ public class Light {
         run.run();
     }
 
-    private double getMaxLengthPercent() {
+    private double getMaxLengthPercent(double length) {
         return data.getMaxLength() * length / 100.0;
     }
 

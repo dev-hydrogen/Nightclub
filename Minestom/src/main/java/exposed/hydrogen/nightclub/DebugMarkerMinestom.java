@@ -19,6 +19,7 @@ public class DebugMarkerMinestom extends DebugMarkerWrapper {
     private static final PluginMessagePacket STOP_ALL_MARKERS;
     private Marker marker;
     private final List<Player> seen;
+    private long endTime;
 
     public DebugMarkerMinestom(Location location, Color color, String name, Integer duration) {
         super(location, color, name, duration);
@@ -34,10 +35,11 @@ public class DebugMarkerMinestom extends DebugMarkerWrapper {
     @Override
     public void start(int distance, Runnable callback) {
         if (!executorService.isShutdown()) {
-            stop();
+            seen.clear();
+            executorService.shutdownNow();
         }
         distanceSquared = distance < 0 ? -1 : distance * distance;
-        long endTime = System.currentTimeMillis() + duration;
+        endTime = System.currentTimeMillis() + duration;
         executorService = Executors.newScheduledThreadPool(1);
         // probably not the most efficient way of doing this
         Runnable run = () -> {
@@ -64,8 +66,7 @@ public class DebugMarkerMinestom extends DebugMarkerWrapper {
 
     @Override
     public void stop() {
-        marker = new Marker(location, new Color(0,0,0,0), "", 0);
-        sendPacketToPlayerIfCloseEnough(getMarkerPacket(marker), location);
+        sendPacketToPlayerIfCloseEnough(getMarkerPacket(new Marker(location, new Color(0,0,0,0), "", 0)), location);
         seen.clear();
         executorService.shutdownNow();
     }
@@ -91,6 +92,10 @@ public class DebugMarkerMinestom extends DebugMarkerWrapper {
     @Override
     public void setData(Location location, Color color, String name, int duration) {
         marker = new Marker(location, color, name, duration);
+    }
+
+    public boolean isOn() {
+        return executorService.isShutdown();
     }
 
     /**

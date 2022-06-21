@@ -61,7 +61,7 @@ public class BeatmapPlayer {
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < events.size(); i++) {
             // account for the time it takes to parse the beatmap in the first place
-            Long diff = System.currentTimeMillis()-startTime;
+            long diff = System.currentTimeMillis()-startTime;
 
             LightEvent event = events.get(i);
             List<LightEvent> filteredEvents = events.parallelStream().filter(e -> e.getType().equals(event.getType())).toList();
@@ -69,7 +69,7 @@ public class BeatmapPlayer {
             LightEvent nextEvent = nextIndex < filteredEvents.size() ? filteredEvents.get(nextIndex) : null;
 
             Runnable task = () -> handle(event, nextEvent);
-            executorService.schedule(task, event.getTime()-diff, TimeUnit.MICROSECONDS);
+            executorService.schedule(task, event.getTime()-(diff*1000), TimeUnit.MICROSECONDS);
         }
 
         //schedule turn off 5s after the show is over

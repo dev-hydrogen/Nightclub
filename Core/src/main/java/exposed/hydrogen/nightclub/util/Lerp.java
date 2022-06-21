@@ -7,8 +7,8 @@ public enum Lerp {
     HSV,
     RGB;
 
-    public Color lerp(Lerp lerp, Color start, Color end, Number fraction, Easing easing) {
-        return lerp == HSV ? hsvLerp(start,end,fraction,easing)
+    public Color lerp(Color start, Color end, Number fraction, Easing easing) {
+        return this == HSV ? hsvLerp(start,end,fraction,easing)
                 : rgbLerp(start,end,fraction,easing);
     }
     private Color hsvLerp(Color start, Color end, Number fraction, Easing easing) {
@@ -24,6 +24,7 @@ public enum Lerp {
         var r = Util.lerp(start.getRed(),end.getRed(),fraction,easing);
         var g = Util.lerp(start.getGreen(),end.getGreen(),fraction,easing);
         var b = Util.lerp(start.getBlue(),end.getBlue(),fraction,easing);
-        return new Color((int) r, (int) g, (int) b);
+        var a = Util.lerp(start.getAlpha(),end.getAlpha(),fraction,easing);
+        return new Color((int) r, (int) g, (int) b, (int) a);
     }
 }
