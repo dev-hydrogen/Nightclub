@@ -87,6 +87,7 @@ public class Light {
         this.channel = channel;
         this.speedChannel = speedChannel;
         this.data = data;
+        color = new Color(0x000000);
 
         run = () -> {
             try {
