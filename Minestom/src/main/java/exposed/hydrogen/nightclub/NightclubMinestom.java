@@ -8,6 +8,7 @@ import exposed.hydrogen.nightclub.wrapper.LaserFactory;
 import lombok.Getter;
 import lombok.Setter;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.event.player.PlayerLoginEvent;
 import net.minestom.server.extensions.Extension;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.network.packet.server.play.TeamsPacket;
@@ -28,16 +29,10 @@ public class NightclubMinestom extends Extension {
                 .collisionRule(TeamsPacket.CollisionRule.PUSH_OTHER_TEAMS)
                 .build();
 
-        /*MinecraftServer.getGlobalEventHandler().addListener(PlayerLoginEvent.class, event -> {
-            event.getPlayer().addPermission(new Permission("nightclub.light"));
-            event.getPlayer().addPermission(new Permission("nightclub.lightuniverse"));
-            event.getPlayer().addPermission(new Permission("nightclub.beatmap"));
-            event.getPlayer().addPermission(new Permission("nightclub.ring"));
-            event.getPlayer().setGameMode(GameMode.CREATIVE);
+        MinecraftServer.getGlobalEventHandler().addListener(PlayerLoginEvent.class, event -> {
             event.getPlayer().setTeam(noCollisionTeam);
-            chameleon.getLogger().info("added permissions for " + event.getPlayer());
-            mapInstance.setTime(16000);
-        });*/
+            chameleon.getLogger().info("set collision team for " + event.getPlayer().getUsername());
+        });
         instance = this;
         util = new MinestomUtil();
         Nightclub.setCrossCompatUtil(util);
