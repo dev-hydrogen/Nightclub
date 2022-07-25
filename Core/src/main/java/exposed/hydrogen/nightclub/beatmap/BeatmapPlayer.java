@@ -49,7 +49,7 @@ public class BeatmapPlayer {
     public InfoData play(List<CrossCompatPlayer> playTo) {
         List<LightChannel> channelList = Arrays.asList(LightChannel.values());
         this.playTo = playTo;
-        executorService = Executors.newScheduledThreadPool(1);
+        executorService = Executors.newScheduledThreadPool(7);
         playTo.forEach((player) -> player.playSound(player.getLocation(), sound, 1, 1));
         isPlaying = true;
         Nightclub.getLightUniverseManager().getLoadedUniverse().getRings().forEach(Ring::reset);
@@ -59,6 +59,7 @@ public class BeatmapPlayer {
         channelList.forEach(LightChannel::initializePlayback);
 
         long startTime = System.currentTimeMillis();
+        Nightclub.getChameleon().getLogger().info("Event count: " + events.size());
         for (int i = 0; i < events.size(); i++) {
             // account for the time it takes to parse the beatmap in the first place
             long diff = System.currentTimeMillis()-startTime;
