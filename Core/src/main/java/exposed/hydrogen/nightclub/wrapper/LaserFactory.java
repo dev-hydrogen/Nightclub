@@ -5,12 +5,8 @@ import exposed.hydrogen.nightclub.util.Location;
 
 import java.lang.reflect.InvocationTargetException;
 
-public class LaserFactory<T extends LaserWrapper> {
-    private Class<T> clazz;
+public record LaserFactory<T extends LaserWrapper>(Class<T> clazz) {
 
-    public LaserFactory(Class<T> clazz) {
-        this.clazz = clazz;
-    }
     public LaserWrapper build(Location start, Location end, int duration, int distance, LightType type) {
         try {
             return getT(start, end, duration, distance, type);
@@ -21,6 +17,6 @@ public class LaserFactory<T extends LaserWrapper> {
     }
 
     private T getT(Location start, Location end, Integer duration, Integer distance, LightType type) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        return clazz.getDeclaredConstructor(Location.class,Location.class,Integer.class,Integer.class,LightType.class).newInstance(start, end, duration, distance, type);
+        return clazz.getDeclaredConstructor(Location.class, Location.class, Integer.class, Integer.class, LightType.class).newInstance(start, end, duration, distance, type);
     }
 }
