@@ -42,7 +42,6 @@ public class RingCommand extends BaseCommand {
     }
 
     @Subcommand("build")
-    @CommandAlias("b")
     @Description("Build a new Ring!")
     @CommandPermission("nightclub.ring")
     public static void onBuild(CommandIssuer sender) {
@@ -79,7 +78,6 @@ public class RingCommand extends BaseCommand {
     }
 
     @Subcommand("remove")
-    @CommandAlias("r")
     @Description("Remove currently loaded Ring")
     @CommandPermission("nightclub.ring")
     public static void onRemove(CommandIssuer sender) {
@@ -95,7 +93,6 @@ public class RingCommand extends BaseCommand {
     }
 
     @Subcommand("load")
-    @CommandAlias("l")
     @Description("Load a Light from currently loaded LightUniverse")
     @CommandCompletion("@rings")
     @CommandPermission("nightclub.ring")
@@ -118,7 +115,6 @@ public class RingCommand extends BaseCommand {
     }
 
     @Subcommand("clone")
-    @CommandAlias("c")
     @Description("Clone a Ring from currently loaded LightUniverse")
     @CommandCompletion("@rings")
     @CommandPermission("nightclub.ring")
@@ -152,12 +148,10 @@ public class RingCommand extends BaseCommand {
     }
 
     @Subcommand("data")
-    @CommandAlias("d")
     @Description("Modify a Ring's data")
     @CommandPermission("nightclub.ring")
     public class RingDataCommand extends BaseCommand {
         @Subcommand("name")
-        @CommandAlias("n")
         @Description("Alter Ring Name")
         @CommandPermission("nightclub.ring")
         public static void onNameChange(CommandIssuer sender, String[] args) {
@@ -172,7 +166,6 @@ public class RingCommand extends BaseCommand {
             ring.setName(args[0]);
         }
         @Subcommand("type")
-        @CommandAlias("t")
         @Description("Alter the Rings type")
         @CommandCompletion("@types")
         @CommandPermission("nightclub.ring")
@@ -192,7 +185,6 @@ public class RingCommand extends BaseCommand {
         }
 
         @Subcommand("setlocation")
-        @CommandAlias("sl")
         @Description("Set the Rings location to your location, including pitch and yaw")
         @CommandPermission("nightclub.ring")
         public static void onSetLocation(CommandIssuer sender, String[] args) {
@@ -224,7 +216,6 @@ public class RingCommand extends BaseCommand {
         }
 
         @Subcommand("count")
-        @CommandAlias("rc")
         @Description("Set ring count")
         @CommandPermission("nightclub.ring")
         public static void onRingCount(CommandIssuer sender, String[] args) {
@@ -242,7 +233,6 @@ public class RingCommand extends BaseCommand {
         }
 
         @Subcommand("lightcount")
-        @CommandAlias("lc")
         @Description("Set ring count")
         @CommandPermission("nightclub.ring")
         public static void onRingLightCount(CommandIssuer sender, String[] args) {
@@ -260,7 +250,6 @@ public class RingCommand extends BaseCommand {
         }
 
         @Subcommand("size")
-        @CommandAlias("sz")
         @Description("Set ring size")
         @CommandPermission("nightclub.ring")
         public static void onRingSize(CommandIssuer sender, String[] args) {
@@ -277,7 +266,6 @@ public class RingCommand extends BaseCommand {
         }
 
         @Subcommand("offset")
-        @CommandAlias("os")
         @Description("Set ring offset from linked ring")
         @CommandPermission("nightclub.ring")
         public static void onOffset(CommandIssuer sender, String[] args) {
@@ -293,7 +281,6 @@ public class RingCommand extends BaseCommand {
             ring.start();
         }
         @Subcommand("spacing")
-        @CommandAlias("spac")
         @Description("Set ring spacing")
         @CommandPermission("nightclub.ring")
         public static void onSpacing(CommandIssuer sender, String[] args) {
@@ -309,7 +296,6 @@ public class RingCommand extends BaseCommand {
             ring.start();
         }
         @Subcommand("rotation")
-        @CommandAlias("rot")
         @Description("Set ring rotation per event")
         @CommandPermission("nightclub.ring")
         public static void onRotation(CommandIssuer sender, String[] args) {
@@ -326,7 +312,6 @@ public class RingCommand extends BaseCommand {
         }
 
         @Subcommand("zoomdistance")
-        @CommandAlias("zd")
         @Description("Alter zooming distance")
         @CommandPermission("nightclub.ring")
         public static void onModifyDistance(CommandIssuer sender, String[] args) {
@@ -344,7 +329,6 @@ public class RingCommand extends BaseCommand {
         }
 
         @Subcommand("zoomtime")
-        @CommandAlias("zt")
         @Description("Alter time to move")
         @CommandPermission("nightclub.ring")
         public static void onModifyTime(CommandIssuer sender, String[] args) {

@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-@CommandAlias("light|li")
+@CommandAlias("light")
 @CommandPermission("nightclub.light")
 public class LightCommand extends BaseCommand {
     @Getter private static Light light;
@@ -43,7 +43,6 @@ public class LightCommand extends BaseCommand {
     }
 
     @Subcommand("build")
-    @CommandAlias("b")
     @Description("Build a new Light!")
     @CommandPermission("nightclub.light")
     public static void onBuild(CommandIssuer sender) {
@@ -83,7 +82,6 @@ public class LightCommand extends BaseCommand {
     }
 
     @Subcommand("remove")
-    @CommandAlias("r")
     @Description("Remove currently loaded Light")
     @CommandPermission("nightclub.light")
     public static void onRemove(CommandIssuer sender) {
@@ -99,7 +97,6 @@ public class LightCommand extends BaseCommand {
     }
 
     @Subcommand("load")
-    @CommandAlias("l")
     @Description("Load a Light from currently loaded LightUniverse")
     @CommandCompletion("@lights")
     @CommandPermission("nightclub.light")
@@ -124,7 +121,6 @@ public class LightCommand extends BaseCommand {
     }
 
     @Subcommand("clone")
-    @CommandAlias("c")
     @Description("Clone a Light from currently loaded LightUniverse")
     @CommandCompletion("@lights")
     @CommandPermission("nightclub.light")
@@ -162,13 +158,11 @@ public class LightCommand extends BaseCommand {
     }
 
     @Subcommand("data")
-    @CommandAlias("d")
     @Description("Modify a Light's data")
     @CommandPermission("nightclub.light")
     public class LightDataCommand extends BaseCommand {
 
         @Subcommand("name")
-        @CommandAlias("n")
         @Description("Alter Light Name")
         @CommandPermission("nightclub.light")
         public static void onNameChange(CommandIssuer sender, String[] args) {
@@ -184,7 +178,6 @@ public class LightCommand extends BaseCommand {
         }
 
         @Subcommand("pattern")
-        @CommandAlias("p")
         @Description("Alter pattern")
         @CommandCompletion("@patterns")
         @CommandPermission("nightclub.light")
@@ -203,7 +196,6 @@ public class LightCommand extends BaseCommand {
         }
 
         @Subcommand("secondarypattern")
-        @CommandAlias("sp")
         @Description("Alter secondary pattern")
         @CommandCompletion("@patterns")
         @CommandPermission("nightclub.light")
@@ -222,7 +214,6 @@ public class LightCommand extends BaseCommand {
         }
 
         @Subcommand("maxlength")
-        @CommandAlias("ml")
         @Description("Alter max length multiplier")
         @CommandPermission("nightclub.light")
         public static void onMaxLength(CommandIssuer sender, String[] args) {
@@ -241,7 +232,6 @@ public class LightCommand extends BaseCommand {
         }
 
         @Subcommand("onlength")
-        @CommandAlias("ol")
         @Description("Alter the on length percentage")
         @CommandPermission("nightclub.light")
         public static void onModifyOnLength(CommandIssuer sender, String[] args) {
@@ -259,7 +249,6 @@ public class LightCommand extends BaseCommand {
         }
 
         @Subcommand("patternmultiplier")
-        @CommandAlias("pm")
         @Description("Alter the pattern size multiplier")
         @CommandPermission("nightclub.light")
         public static void onModifyPatternMultiplier(CommandIssuer sender, String[] args) {
@@ -277,7 +266,6 @@ public class LightCommand extends BaseCommand {
         }
 
         @Subcommand("secondarypatternmultiplier")
-        @CommandAlias("spm")
         @Description("Alter the secondary pattern size multiplier")
         @CommandPermission("nightclub.light")
         public static void onModifySecondaryPatternMultiplier(CommandIssuer sender, String[] args) {
@@ -295,7 +283,6 @@ public class LightCommand extends BaseCommand {
         }
 
         @Subcommand("speed")
-        @CommandAlias("s")
         @Description("Alter speed")
         @CommandPermission("nightclub.light")
         public static void onModifySpeed(CommandIssuer sender, String[] args) {
@@ -311,7 +298,6 @@ public class LightCommand extends BaseCommand {
         }
 
         @Subcommand("secondaryspeed")
-        @CommandAlias("ss")
         @Description("Alter secondary speed")
         @CommandPermission("nightclub.light")
         public static void onModifySecondarySpeed(CommandIssuer sender, String[] args) {
@@ -328,7 +314,6 @@ public class LightCommand extends BaseCommand {
         }
 
         @Subcommand("lightcount")
-        @CommandAlias("lc")
         @Description("Alter the amount of lights")
         @CommandPermission("nightclub.light")
         public static void onModifyLightCount(CommandIssuer sender, String[] args) {
@@ -347,7 +332,6 @@ public class LightCommand extends BaseCommand {
         }
 
         @Subcommand("type")
-        @CommandAlias("t")
         @Description("Alter the Light's type")
         @CommandCompletion("@types")
         @CommandPermission("nightclub.light")
@@ -367,7 +351,6 @@ public class LightCommand extends BaseCommand {
         }
 
         @Subcommand("rotation")
-        @CommandAlias("r")
         @Description("Alter rotation")
         @CommandPermission("nightclub.light")
         public static void onModifyRotation(CommandIssuer sender, String[] args) {
@@ -386,7 +369,6 @@ public class LightCommand extends BaseCommand {
         }
 
         @Subcommand("secondaryrotation")
-        @CommandAlias("sr")
         @Description("Alter secondary rotation")
         @CommandPermission("nightclub.light")
         public static void onModifySecondaryRotation(CommandIssuer sender, String[] args) {
@@ -406,7 +388,6 @@ public class LightCommand extends BaseCommand {
         }
 
         @Subcommand("channel")
-        @CommandAlias("c")
         @Description("Change a Light's channel")
         @CommandCompletion("@channels")
         @CommandPermission("nightclub.light")
@@ -423,7 +404,6 @@ public class LightCommand extends BaseCommand {
         }
 
         @Subcommand("speedchannel")
-        @CommandAlias("sc")
         @Description("Change a Light's speed channel")
         @CommandCompletion("@speedchannels")
         @CommandPermission("nightclub.light")
@@ -440,7 +420,6 @@ public class LightCommand extends BaseCommand {
         }
 
         @Subcommand("setlocation")
-        @CommandAlias("sl")
         @Description("Set the lights location to your location, including pitch and yaw")
         @CommandPermission("nightclub.light")
         public static void onSetLocation(CommandIssuer sender, String[] args) {
@@ -469,7 +448,6 @@ public class LightCommand extends BaseCommand {
         }
 
         @Subcommand("flip")
-        @CommandAlias("fl")
         @Description("Flip start and end locations of light")
         @CommandPermission("nightclub.light")
         public static void onFlip(CommandIssuer sender, String[] args) {
@@ -483,7 +461,6 @@ public class LightCommand extends BaseCommand {
         }
 
         @Subcommand("startx")
-        @CommandAlias("sx")
         @Description("Set start x number")
         @CommandPermission("nightclub.light")
         public static void onStartX(CommandIssuer sender, String[] args) {
@@ -499,7 +476,6 @@ public class LightCommand extends BaseCommand {
         }
 
         @Subcommand("secondarystartx")
-        @CommandAlias("ssx")
         @Description("Set secondary start x number")
         @CommandPermission("nightclub.light")
         public static void onSecondaryStartX(CommandIssuer sender, String[] args) {
@@ -515,13 +491,11 @@ public class LightCommand extends BaseCommand {
         }
 
         @Subcommand("lightid")
-        @CommandAlias("lid")
         @Description("Modify a Light's lightID's")
         @CommandPermission("nightclub.light")
         public class LightIDcommand extends BaseCommand {
 
             @Subcommand("add")
-            @CommandAlias("a")
             @Description("Add a LightID")
             @CommandPermission("nightclub.light")
             public static void onAddLightID(CommandIssuer sender, String[] args) {
@@ -539,7 +513,6 @@ public class LightCommand extends BaseCommand {
             }
 
             @Subcommand("remove")
-            @CommandAlias("r")
             @Description("Remove a LightID")
             @CommandPermission("nightclub.light")
             @CommandCompletion("@lightids")
@@ -559,13 +532,11 @@ public class LightCommand extends BaseCommand {
         }
 
         @Subcommand("ringzoom")
-        @CommandAlias("rz")
         @Description("Modify a Light's ring zoom movement")
         @CommandPermission("nightclub.light")
         public class LightRingMoveCommand extends BaseCommand {
 
             @Subcommand("setlocation")
-            @CommandAlias("sl")
             @Description("Set the pitch and yaw")
             @CommandPermission("nightclub.light")
             public static void onSetLocation(CommandIssuer sender, String[] args) {
@@ -593,7 +564,6 @@ public class LightCommand extends BaseCommand {
             }
 
             @Subcommand("distance")
-            @CommandAlias("d")
             @Description("Alter distance")
             @CommandPermission("nightclub.light")
             public static void onModifyDistance(CommandIssuer sender, String[] args) {
@@ -612,7 +582,6 @@ public class LightCommand extends BaseCommand {
             }
 
             @Subcommand("time")
-            @CommandAlias("t")
             @Description("Alter time to move")
             @CommandPermission("nightclub.light")
             public static void onModifyTime(CommandIssuer sender, String[] args) {
@@ -634,7 +603,6 @@ public class LightCommand extends BaseCommand {
 
 
     @Subcommand("control")
-    @CommandAlias("c")
     @Description("Control a light, for example, turn it on or off")
     @CommandPermission("nightclub.light")
     public class LightControlCommand extends BaseCommand {

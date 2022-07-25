@@ -19,7 +19,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 
-@CommandAlias("lightuniverse|lu")
+@CommandAlias("lightuniverse")
 @CommandPermission("nightclub.lightuniverse")
 public class LightUniverseCommand extends BaseCommand {
     private static final LightUniverseManager manager = Nightclub.getLightUniverseManager();
@@ -143,7 +143,6 @@ public class LightUniverseCommand extends BaseCommand {
     }
 
     @Subcommand("channel")
-    @CommandAlias("c")
     @Description("Control a channel, for example, turn it on or off")
     @CommandPermission("nightclub.lightuniverse")
     public class LightControlCommand extends BaseCommand {

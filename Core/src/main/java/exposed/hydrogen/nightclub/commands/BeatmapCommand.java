@@ -13,7 +13,7 @@ import team.unnamed.creative.sound.Sound;
 import java.io.File;
 import java.util.List;
 
-@CommandAlias("beatmap|bp")
+@CommandAlias("beatmap")
 @CommandPermission("nightclub.beatmap")
 public class BeatmapCommand extends BaseCommand {
 
@@ -21,7 +21,6 @@ public class BeatmapCommand extends BaseCommand {
 
 
     @Subcommand("play")
-    @CommandAlias("p")
     @Description("Play a beatmap")
     @CommandCompletion("@beatmaps")
     @CommandPermission("nightclub.beatmap")
@@ -48,7 +47,6 @@ public class BeatmapCommand extends BaseCommand {
     }
 
     @Subcommand("stop")
-    @CommandAlias("s")
     @Description("Stop the current beatmap")
     @CommandPermission("nightclub.beatmap")
     public static void onStop(CommandIssuer sender) {
