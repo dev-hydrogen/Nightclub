@@ -128,7 +128,7 @@ public class Ring {
                 LaserWrapper laser = Nightclub.getLaserFactory().build(
                         this.location.clone().add(Location.fromVector3D(ringedgePoint.add(v1).add(v))),
                         this.location.clone().add(Location.fromVector3D(nextRingEdgePoint.add(v1).add(v))),
-                        -1, 256, lightType);
+                        -1, 256, lightType,false);
                 laserWrappers.add(laser);
             }
             lasers.put(ring, laserWrappers);

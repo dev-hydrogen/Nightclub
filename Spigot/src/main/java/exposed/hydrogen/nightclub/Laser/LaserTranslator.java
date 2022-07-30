@@ -8,10 +8,12 @@ import exposed.hydrogen.nightclub.wrapper.LaserWrapper;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
+
 public class LaserTranslator extends LaserWrapper {
     @Getter private Laser laser;
-    public LaserTranslator(Location start, Location end, Integer duration, Integer distance, LightType type) {
-        super(start, end, duration, distance, type);
+    public LaserTranslator(Location start, Location end, Integer duration, Integer distance, LightType type, Boolean glow) {
+        super(start, end, duration, distance, type,glow);
         try {
             Laser.LaserType laserType = type == LightType.GUARDIAN_BEAM ? Laser.LaserType.GUARDIAN : Laser.LaserType.ENDER_CRYSTAL;
             laser = laserType.create(SpigotUtil.getBukkitLocation(start), SpigotUtil.getBukkitLocation(end), duration, distance);
@@ -67,5 +69,10 @@ public class LaserTranslator extends LaserWrapper {
         } catch (ReflectiveOperationException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void setTeamColor(Color color) {
+
     }
 }

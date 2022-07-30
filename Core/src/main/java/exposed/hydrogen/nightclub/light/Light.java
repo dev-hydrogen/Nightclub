@@ -178,6 +178,7 @@ public class Light {
                         laser.setEnd(result);
                         laser.setStart(startResult);
                     }
+                    laser.setTeamColor(this.color);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -250,9 +251,9 @@ public class Light {
             Vector3D v3 = data.getSecondPatternData().getPattern().apply(v, 0.0, r2, data.getSecondPatternData().getPatternSizeMultiplier() * (data.getOnLength() / 100));
             Vector3D v4 = v.add(v3).add(v2);
             if (data.isFlipStartAndEnd()) {
-                laser = Nightclub.getLaserFactory().build(location.clone().add(v4.getX(), v4.getZ(), v4.getY()), location, -1, 256, type);
+                laser = Nightclub.getLaserFactory().build(location.clone().add(v4.getX(), v4.getZ(), v4.getY()), location, -1, 256, type,true);
             } else {
-                laser = Nightclub.getLaserFactory().build(location, location.clone().add(v4.getX(), v4.getZ(), v4.getY()), -1, 256, type);
+                laser = Nightclub.getLaserFactory().build(location, location.clone().add(v4.getX(), v4.getZ(), v4.getY()), -1, 256, type,true);
             }
             lasers.add(laser);
         }
