@@ -24,7 +24,7 @@ public class NightclubMinestom extends Extension {
     private MinestomChameleon chameleon;
 
     @Override
-    public LoadStatus initialize() {
+    public void initialize() {
         noCollisionTeam = new TeamBuilder("NoCollision",MinecraftServer.getTeamManager())
                 .collisionRule(TeamsPacket.CollisionRule.PUSH_OTHER_TEAMS)
                 .build();
@@ -44,13 +44,11 @@ public class NightclubMinestom extends Extension {
             chameleon.onEnable();
         } catch (ChameleonInstantiationException ex) {
             ex.printStackTrace();
-            return LoadStatus.FAILED;
         }
         // needs to be after chameleon
         commandManager = new MinestomCommandManager();
         Nightclub.registerCommands(commandManager);
         Nightclub.registerCompletions(commandManager.getCommandCompletions());
-        return LoadStatus.SUCCESS;
     }
 
     @Override

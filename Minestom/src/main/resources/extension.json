@@ -3,12 +3,16 @@
   "name": "Nightclub",
   "version": "2.3.1",
 
-  "repositories": [
-    {"id": "mavencentral", "url": "https://repo.maven.apache.org/maven2/"}
-  ],
   "dependencies": [
-    "com.google.guava:guava:31.1-jre",
     "Resources"
-  ]
+  ],
+  "externalDependencies": {
+    "repositories": [
+      {"name": "Central", "url": "https://repo.maven.apache.org/maven2/"}
+    ],
+    "artifacts": [
+      "com.google.guava:guava:31.1-jre"
+    ]
+  }
 
 }
