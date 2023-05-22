@@ -7,4 +7,6 @@ public interface CrossCompatPlayer {
     void playSound(Location location, String sound, float volume, float pitch);
 
     void stopSound(String name);
+
+    void teleport(Location location);
 }

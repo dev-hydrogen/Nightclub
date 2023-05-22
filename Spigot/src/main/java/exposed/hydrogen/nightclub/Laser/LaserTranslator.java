@@ -75,4 +75,8 @@ public class LaserTranslator extends LaserWrapper {
     public void setTeamColor(Color color) {
 
     }
+
+    public void kill() {
+
+    }
 }

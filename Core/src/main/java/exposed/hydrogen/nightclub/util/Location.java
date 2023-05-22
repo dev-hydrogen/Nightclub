@@ -1,5 +1,6 @@
 package exposed.hydrogen.nightclub.util;
 
+import com.google.gson.JsonArray;
 import lombok.Data;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
@@ -23,13 +24,25 @@ public class Location implements Cloneable {
     public Location() {
         this(0, 0, 0, 0, 0);
     }
-
+    public Location(Number x, Number y, Number z) {
+        this(x,y,z,0,0);
+    }
     public Location(Number x, Number y, Number z, Number pitch, Number yaw) {
         this.x = x.doubleValue();
         this.y = y.doubleValue();
         this.z = z.doubleValue();
         this.pitch = pitch.doubleValue();
         this.yaw = yaw.doubleValue() % 360;
+    }
+
+    public static Location of() {
+        return new Location();
+    }
+    public static Location of(Number x, Number y, Number z) {
+        return new Location(x,y,z);
+    }
+    public static Location of(Number x, Number y, Number z, Number pitch, Number yaw) {
+        return new Location(x,y,z,pitch,yaw);
     }
 
     public Location clone() {
@@ -54,6 +67,11 @@ public class Location implements Cloneable {
 
     public static Location fromVector3D(Vector3D vector) {
         return new Location(vector.getX(), vector.getZ(), vector.getY(), 0, 0);
+    }
+
+    public static Location fromJsonArray(JsonArray array) {
+        if(array == null) return null;
+        return new Location(array.get(0).getAsDouble(),array.get(1).getAsDouble(),array.get(2).getAsDouble());
     }
 
     public Vector3D toVector3D() {

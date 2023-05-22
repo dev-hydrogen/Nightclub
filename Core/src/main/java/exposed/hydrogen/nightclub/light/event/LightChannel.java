@@ -1,7 +1,7 @@
 package exposed.hydrogen.nightclub.light.event;
 
 import com.google.gson.JsonArray;
-import exposed.hydrogen.nightclub.beatmap.GradientEvent;
+import exposed.hydrogen.nightclub.beatmap.json.GradientEvent;
 import exposed.hydrogen.nightclub.light.Light;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;

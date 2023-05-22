@@ -19,9 +19,10 @@ public class JSONUtils {
             return null;
         }
     }
+
     public static LightData addNewDataIfNull(LightData lightData) {
         LightData data = lightData.clone();
-        if(data.getRingMovementData() == null) {
+        if (data.getRingMovementData() == null) {
             data.setRingMovementData(new RingMovementData());
         }
         return data;

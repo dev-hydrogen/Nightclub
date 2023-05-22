@@ -75,6 +75,7 @@ public class LightUniverse {
             light.stop();
         });
         this.rings.forEach(Ring::stop);
+        this.rings.forEach(Ring::unload);
         isLoaded = false;
     }
 

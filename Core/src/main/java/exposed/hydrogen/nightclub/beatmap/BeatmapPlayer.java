@@ -2,6 +2,9 @@ package exposed.hydrogen.nightclub.beatmap;
 
 import com.google.gson.JsonArray;
 import exposed.hydrogen.nightclub.Nightclub;
+import exposed.hydrogen.nightclub.beatmap.json.GradientEvent;
+import exposed.hydrogen.nightclub.beatmap.json.InfoData;
+import exposed.hydrogen.nightclub.beatmap.json.LightEvent;
 import exposed.hydrogen.nightclub.light.Light;
 import exposed.hydrogen.nightclub.light.Ring;
 import exposed.hydrogen.nightclub.light.event.LightChannel;
@@ -21,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 public class BeatmapPlayer {
     private final List<LightEvent> events;
     private List<CrossCompatPlayer> playTo;
+    @Getter private final List<Track> trackRegistry;
     private final InfoData info;
     private final String name;
     private final String sound;
@@ -35,6 +39,7 @@ public class BeatmapPlayer {
     public BeatmapPlayer(String sound, String name, boolean useChroma) {
         info = BeatmapParser.getInfoData(name, useChroma);
         events = BeatmapParser.getEvents(name, useChroma);
+        trackRegistry = new ArrayList<>();
         this.sound = sound;
         this.name = name;
         playTo = new ArrayList<>();

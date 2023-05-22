@@ -25,4 +25,9 @@ public record MinestomPlayer(Player player) implements CrossCompatPlayer {
     public void stopSound(String name) {
         player.stopSound(SoundStop.named(Key.key(name)));
     }
+
+    @Override
+    public void teleport(Location location) {
+        player.teleport(MinestomUtil.getMinestomPos(location));
+    }
 }

@@ -1,4 +1,4 @@
-package exposed.hydrogen.nightclub.beatmap;
+package exposed.hydrogen.nightclub.beatmap.json;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

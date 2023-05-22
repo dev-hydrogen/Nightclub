@@ -100,6 +100,17 @@ public class LaserMinestom extends LaserWrapper {
         team.updateTeamColor(NamedTextColor.nearestTo(TextColor.color(this.color.getRGB())));
     }
 
+    public void kill() {
+        if(type == LightType.GUARDIAN_BEAM) {
+            guardian.kill();
+            squid.kill();
+            guardian.remove();
+            squid.remove();
+            return;
+        }
+        laser.remove();
+    }
+
     private void setTeam(LivingEntity entity) {
         team = new TeamBuilder(""+ this.hashCode(), MinecraftServer.getTeamManager())
                 .teamColor(NamedTextColor.nearestTo(TextColor.color(color.getRGB())))

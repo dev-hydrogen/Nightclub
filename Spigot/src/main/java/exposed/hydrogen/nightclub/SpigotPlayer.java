@@ -21,4 +21,9 @@ public record SpigotPlayer(Player player) implements CrossCompatPlayer {
     public void stopSound(String name) {
         player.stopSound(name);
     }
+
+    @Override
+    public void teleport(Location location) {
+        player.teleport(SpigotUtil.getBukkitLocation(location));
+    }
 }

@@ -2,6 +2,8 @@ package exposed.hydrogen.nightclub.beatmap;
 
 import com.google.gson.*;
 import exposed.hydrogen.nightclub.Nightclub;
+import exposed.hydrogen.nightclub.beatmap.json.InfoData;
+import exposed.hydrogen.nightclub.beatmap.json.LightEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

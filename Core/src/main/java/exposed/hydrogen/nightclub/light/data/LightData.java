@@ -21,6 +21,7 @@ public class LightData implements Cloneable {
     private int timeToFadeToBlack; // x * 100 ms
     private int lightCount;
     private boolean flipStartAndEnd; // flipped start and end makes downward pointing beams brighter, upward pointing beams less bright
+    private boolean isDuplicate; // is this laser a duplicate; does it need to be cleared when beatmap finishes
 
     //Auto-generated clone method
     @Override

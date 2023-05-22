@@ -1,18 +1,16 @@
 package exposed.hydrogen.nightclub.light;
 
 import com.google.gson.JsonArray;
+import exposed.hydrogen.nightclub.GameObject;
 import exposed.hydrogen.nightclub.Nightclub;
-import exposed.hydrogen.nightclub.beatmap.GradientEvent;
+import exposed.hydrogen.nightclub.beatmap.json.GradientEvent;
 import exposed.hydrogen.nightclub.light.data.*;
 import exposed.hydrogen.nightclub.light.event.LightChannel;
 import exposed.hydrogen.nightclub.light.event.LightSpeedChannel;
 import exposed.hydrogen.nightclub.util.Location;
 import exposed.hydrogen.nightclub.wrapper.DebugMarkerWrapper;
 import exposed.hydrogen.nightclub.wrapper.LaserWrapper;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.apache.commons.math3.geometry.euclidean.threed.Rotation;
 import org.apache.commons.math3.geometry.euclidean.threed.RotationConvention;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
@@ -27,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.StreamSupport;
 
 @EqualsAndHashCode
-public class Light {
+public class Light implements GameObject, Cloneable {
     private transient ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
     private static final transient int DELAY = 100; // run every x ms
     // annotations lol
@@ -47,6 +45,8 @@ public class Light {
     private transient double lastLength = 0;
     private transient double zoomTime = 0; // 0 to 1, current zoom time. does nothing if <=0
     private transient Location loc; // current location
+    private transient Location vec3Scale = new Location(); // vec3 scale
+    private transient Location vec3Rot = new Location(); // vec3 rotation
     @Getter @Setter private transient double x = 0; // 0 to 100, usually percentage of 360
     @Getter @Setter private transient double x2 = 0; // 0 to 100, usually percentage of 360, secondary pattern
     @Getter private transient Color color; // current color
@@ -58,6 +58,7 @@ public class Light {
     private transient int timeToFade; // internal fade off value
     private final transient Runnable run;
     private transient boolean isLoaded;
+    private transient boolean isEnabled = true;
 
     private Light() {
         this(new Location(0, 0, 0, 0, 0), LightPattern.STILL, LightType.GUARDIAN_BEAM, LightChannel.CENTER_LIGHTS);
@@ -75,7 +76,7 @@ public class Light {
         this(uniqueID, name, loc, type, channel, LightSpeedChannel.DEFAULT, new LightData(
                 new LightPatternData(pattern, 0, 0, 0, 0), new LightPatternData(LightPattern.STILL,
                 0, 0, 0, 0), new ArrayList<>(), new RingMovementData(new Location(), 0, 0), 0, 0, 0,
-                0, false));
+                0, false,false));
     }
 
     @Builder
@@ -91,6 +92,7 @@ public class Light {
 
         run = () -> {
             try {
+                if(!isEnabled) return;
                 if (isZoomed ? zoomTime < 1 : zoomTime > 0) {
                     double duration = getData().getRingMovementData().getDuration();
                     zoomTime = isZoomed ?
@@ -146,8 +148,11 @@ public class Light {
 
                 // a (invisible) "ray", pointing towards the set pitch and yaw, length is set later
                 Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize();
-                // make v the size of length
-                Vector3D v1 = v.scalarMultiply(getMaxLengthPercent(l));
+
+                Rotation rot = new Rotation(1,vec3Rot.getX(),vec3Rot.getY(),vec3Rot.getZ(),false);
+                // make v the size of length and add vec3scale
+                Vector3D v1 = rot.applyTo(v.scalarMultiply(getMaxLengthPercent(l))
+                        .add(new Vector3D(vec3Scale.getX(),vec3Scale.getY(),vec3Scale.getZ())));
                 for (int i = 0; i < lasers.size(); i++) {
                     LaserWrapper laser = lasers.get(i);
                     /*
@@ -204,6 +209,7 @@ public class Light {
         this.channel.removeListener(this);
         this.speedChannel.getChannel().removeSpeedListener(this);
         off(new Color(0x000000));
+        lasers.forEach(LaserWrapper::kill);
         stop();
         isLoaded = false;
     }
@@ -468,5 +474,58 @@ public class Light {
                 .replace("this.channel", "" + this.channel)
                 .replace("this.speedChannel", "" + this.speedChannel)
                 .replace("lightid", "" + data.getLightIDs());
+    }
+
+    @Override
+    public String name() {
+        return name;
+    }
+
+    @Override
+    public void position(Location location) {
+        this.loc = location;
+    }
+
+    @Override
+    public void setActive(boolean active) {
+        isEnabled = active;
+    }
+
+    @Override
+    public void scale(Location vec) {}
+
+    @Override
+    public void rotation(Location vec) {
+        vec3Rot = vec;
+    }
+
+    @Override
+    public Location position() {
+        return location;
+    }
+
+    @Override
+    public boolean active() {
+        return isEnabled;
+    }
+
+    @Override
+    public Location scale() {
+        return vec3Scale;
+    }
+
+    @Override
+    public Location rotation() {
+        return vec3Rot;
+    }
+
+    @SneakyThrows
+    @Override
+    public List<GameObject> duplicate(int amount) {
+        List<GameObject> these = new ArrayList<>();
+        for (int i = 0; i < amount; i++) {
+            these.add((GameObject) this.clone());
+        }
+        return these;
     }
 }

@@ -36,4 +36,6 @@ public abstract class LaserWrapper {
     public abstract void changeColor();
 
     public abstract void setTeamColor(Color color);
+
+    public abstract void kill();
 }

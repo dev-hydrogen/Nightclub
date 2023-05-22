@@ -168,6 +168,14 @@ public class Ring {
         this.isZoomed = false;
     }
 
+    public void unload() {
+        for(List<LaserWrapper> laserWrappers : lasers.values()) {
+            for(LaserWrapper laserWrapper : laserWrappers) {
+                laserWrapper.kill();
+            }
+        }
+    }
+
     public void spin() {
         // Replicates beat sabers ring system which is random, TODO: Implement chroma support of customizable ring direction
         rotationTime = random.nextBoolean() ? rotationTime + ringData.getRingRotation() + Math.abs(rotation/getRingData().getRingCount())

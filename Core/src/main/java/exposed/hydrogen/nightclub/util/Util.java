@@ -3,7 +3,7 @@ package exposed.hydrogen.nightclub.util;
 import com.google.gson.JsonArray;
 import exposed.hydrogen.nightclub.Nightclub;
 import exposed.hydrogen.nightclub.beatmap.BeatmapParser;
-import exposed.hydrogen.nightclub.beatmap.InfoData;
+import exposed.hydrogen.nightclub.beatmap.json.InfoData;
 import exposed.hydrogen.nightclub.commands.CommandError;
 import exposed.hydrogen.nightclub.light.Light;
 import exposed.hydrogen.nightclub.light.LightUniverse;
