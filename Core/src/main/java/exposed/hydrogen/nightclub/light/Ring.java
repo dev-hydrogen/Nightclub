@@ -16,7 +16,7 @@ import java.util.concurrent.ScheduledExecutorService;
 @EqualsAndHashCode
 public class Ring {
     private transient ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
-    private static final transient int DELAY = 100; // run every x ms
+    private static final int DELAY = 100; // run every x ms
 
     @Getter private final UUID uniqueId;
     @Getter @Setter private String name;

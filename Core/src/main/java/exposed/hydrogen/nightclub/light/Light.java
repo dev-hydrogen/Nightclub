@@ -27,7 +27,7 @@ import java.util.stream.StreamSupport;
 @EqualsAndHashCode
 public class Light implements GameObject, Cloneable {
     private transient ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
-    private static final transient int DELAY = 100; // run every x ms
+    private static final int DELAY = 100; // run every x ms
     // annotations lol
     @Getter private final UUID uniqueID;
     @Getter @Setter private String name;

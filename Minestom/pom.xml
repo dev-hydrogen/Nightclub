@@ -58,9 +58,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.Minestom</groupId>
-            <artifactId>Minestom</artifactId>
-            <version>-SNAPSHOT</version>
+            <groupId>com.github.hollow-cube</groupId>
+            <artifactId>minestom-ce</artifactId>
+            <version>7f3144337d</version> <!-- minestom 1.19.4 fork -->
             <scope>provided</scope>
             <exclusions>
                 <exclusion>

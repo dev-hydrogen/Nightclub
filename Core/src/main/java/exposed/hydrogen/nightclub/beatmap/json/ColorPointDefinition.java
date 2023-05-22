@@ -22,6 +22,7 @@ public class ColorPointDefinition {
         if(arr == null) return List.of();
         if(arr.isJsonPrimitive()) return List.of(); //TODO: support pre-set point definitions
         List<ColorPointDefinition> result = new ArrayList<>();
+        if(arr.getAsJsonArray().get(0).isJsonPrimitive()) return List.of(new ColorPointDefinition(arr.getAsJsonArray()));
         for(JsonElement element : arr.getAsJsonArray()) {
             var array = element.getAsJsonArray();
             result.add(new ColorPointDefinition(array));

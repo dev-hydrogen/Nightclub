@@ -24,6 +24,7 @@ public class TriplePointDefinition {
         if(arr == null) return List.of();
         if(arr.isJsonPrimitive()) return List.of(); //TODO: support pre-set point definitions
         List<TriplePointDefinition> result = new ArrayList<>();
+        if(arr.getAsJsonArray().get(0).isJsonPrimitive()) return List.of(new TriplePointDefinition(arr.getAsJsonArray()));
         for(JsonElement element : arr.getAsJsonArray()) {
             var array = element.getAsJsonArray();
             result.add(new TriplePointDefinition(array));
