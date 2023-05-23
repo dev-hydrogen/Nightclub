@@ -2,6 +2,7 @@ package exposed.hydrogen.nightclub.beatmap;
 
 import com.google.gson.JsonArray;
 import exposed.hydrogen.nightclub.Nightclub;
+import exposed.hydrogen.nightclub.beatmap.json.CustomEvent;
 import exposed.hydrogen.nightclub.beatmap.json.GradientEvent;
 import exposed.hydrogen.nightclub.beatmap.json.InfoData;
 import exposed.hydrogen.nightclub.beatmap.json.LightEvent;
@@ -23,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 public class BeatmapPlayer {
     private final List<LightEvent> events;
+    private final List<CustomEvent<?>> customEvents;
     private List<CrossCompatPlayer> playTo;
     @Getter private final List<Track> trackRegistry;
     private final InfoData info;
@@ -39,6 +41,11 @@ public class BeatmapPlayer {
     public BeatmapPlayer(String sound, String name, boolean useChroma) {
         info = BeatmapParser.getInfoData(name, useChroma);
         events = BeatmapParser.getEvents(name, useChroma);
+        if(useChroma) {
+            customEvents = BeatmapParser.getCustomEvents(name);
+        } else {
+            customEvents = new ArrayList<>();
+        }
         trackRegistry = new ArrayList<>();
         this.sound = sound;
         this.name = name;
@@ -129,6 +136,10 @@ public class BeatmapPlayer {
             // Rotation speed multiplier for right lasers
             case 13 -> LightChannel.RIGHT_ROTATING_LASERS.setSpeed(event.getValue());
         }
+    }
+
+    private void handle(CustomEvent<?> event, @Nullable CustomEvent<?> nextEvent) {
+
     }
 
     private void handleValue(LightChannel handler, int value, Color color, JsonArray lightIDs, int duration, @Nullable GradientEvent gradientEvent) {

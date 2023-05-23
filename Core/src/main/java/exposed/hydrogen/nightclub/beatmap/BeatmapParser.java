@@ -2,8 +2,12 @@ package exposed.hydrogen.nightclub.beatmap;
 
 import com.google.gson.*;
 import exposed.hydrogen.nightclub.Nightclub;
+import exposed.hydrogen.nightclub.beatmap.json.CustomEvent;
 import exposed.hydrogen.nightclub.beatmap.json.InfoData;
 import exposed.hydrogen.nightclub.beatmap.json.LightEvent;
+import exposed.hydrogen.nightclub.beatmap.json.events.AnimateTrack;
+import exposed.hydrogen.nightclub.beatmap.json.events.AssignPlayerToTrack;
+import exposed.hydrogen.nightclub.beatmap.json.events.AssignTrackParent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -149,6 +153,47 @@ public class BeatmapParser {
 
         eventArray.forEach(obj -> events.add(new LightEvent((JsonObject) obj, bpm, isChroma, info)));
 
+        return events;
+    }
+
+    public static List<CustomEvent<?>> getCustomEvents(String name) {
+        File dataFolder = Nightclub.DATA_FOLDER;
+        List<CustomEvent<?>> events = new ArrayList<>();
+        JsonArray eventArray;
+        InfoData info = BeatmapParser.getInfoData(name, true);
+        if (info == null) {
+            return new ArrayList<>();
+        }
+        File beatMapFile = new File(dataFolder + "/" + name + "/" + info.getBeatmapFileName());
+        double bpm = info.getBeatsPerMinute().doubleValue();
+
+        if (!beatMapFile.isFile()) {
+            // compatability with older versions of the plugin where you had to make sure your difficulty file was spelled exactly the same as the folder it was in
+            beatMapFile = new File(dataFolder + "/" + name + "/" + name + ".dat");
+            if (!beatMapFile.isFile()) {
+                return new ArrayList<>();
+            }
+        }
+        try {
+            JsonParser parser = new JsonParser();
+            FileReader reader = new FileReader(beatMapFile);
+
+            // LOL
+            eventArray = (JsonArray) ((JsonObject) parser.parse(reader)).get("_customEvents");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return events; // empty list
+        }
+
+        eventArray.forEach(obj -> {
+            JsonObject event = obj.getAsJsonObject();
+            String type = event.get("_type").getAsString();
+            switch(type) {
+                case "AnimateTrack" -> events.add(new AnimateTrack(event));
+                case "AssignPlayerToTrack" -> events.add(new AssignPlayerToTrack(event));
+                case "AssignTrackParent" -> events.add(new AssignTrackParent(event));
+            }
+        });
         return events;
     }
 }
