@@ -1,7 +1,9 @@
 package exposed.hydrogen.nightclub.light;
 
 import com.google.gson.InstanceCreator;
+import exposed.hydrogen.nightclub.GameObject;
 import exposed.hydrogen.nightclub.Nightclub;
+import exposed.hydrogen.nightclub.beatmap.json.EnvironmentObject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -117,6 +119,40 @@ public class LightUniverse {
                 .filter(light -> name.equals(light.getName()))
                 .findFirst()
                 .orElse(null);
+    }
+
+    public List<GameObject> getGameObjects() {
+        List<GameObject> gameObjects = new ArrayList<>();
+        gameObjects.addAll(lights);
+        gameObjects.addAll(rings);
+        return gameObjects;
+    }
+
+    public @Nullable GameObject getGameObject(String id, EnvironmentObject.LookupMethod lookupMethod) {
+        var objects = getGameObjects();
+        for (GameObject object : objects) {
+            switch(lookupMethod) {
+                case EXACT -> {
+                    if (object.name().equals(id)) {
+                        return object;
+                    }
+                }
+                case CONTAINS -> {
+                    if (object.name().contains(id)) {
+                        return object;
+                    }
+                }
+                case REGEX -> {
+                    if (object.name().matches(id)) {
+                        return object;
+                    }
+                }
+                default -> {
+                    return null;
+                }
+            }
+        }
+        return null;
     }
 
     public static class LightUniverseInstanceCreator implements InstanceCreator<LightUniverse> {

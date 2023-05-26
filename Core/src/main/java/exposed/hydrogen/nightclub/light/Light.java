@@ -492,7 +492,9 @@ public class Light implements GameObject, Cloneable {
     }
 
     @Override
-    public void scale(Location vec) {}
+    public void scale(Location vec) {
+        vec3Scale = vec;
+    }
 
     @Override
     public void rotation(Location vec) {

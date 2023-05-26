@@ -1,5 +1,6 @@
 package exposed.hydrogen.nightclub.light;
 
+import exposed.hydrogen.nightclub.GameObject;
 import exposed.hydrogen.nightclub.Nightclub;
 import exposed.hydrogen.nightclub.light.data.LightType;
 import exposed.hydrogen.nightclub.light.data.RingData;
@@ -14,7 +15,7 @@ import java.util.concurrent.ScheduledExecutorService;
 
 @ToString
 @EqualsAndHashCode
-public class Ring {
+public class Ring implements GameObject, Cloneable {
     private transient ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
     private static final int DELAY = 100; // run every x ms
 
@@ -32,6 +33,10 @@ public class Ring {
     private final transient Runnable run;
     private final transient Random random = new Random(56789);
     private transient boolean isBuilt;
+    private transient boolean isActive;
+    private transient Location currentLocation;
+    private transient Location scale;
+    private transient Location rotationVec;
 
     private Ring() {
         this(UUID.randomUUID(),"",new Location(),new RingData(),LightType.GUARDIAN_BEAM);
@@ -45,7 +50,10 @@ public class Ring {
         this.ringData = ringData;
         this.lightType = lightType;
         lasers = new LinkedHashMap<>();
+        isActive = true;
+        currentLocation = location.clone();
         this.run = () -> {
+            if(!isActive) return;
             if (isZoomed ? zoomTime < 1 : zoomTime > 0) {
                 double duration = getRingData().getRingMovementData().getDuration();
                 zoomTime = isZoomed ?
@@ -78,7 +86,7 @@ public class Ring {
             rotation = rotation % (360*this.ringData.getRingCount());
             for (int ring = 0; ring < this.ringData.getRingCount(); ring++) {
                 // a (invisible) "ray" the size of length, pointing towards the set pitch and yaw
-                Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch()))
+                Vector3D v = new Vector3D(Math.toRadians(this.currentLocation.getYaw()), Math.toRadians(this.currentLocation.getPitch()))
                         .normalize().scalarMultiply(((ring+1) * this.ringData.getRingSpacing()) / (zoomTime+1));
 
                 double ringRotation = (rotation*(this.ringData.getRingOffset()+ring))/this.ringData.getRingCount();
@@ -94,8 +102,8 @@ public class Ring {
                     Vector3D nextRingEdgePoint = ringEdgePoints.get((i + 1) % ringEdgePoints.size());
                     Vector3D v1 = getRingData().getRingMovementData().calculateMovement(zoomTime);
 
-                    laser.setStart(this.location.clone().add(Location.fromVector3D(ringedgePoint.add(v1).add(v))));
-                    laser.setEnd(this.location.clone().add(Location.fromVector3D(nextRingEdgePoint.add(v1).add(v))));
+                    laser.setStart(this.currentLocation.clone().add(Location.fromVector3D(ringedgePoint.add(v1).add(v))));
+                    laser.setEnd(this.currentLocation.clone().add(Location.fromVector3D(nextRingEdgePoint.add(v1).add(v))));
                 }
             }
         };
@@ -189,5 +197,75 @@ public class Ring {
 
     public void ringZoom() {
         isZoomed = !isZoomed;
+    }
+
+    @Override
+    public String name() {
+        return getName();
+    }
+
+    @Override
+    public void position(Location location) {
+        this.currentLocation = location;
+    }
+
+    @Override
+    public void setActive(boolean active) {
+        if(active) {
+            start();
+        } else {
+            stop();
+        }
+        this.isActive = active;
+    }
+
+    @Override
+    public void scale(Location vec) {
+        scale = vec;
+    }
+
+    @Override
+    public void rotation(Location vec) {
+        rotationVec = vec;
+    }
+
+    @Override
+    public Location position() {
+        return currentLocation;
+    }
+
+    @Override
+    public boolean active() {
+        return isActive;
+    }
+
+    @Override
+    public Location scale() {
+        return scale;
+    }
+
+    @Override
+    public Location rotation() {
+        return rotationVec;
+    }
+
+    @Override
+    public List<GameObject> duplicate(int amount) {
+        List<Ring> list = new ArrayList<>();
+        for (int i = 0; i < amount; i++) {
+            try {
+                list.add(this.clone());
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return new ArrayList<>(list);
+    }
+
+    // clone method
+    @Override
+    public Ring clone() throws CloneNotSupportedException {
+        Ring ring = (Ring) super.clone();
+        return ring;
     }
 }

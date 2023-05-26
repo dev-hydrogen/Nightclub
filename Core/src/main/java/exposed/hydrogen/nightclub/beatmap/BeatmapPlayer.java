@@ -58,7 +58,7 @@ public class BeatmapPlayer {
     public InfoData play(List<CrossCompatPlayer> playTo) {
         List<LightChannel> channelList = Arrays.asList(LightChannel.values());
         this.playTo = playTo;
-        executorService = Executors.newScheduledThreadPool(7);
+        executorService = Executors.newScheduledThreadPool(8);
         playTo.forEach((player) -> player.playSound(player.getLocation(), sound, 1, 1));
         isPlaying = true;
         Nightclub.getLightUniverseManager().getLoadedUniverse().getRings().forEach(Ring::reset);
@@ -107,6 +107,12 @@ public class BeatmapPlayer {
             Nightclub.getLightUniverseManager().getLoadedUniverse().getRings().forEach(Ring::reset);
         }
         playTo.forEach(player -> player.stopSound(sound));
+    }
+
+    private void handleEnvironment() {
+        for(EnvironmentObject object : environment) {
+
+        }
     }
 
     /**
