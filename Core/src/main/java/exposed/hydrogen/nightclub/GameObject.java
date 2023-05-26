@@ -7,7 +7,7 @@ import java.util.List;
 public interface GameObject {
     String name();
     void position(Location location);
-    void setActive(boolean active);
+    void active(boolean active);
     void scale(Location vec);
     void rotation(Location vec);
     void lightID(int id);
@@ -16,5 +16,6 @@ public interface GameObject {
     Location scale();
     Location rotation();
     int lightID();
+    void destroy();
     List<GameObject> duplicate(int amount);
 }

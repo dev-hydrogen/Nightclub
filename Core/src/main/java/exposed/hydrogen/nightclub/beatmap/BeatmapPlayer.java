@@ -73,6 +73,8 @@ public class BeatmapPlayer {
         //start all channels up and then turn them off to wait for beatmap instructions
         channelList.forEach(LightChannel::initializePlayback);
 
+        setupEnvironment();
+
         long startTime = System.currentTimeMillis();
         Nightclub.getChameleon().getLogger().info("Event count: " + events.size());
         for (int i = 0; i < events.size(); i++) {
@@ -115,7 +117,7 @@ public class BeatmapPlayer {
         playTo.forEach(player -> player.stopSound(sound));
     }
 
-    private void handleEnvironment() {
+    private void setupEnvironment() {
         for(EnvironmentObject object : environment) {
             GameObject oGameObject = universe.getGameObject(object.id(), object.lookupMethod());
             if (oGameObject == null) {
@@ -123,7 +125,7 @@ public class BeatmapPlayer {
             }
             List<GameObject> duplicated = oGameObject.duplicate(object.duplicate().orElse(1));
             for(GameObject gameObject : duplicated) {
-                gameObject.setActive(object.active().orElse(true));
+                gameObject.active(object.active().orElse(true));
                 if (object.position().isPresent()) {
                     gameObject.position(object.position().get());
                 }
@@ -143,14 +145,24 @@ public class BeatmapPlayer {
                     gameObject.lightID(object.lightID().get());
                 }
                 if(object.track().isPresent()) {
-                    getTrack(object.track().get().name()).addGameObject(gameObject);
+                    getTrackOrCreate(object.track().get()).addGameObject(gameObject);
                 }
+                this.clonedObjects.add(gameObject);
             }
         }
     }
 
     public Track getTrack(String track) {
         return trackRegistry.stream().filter(t -> t.name().equals(track)).findFirst().orElse(null);
+    }
+
+    public Track getTrackOrCreate(String track) {
+        Track t = getTrack(track);
+        if(t == null) {
+            t = new Track(track, new ArrayList<>(), new ArrayList<>(),null);
+            trackRegistry.add(t);
+        }
+        return t;
     }
 
     /**

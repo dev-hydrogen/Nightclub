@@ -487,7 +487,7 @@ public class Light implements GameObject, Cloneable {
     }
 
     @Override
-    public void setActive(boolean active) {
+    public void active(boolean active) {
         isEnabled = active;
     }
 
@@ -529,6 +529,11 @@ public class Light implements GameObject, Cloneable {
     @Override
     public int lightID() {
         return data.getLightIDs().get(0);
+    }
+
+    @Override
+    public void destroy() {
+        unload();
     }
 
     @SneakyThrows

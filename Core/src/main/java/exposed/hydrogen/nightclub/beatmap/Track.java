@@ -35,21 +35,25 @@ public class Track implements GameObject, Cloneable {
     @Override
     public void position(Location location) {
         loc = location;
+        updateChildren();
     }
 
     @Override
-    public void setActive(boolean active) {
+    public void active(boolean active) {
         this.active = active;
+        updateChildren();
     }
 
     @Override
     public void scale(Location vec) {
         this.scale = vec;
+        updateChildren();
     }
 
     @Override
     public void rotation(Location vec) {
         rot = vec;
+        updateChildren();
     }
 
     @Override
@@ -82,7 +86,14 @@ public class Track implements GameObject, Cloneable {
         return lightID;
     }
 
+    @Override
+    public void destroy() {
+        objects.forEach(GameObject::destroy);
+        children.forEach(GameObject::destroy);
+    }
+
     public void addChild(Track child) {
+        if(child == this) throw new IllegalArgumentException("Cannot add a track to itself!");
         children.add(child);
         child.parent = this;
     }
@@ -93,6 +104,8 @@ public class Track implements GameObject, Cloneable {
     }
 
     public void addGameObject(GameObject object) {
+        if(object instanceof Track) addChild((Track) object);
+        if(object == this) throw new IllegalArgumentException("Cannot add a track to itself!");
         objects.add(object);
     }
 
@@ -102,6 +115,7 @@ public class Track implements GameObject, Cloneable {
 
     private void updateChildren() {
         children.forEach((c) -> {
+            c.active(active);
             c.position(loc);
             c.rotation(rot);
             c.scale(scale);

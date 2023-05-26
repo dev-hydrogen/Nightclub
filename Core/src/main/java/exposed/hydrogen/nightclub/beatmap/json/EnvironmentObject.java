@@ -22,7 +22,7 @@ public record EnvironmentObject(String id,
                                 Optional<Location> rotation,
                                 Optional<Location> localRotation,
                                 Optional<Integer> lightID,
-                                Optional<Track> track) {
+                                Optional<String> track) {
     public static EnvironmentObject fromObject(JsonObject obj) {
         if(obj.get("_geometry") != null) throw new IllegalArgumentException("_geometry objects not allowed");
         if(BeatmapCommand.getPlayer() == null) throw new IllegalStateException("Beatmap player is null");
@@ -51,8 +51,9 @@ public record EnvironmentObject(String id,
         if(lightIDObj != null) {
             lightID = lightIDObj.getAsInt();
         }
+        String trackStr;
         if(track != null) {
-            String trackStr = track.getAsString();
+            trackStr = track.getAsString();
             trackObj = BeatmapCommand.getPlayer().getTrackRegistry()
                     .stream()
                     .filter(trck -> trck.name().equals(trackStr))
@@ -60,6 +61,7 @@ public record EnvironmentObject(String id,
                     .orElse(new Track(trackStr, new ArrayList<>(), new ArrayList<>(),null));
         } else {
             trackObj = null;
+            trackStr = null;
         }
 
         return new EnvironmentObject(
@@ -73,7 +75,7 @@ public record EnvironmentObject(String id,
                 Optional.ofNullable(rotation),
                 Optional.ofNullable(localRotation),
                 Optional.ofNullable(lightID),
-                Optional.ofNullable(trackObj)
+                Optional.ofNullable(trackStr)
         );
     }
     public enum LookupMethod {

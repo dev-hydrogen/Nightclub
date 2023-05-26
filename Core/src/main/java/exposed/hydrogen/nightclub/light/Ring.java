@@ -211,7 +211,7 @@ public class Ring implements GameObject, Cloneable {
     }
 
     @Override
-    public void setActive(boolean active) {
+    public void active(boolean active) {
         if(active) {
             start();
         } else {
@@ -258,6 +258,13 @@ public class Ring implements GameObject, Cloneable {
     @Override
     public int lightID() {
         return lightID;
+    }
+
+    @Override
+    public void destroy() {
+        reset();
+        stop();
+        unload();
     }
 
     @Override
