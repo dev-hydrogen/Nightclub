@@ -10,9 +10,11 @@ public interface GameObject {
     void setActive(boolean active);
     void scale(Location vec);
     void rotation(Location vec);
+    void lightID(int id);
     Location position();
     boolean active();
     Location scale();
     Location rotation();
+    int lightID();
     List<GameObject> duplicate(int amount);
 }

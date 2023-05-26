@@ -1,5 +1,6 @@
 package exposed.hydrogen.nightclub.beatmap.json;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import exposed.hydrogen.nightclub.beatmap.Track;
 import exposed.hydrogen.nightclub.commands.BeatmapCommand;
@@ -27,8 +28,8 @@ public record EnvironmentObject(String id,
         if(BeatmapCommand.getPlayer() == null) throw new IllegalStateException("Beatmap player is null");
         String id = obj.get("_id").getAsString();
         LookupMethod lookupMethod = LookupMethod.valueOf(obj.get("_lookupMethod").getAsString().toUpperCase(Locale.ROOT));
-        JsonObject duplicateObj = obj.getAsJsonObject("_duplicate");
-        JsonObject activeObj = obj.getAsJsonObject("_active");
+        JsonElement duplicateObj = obj.get("_duplicate");
+        JsonElement activeObj = obj.get("_active");
         Integer duplicate = null;
         Boolean active = null;
         if(duplicateObj != null) {
@@ -43,8 +44,8 @@ public record EnvironmentObject(String id,
         Location rotation = fromJsonArray(obj.getAsJsonArray("_rotation"));
         Location localRotation = fromJsonArray(obj.getAsJsonArray("_localRotation"));
 
-        JsonObject lightIDObj = obj.getAsJsonObject("_lightID");
-        JsonObject track = obj.getAsJsonObject("_track");
+        JsonElement lightIDObj = obj.get("_lightID");
+        JsonElement track = obj.get("_track");
         Integer lightID = null;
         Track trackObj;
         if(lightIDObj != null) {

@@ -24,6 +24,7 @@ public class Ring implements GameObject, Cloneable {
     @Getter @Setter private Location location; // only changes when manually set
     @Getter @Setter private RingData ringData;
     @Getter @Setter private LightType lightType;
+    @Getter @Setter private int lightID;
 
     private final transient LinkedHashMap<Integer,List<LaserWrapper>> lasers;
     private transient double zoomTime = 0; // 0 to 1, current zoom time. does nothing if <=0
@@ -230,6 +231,11 @@ public class Ring implements GameObject, Cloneable {
     }
 
     @Override
+    public void lightID(int id) {
+        lightID = id;
+    }
+
+    @Override
     public Location position() {
         return currentLocation;
     }
@@ -247,6 +253,11 @@ public class Ring implements GameObject, Cloneable {
     @Override
     public Location rotation() {
         return rotationVec;
+    }
+
+    @Override
+    public int lightID() {
+        return lightID;
     }
 
     @Override

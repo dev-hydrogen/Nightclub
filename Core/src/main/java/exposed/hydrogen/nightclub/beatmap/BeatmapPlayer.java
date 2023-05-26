@@ -1,9 +1,11 @@
 package exposed.hydrogen.nightclub.beatmap;
 
 import com.google.gson.JsonArray;
+import exposed.hydrogen.nightclub.GameObject;
 import exposed.hydrogen.nightclub.Nightclub;
 import exposed.hydrogen.nightclub.beatmap.json.*;
 import exposed.hydrogen.nightclub.light.Light;
+import exposed.hydrogen.nightclub.light.LightUniverse;
 import exposed.hydrogen.nightclub.light.Ring;
 import exposed.hydrogen.nightclub.light.event.LightChannel;
 import exposed.hydrogen.nightclub.util.CrossCompatPlayer;
@@ -24,11 +26,13 @@ public class BeatmapPlayer {
     private final List<LightEvent> events;
     private final List<CustomEvent<?>> customEvents;
     private final List<EnvironmentObject> environment;
+    private final List<GameObject> clonedObjects;
     private List<CrossCompatPlayer> playTo;
     @Getter private final List<Track> trackRegistry;
     private final InfoData info;
     private final String name;
     private final String sound;
+    private final LightUniverse universe;
     private ScheduledExecutorService executorService;
     @Getter private boolean isPlaying;
 
@@ -37,13 +41,15 @@ public class BeatmapPlayer {
      *
      * @param name name of the folder the beatmap itself resides in (/name/ExpertPlus.dat)
      */
-    public BeatmapPlayer(String sound, String name, boolean useChroma) {
+    public BeatmapPlayer(String sound, String name, boolean useChroma, LightUniverse universe) {
         info = BeatmapParser.getInfoData(name, useChroma);
         parsedBeatmap = BeatmapParser.parseBeatmap(info, name);
         events = parsedBeatmap.getEvents();
         customEvents = parsedBeatmap.getCustomEvents();
         environment = parsedBeatmap.getEnvironment();
         trackRegistry = new ArrayList<>();
+        clonedObjects = new ArrayList<>();
+        this.universe = universe;
         this.sound = sound;
         this.name = name;
         playTo = new ArrayList<>();
@@ -111,8 +117,40 @@ public class BeatmapPlayer {
 
     private void handleEnvironment() {
         for(EnvironmentObject object : environment) {
-
+            GameObject oGameObject = universe.getGameObject(object.id(), object.lookupMethod());
+            if (oGameObject == null) {
+                continue;
+            }
+            List<GameObject> duplicated = oGameObject.duplicate(object.duplicate().orElse(1));
+            for(GameObject gameObject : duplicated) {
+                gameObject.setActive(object.active().orElse(true));
+                if (object.position().isPresent()) {
+                    gameObject.position(object.position().get());
+                }
+                if (object.rotation().isPresent()) {
+                    gameObject.rotation(object.rotation().get());
+                }
+                if (object.scale().isPresent()) {
+                    gameObject.scale(object.scale().get());
+                }
+                if (object.localPosition().isPresent()) {
+                    gameObject.position(gameObject.position().clone().add(object.localPosition().get()));
+                }
+                if (object.localRotation().isPresent()) {
+                    gameObject.rotation(gameObject.rotation().clone().add(object.localRotation().get()));
+                }
+                if(object.lightID().isPresent()) {
+                    gameObject.lightID(object.lightID().get());
+                }
+                if(object.track().isPresent()) {
+                    getTrack(object.track().get().name()).addGameObject(gameObject);
+                }
+            }
         }
+    }
+
+    public Track getTrack(String track) {
+        return trackRegistry.stream().filter(t -> t.name().equals(track)).findFirst().orElse(null);
     }
 
     /**

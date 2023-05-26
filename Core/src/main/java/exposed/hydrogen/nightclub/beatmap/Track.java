@@ -10,20 +10,21 @@ import java.util.List;
 
 @AllArgsConstructor
 public class Track implements GameObject, Cloneable {
-    String name;
-    List<GameObject> objects;
-    List<Track> children;
-    @Nullable Track parent;
+    private String name;
+    private List<GameObject> objects;
+    private List<Track> children;
+    private @Nullable Track parent;
 
-    Location loc;
-    Location localLoc;
-    Location scale;
-    Location rot;
-    Location localRot;
-    boolean active;
+    private Location loc;
+    private Location localLoc;
+    private Location scale;
+    private Location rot;
+    private Location localRot;
+    private boolean active;
+    private int lightID;
 
     public Track(String name, List<GameObject> objects, List<Track> children, @Nullable Track parent) {
-        this(name,objects,children,parent,Location.of(),Location.of(),Location.of(),Location.of(),Location.of(),true);
+        this(name,objects,children,parent,Location.of(),Location.of(),Location.of(),Location.of(),Location.of(),true,0);
     }
 
     @Override
@@ -52,6 +53,11 @@ public class Track implements GameObject, Cloneable {
     }
 
     @Override
+    public void lightID(int id) {
+        lightID = id;
+    }
+
+    @Override
     public Location position() {
         return loc;
     }
@@ -69,6 +75,29 @@ public class Track implements GameObject, Cloneable {
     @Override
     public Location rotation() {
         return rot;
+    }
+
+    @Override
+    public int lightID() {
+        return lightID;
+    }
+
+    public void addChild(Track child) {
+        children.add(child);
+        child.parent = this;
+    }
+
+    public void removeChild(Track child) {
+        children.remove(child);
+        child.parent = null;
+    }
+
+    public void addGameObject(GameObject object) {
+        objects.add(object);
+    }
+
+    public void removeGameObject(GameObject object) {
+        objects.remove(object);
     }
 
     private void updateChildren() {

@@ -502,6 +502,11 @@ public class Light implements GameObject, Cloneable {
     }
 
     @Override
+    public void lightID(int id) {
+        data.setLightIDs(new ArrayList<>(Collections.singletonList(id)));
+    }
+
+    @Override
     public Location position() {
         return location;
     }
@@ -519,6 +524,11 @@ public class Light implements GameObject, Cloneable {
     @Override
     public Location rotation() {
         return vec3Rot;
+    }
+
+    @Override
+    public int lightID() {
+        return data.getLightIDs().get(0);
     }
 
     @SneakyThrows
