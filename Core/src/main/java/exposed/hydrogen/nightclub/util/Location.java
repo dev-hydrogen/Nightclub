@@ -79,7 +79,8 @@ public class Location implements Cloneable {
     }
 
     public static Location fromTriplePointDefinition(TriplePointDefinition definition) {
-        return new Location(definition.getX(), definition.getY(), definition.getZ());
+        double easing = definition.getEasing().getFunction().apply(definition.getT()).doubleValue();
+        return new Location(definition.getX()*easing, definition.getY()*easing, definition.getZ()*easing);
     }
 
     public Vector3D toVector3D() {
