@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public abstract class CustomEvent<Data> {
-    private double time;
+    private long time;
     private String type;
     protected Data data;
 

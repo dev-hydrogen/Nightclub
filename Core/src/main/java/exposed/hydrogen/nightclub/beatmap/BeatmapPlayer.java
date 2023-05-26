@@ -93,6 +93,17 @@ public class BeatmapPlayer {
             executorService.schedule(task, event.getTime()-(diff*1000), TimeUnit.MICROSECONDS);
         }
 
+        long customEventStart = System.currentTimeMillis();
+        for (int i = 0; i < customEvents.size(); i++) {
+
+            long diff = System.currentTimeMillis()-customEventStart;
+            CustomEvent<?> event = customEvents.get(i);
+            CustomEvent<?> nextEvent = i+1 < customEvents.size() ? customEvents.get(i+1) : null;
+
+            Runnable task = () -> handle(event, nextEvent);
+            executorService.schedule(task,event.getTime()-(diff*1000), TimeUnit.MICROSECONDS);
+        }
+
         //schedule turn off 5s after the show is over
         Runnable task = () -> {
             isPlaying = false;
@@ -209,9 +220,9 @@ public class BeatmapPlayer {
 
         }
         if(event instanceof AnimateTrack ev) {
-            Track track = getTrack(ev.getData().get_track());
+            List<Track> track = getTracks(ev.getData().get_track());
             if(track == null) { return; }
-            track.animate(ev);
+            track.forEach(t -> t.animate(ev));
         }
     }
 
