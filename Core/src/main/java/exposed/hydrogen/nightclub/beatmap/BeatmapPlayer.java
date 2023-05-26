@@ -4,6 +4,9 @@ import com.google.gson.JsonArray;
 import exposed.hydrogen.nightclub.GameObject;
 import exposed.hydrogen.nightclub.Nightclub;
 import exposed.hydrogen.nightclub.beatmap.json.*;
+import exposed.hydrogen.nightclub.beatmap.json.events.AnimateTrack;
+import exposed.hydrogen.nightclub.beatmap.json.events.AssignPlayerToTrack;
+import exposed.hydrogen.nightclub.beatmap.json.events.AssignTrackParent;
 import exposed.hydrogen.nightclub.light.Light;
 import exposed.hydrogen.nightclub.light.LightUniverse;
 import exposed.hydrogen.nightclub.light.Ring;
@@ -96,6 +99,7 @@ public class BeatmapPlayer {
             channelList.forEach(LightChannel::terminatePlayback);
             Nightclub.getLightUniverseManager().getLoadedUniverse().getRings().forEach(Ring::stop);
             Nightclub.getLightUniverseManager().getLoadedUniverse().getRings().forEach(Ring::reset);
+            clonedObjects.forEach(GameObject::destroy);
         };
         executorService.schedule(task, events.get(events.size() - 1).getTime() + 5000000, TimeUnit.MICROSECONDS);
         Nightclub.getChameleon().getLogger().info(info.toString());
@@ -156,6 +160,10 @@ public class BeatmapPlayer {
         return trackRegistry.stream().filter(t -> t.name().equals(track)).findFirst().orElse(null);
     }
 
+    public List<Track> getTracks(List<String> track) {
+        return track.stream().map(this::getTrack).toList();
+    }
+
     public Track getTrackOrCreate(String track) {
         Track t = getTrack(track);
         if(t == null) {
@@ -192,7 +200,19 @@ public class BeatmapPlayer {
     }
 
     private void handle(CustomEvent<?> event, @Nullable CustomEvent<?> nextEvent) {
+        if(event instanceof AssignTrackParent ev) {
+            Track parent = getTrack(ev.getData().get_parentTrack());
+            if(parent == null) { return; }
+            getTracks(ev.getData().get_childrenTracks()).forEach(parent::addChild);
+        }
+        if(event instanceof AssignPlayerToTrack ev) {
 
+        }
+        if(event instanceof AnimateTrack ev) {
+            Track track = getTrack(ev.getData().get_track());
+            if(track == null) { return; }
+            track.animate(ev);
+        }
     }
 
     private void handleValue(LightChannel handler, int value, Color color, JsonArray lightIDs, int duration, @Nullable GradientEvent gradientEvent) {

@@ -171,9 +171,9 @@ public class BeatmapParser {
             JsonObject event = obj.getAsJsonObject();
             String type = event.get("_type").getAsString();
             switch(type) {
-                case "AnimateTrack" -> customEvents.add(new AnimateTrack(event));
-                case "AssignPlayerToTrack" -> customEvents.add(new AssignPlayerToTrack(event));
-                case "AssignTrackParent" -> customEvents.add(new AssignTrackParent(event));
+                case "AnimateTrack" -> customEvents.add(new AnimateTrack(event, bpm));
+                case "AssignPlayerToTrack" -> customEvents.add(new AssignPlayerToTrack(event, bpm));
+                case "AssignTrackParent" -> customEvents.add(new AssignTrackParent(event, bpm));
             }
         });
         environmentArray.forEach(obj -> environment.add(EnvironmentObject.fromObject(obj.getAsJsonObject())));

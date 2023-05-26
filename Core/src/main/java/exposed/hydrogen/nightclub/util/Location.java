@@ -1,6 +1,7 @@
 package exposed.hydrogen.nightclub.util;
 
 import com.google.gson.JsonArray;
+import exposed.hydrogen.nightclub.beatmap.json.TriplePointDefinition;
 import lombok.Data;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
@@ -75,6 +76,10 @@ public class Location implements Cloneable {
             throw new IllegalArgumentException("Cannot convert JsonArray of JsonArrays to Location");
         }
         return new Location(array.get(0).getAsDouble(),array.get(1).getAsDouble(),array.get(2).getAsDouble());
+    }
+
+    public static Location fromTriplePointDefinition(TriplePointDefinition definition) {
+        return new Location(definition.getX(), definition.getY(), definition.getZ());
     }
 
     public Vector3D toVector3D() {

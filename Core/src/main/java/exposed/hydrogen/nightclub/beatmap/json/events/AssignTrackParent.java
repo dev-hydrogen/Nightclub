@@ -8,15 +8,15 @@ import java.util.List;
 
 public class AssignTrackParent extends CustomEvent<AssignTrackParent.Data> {
 
-    public AssignTrackParent(JsonObject object) {
-        super(object);
+    public AssignTrackParent(JsonObject object, double bpm) {
+        super(object, bpm);
         data = new Data(object.getAsJsonObject("_data"));
     }
     @lombok.Data
-    class Data {
-        List<String> _childrenTracks;
-        String _parentTrack;
-        boolean _worldPositionStays;
+    public static final class Data {
+        final List<String> _childrenTracks;
+        final String _parentTrack;
+        final boolean _worldPositionStays;
 
         Data(JsonObject object) {
             var arr = object.getAsJsonArray("_childrenTracks");
