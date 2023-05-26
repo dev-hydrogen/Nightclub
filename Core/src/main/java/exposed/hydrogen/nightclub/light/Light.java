@@ -149,7 +149,9 @@ public class Light implements GameObject, Cloneable {
                 // a (invisible) "ray", pointing towards the set pitch and yaw, length is set later
                 Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize();
 
-                Rotation rot = new Rotation(1,vec3Rot.getX(),vec3Rot.getY(),vec3Rot.getZ(),false);
+                Vector3D rot3d = new Vector3D(vec3Rot.getX(),vec3Rot.getY(),vec3Rot.getZ());
+
+                Rotation rot = new Rotation(rot3d,0,RotationConvention.VECTOR_OPERATOR);
                 // make v the size of length and add vec3scale
                 Vector3D v1 = rot.applyTo(v.scalarMultiply(getMaxLengthPercent(l))
                         .add(new Vector3D(vec3Scale.getX(),vec3Scale.getY(),vec3Scale.getZ())));
