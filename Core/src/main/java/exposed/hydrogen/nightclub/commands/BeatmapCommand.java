@@ -38,7 +38,11 @@ public class BeatmapCommand extends BaseCommand {
         var info = BeatmapParser.getInfoData(args[0], true);
         var sounds = Util.getSounds(new File(Nightclub.DATA_FOLDER.getAbsolutePath()));
         var sound = (Sound.File) sounds.get(info).values().toArray()[0];
-        player = new BeatmapPlayer(sound.key().asString(), args[0], args.length >= 2 && Boolean.parseBoolean(args[1]));
+        player = new BeatmapPlayer(
+                sound.key().asString(),
+                args[0],
+                args.length >= 2 && Boolean.parseBoolean(args[1]),
+                Nightclub.getLightUniverseManager().getLoadedUniverse());
 
         player.play(Nightclub.getCrossCompatUtil().getListOfPlayers());
         String playBackMessage = "\u00A76" + "Now Playing: " + "\u00A7b" + info.getSongAuthorName() + " - " + info.getSongName() + " " + info.getSongSubName() + System.lineSeparator()
