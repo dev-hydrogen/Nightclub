@@ -3,11 +3,14 @@ package exposed.hydrogen.nightclub.beatmap;
 import com.google.gson.*;
 import exposed.hydrogen.nightclub.Nightclub;
 import exposed.hydrogen.nightclub.beatmap.json.CustomEvent;
+import exposed.hydrogen.nightclub.beatmap.json.EnvironmentObject;
 import exposed.hydrogen.nightclub.beatmap.json.InfoData;
 import exposed.hydrogen.nightclub.beatmap.json.LightEvent;
 import exposed.hydrogen.nightclub.beatmap.json.events.AnimateTrack;
 import exposed.hydrogen.nightclub.beatmap.json.events.AssignPlayerToTrack;
 import exposed.hydrogen.nightclub.beatmap.json.events.AssignTrackParent;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -121,13 +124,10 @@ public class BeatmapParser {
      * @param name Folder where beatmap is (/name/ExpertPlus.dat/)
      * @return List of LightEvent's in the beatmap file. Returns an empty list if info file can't be found
      */
-    public static @NotNull List<LightEvent> getEvents(String name, boolean useChroma) {
+    public static @NotNull BeatmapParser.ParsedBeatmap parseBeatmap(InfoData info, String name) {
         File dataFolder = Nightclub.DATA_FOLDER;
-        List<LightEvent> events = new ArrayList<>();
-        JsonArray eventArray;
-        InfoData info = BeatmapParser.getInfoData(name, useChroma);
         if (info == null) {
-            return new ArrayList<>();
+            return new ParsedBeatmap(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
         }
         File beatMapFile = new File(dataFolder + "/" + name + "/" + info.getBeatmapFileName());
         double bpm = info.getBeatsPerMinute().doubleValue();
@@ -136,64 +136,56 @@ public class BeatmapParser {
             // compatability with older versions of the plugin where you had to make sure your difficulty file was spelled exactly the same as the folder it was in
             beatMapFile = new File(dataFolder + "/" + name + "/" + name + ".dat");
             if (!beatMapFile.isFile()) {
-                return new ArrayList<>();
+                return new ParsedBeatmap(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
             }
         }
 
+        JsonArray eventArray;
+        JsonArray customEventArray;
+        JsonArray environmentArray;
         try {
             JsonParser parser = new JsonParser();
             FileReader reader = new FileReader(beatMapFile);
 
             // LOL
-            eventArray = (JsonArray) ((JsonObject) parser.parse(reader)).get("_events");
+            JsonElement parsed = parser.parse(reader);
+            eventArray = parsed.getAsJsonObject().getAsJsonArray("_events");
+            JsonObject customDataObj = parsed.getAsJsonObject().getAsJsonObject("_customData");
+            if(customDataObj != null) {
+                customEventArray = customDataObj.getAsJsonArray("_customEvents");
+                environmentArray = customDataObj.getAsJsonArray("_environment");
+            } else {
+                customEventArray = new JsonArray();
+                environmentArray = new JsonArray();
+            }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            return events; // empty list
+            return new ParsedBeatmap(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
         }
+        List<LightEvent> events = new ArrayList<>();
+        List<CustomEvent<?>> customEvents = new ArrayList<>();
+        List<EnvironmentObject> environment = new ArrayList<>();
 
         eventArray.forEach(obj -> events.add(new LightEvent((JsonObject) obj, bpm, isChroma, info)));
-
-        return events;
-    }
-
-    public static List<CustomEvent<?>> getCustomEvents(String name) {
-        File dataFolder = Nightclub.DATA_FOLDER;
-        List<CustomEvent<?>> events = new ArrayList<>();
-        JsonArray eventArray;
-        InfoData info = BeatmapParser.getInfoData(name, true);
-        if (info == null) {
-            return new ArrayList<>();
-        }
-        File beatMapFile = new File(dataFolder + "/" + name + "/" + info.getBeatmapFileName());
-        double bpm = info.getBeatsPerMinute().doubleValue();
-
-        if (!beatMapFile.isFile()) {
-            // compatability with older versions of the plugin where you had to make sure your difficulty file was spelled exactly the same as the folder it was in
-            beatMapFile = new File(dataFolder + "/" + name + "/" + name + ".dat");
-            if (!beatMapFile.isFile()) {
-                return new ArrayList<>();
-            }
-        }
-        try {
-            JsonParser parser = new JsonParser();
-            FileReader reader = new FileReader(beatMapFile);
-
-            // LOL
-            eventArray = (JsonArray) ((JsonObject) parser.parse(reader)).get("_customEvents");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return events; // empty list
-        }
-
-        eventArray.forEach(obj -> {
+        customEventArray.forEach(obj -> {
             JsonObject event = obj.getAsJsonObject();
             String type = event.get("_type").getAsString();
             switch(type) {
-                case "AnimateTrack" -> events.add(new AnimateTrack(event));
-                case "AssignPlayerToTrack" -> events.add(new AssignPlayerToTrack(event));
-                case "AssignTrackParent" -> events.add(new AssignTrackParent(event));
+                case "AnimateTrack" -> customEvents.add(new AnimateTrack(event));
+                case "AssignPlayerToTrack" -> customEvents.add(new AssignPlayerToTrack(event));
+                case "AssignTrackParent" -> customEvents.add(new AssignTrackParent(event));
             }
         });
-        return events;
+        environmentArray.forEach(obj -> environment.add(EnvironmentObject.fromObject(obj.getAsJsonObject())));
+
+        return new ParsedBeatmap(events, customEvents, environment);
+    }
+    @Data
+    @AllArgsConstructor
+    static
+    class ParsedBeatmap {
+        List<LightEvent> events;
+        List<CustomEvent<?>> customEvents;
+        List<EnvironmentObject> environment;
     }
 }

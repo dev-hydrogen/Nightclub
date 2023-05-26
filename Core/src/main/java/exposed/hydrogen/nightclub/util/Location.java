@@ -71,6 +71,9 @@ public class Location implements Cloneable {
 
     public static Location fromJsonArray(JsonArray array) {
         if(array == null) return null;
+        if(array.get(0) instanceof JsonArray) {
+            throw new IllegalArgumentException("Cannot convert JsonArray of JsonArrays to Location");
+        }
         return new Location(array.get(0).getAsDouble(),array.get(1).getAsDouble(),array.get(2).getAsDouble());
     }
 
