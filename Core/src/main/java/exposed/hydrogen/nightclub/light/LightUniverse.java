@@ -134,16 +134,19 @@ public class LightUniverse {
             switch(lookupMethod) {
                 case EXACT -> {
                     if (object.name().equals(id)) {
+                        Nightclub.getChameleon().getLogger().info("Found object: " + object.name() + " with " + lookupMethod.name() + " " + id);
                         return object;
                     }
                 }
                 case CONTAINS -> {
                     if (object.name().contains(id)) {
+                        Nightclub.getChameleon().getLogger().info("Found object: " + object.name() + " with " + lookupMethod.name() + " " + id);
                         return object;
                     }
                 }
                 case REGEX -> {
                     if (object.name().matches(id)) {
+                        Nightclub.getChameleon().getLogger().info("Found object: " + object.name() + " with " + lookupMethod.name() + " " + id);
                         return object;
                     }
                 }

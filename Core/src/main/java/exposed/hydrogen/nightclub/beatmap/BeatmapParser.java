@@ -141,8 +141,8 @@ public class BeatmapParser {
         }
 
         JsonArray eventArray;
-        JsonArray customEventArray;
-        JsonArray environmentArray;
+        JsonArray customEventArray = null;
+        JsonArray environmentArray = null;
         try {
             JsonParser parser = new JsonParser();
             FileReader reader = new FileReader(beatMapFile);
@@ -154,13 +154,16 @@ public class BeatmapParser {
             if(customDataObj != null) {
                 customEventArray = customDataObj.getAsJsonArray("_customEvents");
                 environmentArray = customDataObj.getAsJsonArray("_environment");
-            } else {
-                customEventArray = new JsonArray();
-                environmentArray = new JsonArray();
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return new ParsedBeatmap(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+        }
+        if(customEventArray == null) {
+            customEventArray = new JsonArray();
+        }
+        if(environmentArray == null) {
+            environmentArray = new JsonArray();
         }
         List<LightEvent> events = new ArrayList<>();
         List<CustomEvent<?>> customEvents = new ArrayList<>();

@@ -3,20 +3,17 @@ package exposed.hydrogen.nightclub.beatmap.json;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import exposed.hydrogen.nightclub.beatmap.Track;
-import exposed.hydrogen.nightclub.commands.BeatmapCommand;
 import exposed.hydrogen.nightclub.util.Location;
 import exposed.hydrogen.nightclub.util.Util;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Optional;
 
 import static exposed.hydrogen.nightclub.util.Location.fromJsonArray;
 
 public record GeometryObject(
-        Track track,
+        String track,
         Optional<Color> color,
         Location scale,
         Location position,
@@ -28,11 +25,6 @@ public record GeometryObject(
 
     public static GeometryObject fromObject(JsonObject obj) {
         String track = obj.get("_track").getAsString();
-        Track trackObj = BeatmapCommand.getPlayer().getTrackRegistry()
-                .stream()
-                .filter(trck -> trck.name().equals(track))
-                .findFirst()
-                .orElse(new Track(track, new ArrayList<>(), new ArrayList<>(),null));
         JsonArray color = obj.getAsJsonArray("_color");
         Color colorObj = null;
         if(color != null) {
@@ -54,7 +46,7 @@ public record GeometryObject(
             integerObj = count.getAsInt();
         }
         return new GeometryObject(
-                trackObj,
+                track,
                 Optional.ofNullable(colorObj),
                 scale,
                 position,

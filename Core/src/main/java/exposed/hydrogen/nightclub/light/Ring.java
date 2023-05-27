@@ -175,6 +175,7 @@ public class Ring implements GameObject, Cloneable {
         this.isZoomed = true;
         run.run();
         this.isZoomed = false;
+        this.isActive = true;
     }
 
     public void unload() {

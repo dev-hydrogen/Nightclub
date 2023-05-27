@@ -150,11 +150,9 @@ public class Light implements GameObject, Cloneable {
                 Vector3D v = new Vector3D(Math.toRadians(this.location.getYaw()), Math.toRadians(this.location.getPitch())).normalize();
 
                 Vector3D rot3d = new Vector3D(vec3Rot.getX(),vec3Rot.getY(),vec3Rot.getZ());
-
-                Rotation rot = new Rotation(rot3d,0,RotationConvention.VECTOR_OPERATOR);
                 // make v the size of length and add vec3scale
-                Vector3D v1 = rot.applyTo(v.scalarMultiply(getMaxLengthPercent(l))
-                        .add(new Vector3D(vec3Scale.getX(),vec3Scale.getY(),vec3Scale.getZ())));
+                Vector3D v1 = v.scalarMultiply(getMaxLengthPercent(l))
+                        .add(new Vector3D(vec3Scale.getX(),vec3Scale.getY(),vec3Scale.getZ()));
                 for (int i = 0; i < lasers.size(); i++) {
                     LaserWrapper laser = lasers.get(i);
                     /*
@@ -548,7 +546,11 @@ public class Light implements GameObject, Cloneable {
     public List<GameObject> duplicate(int amount) {
         List<GameObject> these = new ArrayList<>();
         for (int i = 0; i < amount; i++) {
-            these.add((GameObject) this.clone());
+            Light light = new Light(uniqueID, name, location, type, channel, speedChannel, data);
+            these.add(light);
+            light.load();
+            light.start();
+            light.on(color);
         }
         return these;
     }

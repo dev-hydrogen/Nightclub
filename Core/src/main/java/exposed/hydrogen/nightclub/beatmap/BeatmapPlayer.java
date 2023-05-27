@@ -130,8 +130,10 @@ public class BeatmapPlayer {
             executorService.shutdownNow();
             Nightclub.getLightUniverseManager().getLoadedUniverse().getRings().forEach(Ring::stop);
             Nightclub.getLightUniverseManager().getLoadedUniverse().getRings().forEach(Ring::reset);
+            clonedObjects.forEach(GameObject::destroy);
         }
         playTo.forEach(player -> player.stopSound(sound));
+        trackRegistry.clear();
     }
 
     private void setupEnvironment() {
@@ -165,17 +167,22 @@ public class BeatmapPlayer {
                     getTrackOrCreate(object.track().get()).addGameObject(gameObject);
                 }
                 gameObject.name(gameObject.name() + "(Clone)");
+                Nightclub.getChameleon().getLogger().info("Created GameObject: " + gameObject.name());
                 this.clonedObjects.add(gameObject);
             }
         }
     }
 
     public Track getTrack(String track) {
-        return trackRegistry.stream().filter(t -> t.name().equals(track)).findFirst().orElse(null);
+        var result = trackRegistry.stream().filter(t -> t.name().equals(track)).findFirst().orElse(null);
+        if(result != null) {
+            Nightclub.getChameleon().getLogger().info("Found Track: " + result.toString());
+        }
+        return result;
     }
 
     public List<Track> getTracks(List<String> track) {
-        return track.stream().map(this::getTrack).toList();
+        return track.stream().map(this::getTrackOrCreate).toList();
     }
 
     public Track getTrackOrCreate(String track) {
@@ -215,7 +222,7 @@ public class BeatmapPlayer {
 
     private void handle(CustomEvent<?> event, @Nullable CustomEvent<?> nextEvent) {
         if(event instanceof AssignTrackParent ev) {
-            Track parent = getTrack(ev.getData().get_parentTrack());
+            Track parent = getTrackOrCreate(ev.getData().get_parentTrack());
             if(parent == null) { return; }
             getTracks(ev.getData().get_childrenTracks()).forEach(parent::addChild);
         }

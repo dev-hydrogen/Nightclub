@@ -27,7 +27,7 @@ public final class GradientEvent {
         startColor = Util.translateBeatSaberColor(object.get("_startColor").getAsJsonArray());
         endColor = Util.translateBeatSaberColor(object.get("_endColor").getAsJsonArray());
         easing = object.get("_easing") != null
-                ? Easing.valueOf(object.get("_easing").getAsString()) :
+                ? Easing.value(object.get("_easing").getAsString()) :
                 Easing.easeLinear;
         lerpType = object.get("_lerpType") != null
                 ? Lerp.valueOf(object.get("_lerpType").getAsString().toUpperCase(Locale.ROOT))

@@ -3,10 +3,8 @@ package exposed.hydrogen.nightclub.beatmap.json;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import exposed.hydrogen.nightclub.beatmap.Track;
-import exposed.hydrogen.nightclub.commands.BeatmapCommand;
 import exposed.hydrogen.nightclub.util.Location;
 
-import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -25,7 +23,7 @@ public record EnvironmentObject(String id,
                                 Optional<String> track) {
     public static EnvironmentObject fromObject(JsonObject obj) {
         if(obj.get("_geometry") != null) throw new IllegalArgumentException("_geometry objects not allowed");
-        if(BeatmapCommand.getPlayer() == null) throw new IllegalStateException("Beatmap player is null");
+        //if(BeatmapCommand.getPlayer() == null) throw new IllegalStateException("Beatmap player is null");
         String id = obj.get("_id").getAsString();
         LookupMethod lookupMethod = LookupMethod.valueOf(obj.get("_lookupMethod").getAsString().toUpperCase(Locale.ROOT));
         JsonElement duplicateObj = obj.get("_duplicate");
@@ -54,11 +52,11 @@ public record EnvironmentObject(String id,
         String trackStr;
         if(track != null) {
             trackStr = track.getAsString();
-            trackObj = BeatmapCommand.getPlayer().getTrackRegistry()
+            /*trackObj = BeatmapCommand.getPlayer().getTrackRegistry()
                     .stream()
                     .filter(trck -> trck.name().equals(trackStr))
                     .findFirst()
-                    .orElse(new Track(trackStr, new ArrayList<>(), new ArrayList<>(),null));
+                    .orElse(new Track(trackStr, new ArrayList<>(), new ArrayList<>(),null));*/
         } else {
             trackObj = null;
             trackStr = null;

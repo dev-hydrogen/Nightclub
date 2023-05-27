@@ -5,6 +5,7 @@ import exposed.hydrogen.nightclub.beatmap.json.TriplePointDefinition;
 import exposed.hydrogen.nightclub.beatmap.json.events.AnimateTrack;
 import exposed.hydrogen.nightclub.util.Location;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @AllArgsConstructor
+@ToString
 public class Track implements GameObject, Cloneable {
     private transient final ScheduledExecutorService executor = Executors.newScheduledThreadPool(8);
 

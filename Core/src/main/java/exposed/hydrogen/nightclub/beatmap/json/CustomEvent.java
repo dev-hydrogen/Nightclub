@@ -1,9 +1,8 @@
 package exposed.hydrogen.nightclub.beatmap.json;
 
 import com.google.gson.JsonObject;
-import lombok.Data;
 
-@Data
+@lombok.Data
 public abstract class CustomEvent<Data> {
     private long time;
     private String type;

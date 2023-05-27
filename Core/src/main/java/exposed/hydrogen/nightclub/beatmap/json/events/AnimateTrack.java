@@ -39,13 +39,13 @@ public class AnimateTrack extends CustomEvent<AnimateTrack.Data> {
             }
             double duration = object.get("_duration") != null ? object.get("_duration").getAsDouble() : 0;
             _duration = Math.round(duration * 1000.0 * 1000.0 * 60.0 / bpm);
-            _easing = object.get("_easing") != null ? Easing.valueOf(object.get("_easing").getAsString()) : Easing.easeLinear;
+            _easing = object.get("_easing") != null ? Easing.value(object.get("_easing").getAsString()) : Easing.easeLinear;
             _position = fromArray(object.get("_position"));
             _localPosition = fromArray(object.get("_localPosition"));
             _rotation = fromArray(object.get("_rotation"));
             _localRotation = fromArray(object.get("_localRotation"));
             _scale = fromArray(object.get("_scale"));
-            _color = ColorPointDefinition.fromArray(object.get("_position"));
+            _color = ColorPointDefinition.fromArray(object.get("_color"));
         }
     }
 }

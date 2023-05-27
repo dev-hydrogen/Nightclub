@@ -16,7 +16,7 @@ public class ColorPointDefinition {
         b = arr.get(2).getAsDouble();
         a = arr.get(3).getAsDouble();
         t = arr.get(4).getAsDouble();
-        easing = arr.size() == 6 ? Easing.valueOf(arr.get(5).getAsString()) : Easing.easeLinear;
+        easing = arr.size() == 6 ? Easing.value(arr.get(5).getAsString()) : Easing.easeLinear;
     }
     public static List<ColorPointDefinition> fromArray(JsonElement arr) {
         if(arr == null) return List.of();

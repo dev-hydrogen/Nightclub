@@ -14,11 +14,11 @@ public class TriplePointDefinition {
     Easing easing;
 
     public TriplePointDefinition(JsonArray arr) {
-        x = arr.get(0).getAsDouble();
-        y = arr.get(1).getAsDouble();
-        z = arr.get(2).getAsDouble();
-        t = arr.get(3).getAsDouble();
-        easing = arr.size() == 5 ? Easing.valueOf(arr.get(4).getAsString()) : Easing.easeLinear;
+        x = Math.max(Math.min(arr.get(0).getAsDouble(),50),-50);
+        y = Math.max(Math.min(arr.get(1).getAsDouble(),20),-20);
+        z = Math.max(Math.min(arr.get(2).getAsDouble(),50),-50);
+        t = arr.size() >= 4 ? arr.get(3).getAsDouble() : 0;
+        easing = arr.size() == 5 ? Easing.value(arr.get(4).getAsString()) : Easing.easeLinear;
     }
     public static List<TriplePointDefinition> fromArray(JsonElement arr) {
         if(arr == null) return List.of();

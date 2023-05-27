@@ -1,5 +1,7 @@
 package exposed.hydrogen.nightclub.util;
 
+import exposed.hydrogen.nightclub.Nightclub;
+
 import java.util.function.Function;
 
 import static java.lang.Math.*;
@@ -42,5 +44,13 @@ public enum Easing {
     }
     public Function<Double, Number> getFunction() {
         return function;
+    }
+    public static Easing value(String name) {
+        try {
+            return Easing.valueOf(name);
+        } catch (IllegalArgumentException e) {
+            Nightclub.getChameleon().getLogger().info("Invalid easing function: " + name + ". Using linear instead.");
+            return easeLinear;
+        }
     }
 }
