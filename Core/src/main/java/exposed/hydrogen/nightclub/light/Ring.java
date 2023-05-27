@@ -206,6 +206,11 @@ public class Ring implements GameObject, Cloneable {
     }
 
     @Override
+    public void name(String name) {
+        setName(name);
+    }
+
+    @Override
     public void position(Location location) {
         this.currentLocation = location;
     }

@@ -484,6 +484,11 @@ public class Light implements GameObject, Cloneable {
     }
 
     @Override
+    public void name(String name) {
+        this.name = name;
+    }
+
+    @Override
     public void position(Location location) {
         this.loc = location;
     }

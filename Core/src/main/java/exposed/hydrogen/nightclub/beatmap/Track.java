@@ -74,6 +74,11 @@ public class Track implements GameObject, Cloneable {
     }
 
     @Override
+    public void name(String name) {
+        this.name = name;
+    }
+
+    @Override
     public void position(Location location) {
         loc = location;
         updateChildren();

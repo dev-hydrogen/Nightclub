@@ -80,6 +80,8 @@ public class BeatmapPlayer {
 
         long startTime = System.currentTimeMillis();
         Nightclub.getChameleon().getLogger().info("Event count: " + events.size());
+        Nightclub.getChameleon().getLogger().info("Custom Event count: " + customEvents.size());
+        Nightclub.getChameleon().getLogger().info("Environment count: " + environment.size());
         for (int i = 0; i < events.size(); i++) {
             // account for the time it takes to parse the beatmap in the first place
             long diff = System.currentTimeMillis()-startTime;
@@ -162,6 +164,7 @@ public class BeatmapPlayer {
                 if(object.track().isPresent()) {
                     getTrackOrCreate(object.track().get()).addGameObject(gameObject);
                 }
+                gameObject.name(gameObject.name() + "(Clone)");
                 this.clonedObjects.add(gameObject);
             }
         }

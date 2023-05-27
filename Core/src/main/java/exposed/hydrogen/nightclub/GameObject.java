@@ -6,6 +6,7 @@ import java.util.List;
 
 public interface GameObject {
     String name();
+    void name(String name);
     void position(Location location);
     void active(boolean active);
     void scale(Location vec);

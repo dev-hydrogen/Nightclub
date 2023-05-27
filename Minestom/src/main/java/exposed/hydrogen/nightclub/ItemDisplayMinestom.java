@@ -5,6 +5,7 @@ import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.metadata.display.ItemDisplayMeta;
 import net.minestom.server.item.ItemStack;
+import net.minestom.server.utils.Quaternion;
 
 public class ItemDisplayMinestom {
     private Entity itemDisplay;
@@ -26,24 +27,24 @@ public class ItemDisplayMinestom {
         meta.setInterpolationDuration(duration);
     }
     public void setInterpolationStartDelta(int delta) {
-        meta.setInterpolationStartDelta(delta);
+        meta.setInterpolationStartTicks(delta);
     }
     public int getInterpolationDuration() {
         return meta.getInterpolationDuration();
     }
     public long getInterpolationStartDelta() {
-        return meta.getInterpolationStartDelta();
+        return meta.getInterpolationStartTicks();
     }
-    public float [] getLeftRotation() {
+    public Quaternion getLeftRotation() {
         return meta.getLeftRotation();
     }
-    public float [] getRightRotation() {
+    public Quaternion getRightRotation() {
         return meta.getRightRotation();
     }
-    public void setLeftRotation(float [] rotation) {
+    public void setLeftRotation(Quaternion rotation) {
         meta.setLeftRotation(rotation);
     }
-    public void setRightRotation(float [] rotation) {
+    public void setRightRotation(Quaternion rotation) {
         meta.setRightRotation(rotation);
     }
     public ItemStack getItemStack() {
