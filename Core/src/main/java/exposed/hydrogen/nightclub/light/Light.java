@@ -278,10 +278,11 @@ public class Light implements GameObject, Cloneable {
         if(gradientEvent != null) {
             currentGradient = gradientEvent;
         }
-        lasers.forEach(LaserWrapper::start);
-        if (length < data.getOnLength() && !isOn) {
-            length = data.getOnLength();
-        }
+            lasers.forEach(LaserWrapper::start);
+            if (length < data.getOnLength() && !isOn) {
+                length = data.getOnLength();
+            }
+
         length = Math.max(data.getOnLength() * (color.getAlpha() / 255.0), 0.05);
         isOn = true;
         timeToFade = 0;

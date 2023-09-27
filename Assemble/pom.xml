@@ -76,11 +76,5 @@
             <version>2.4</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>exposed.hydrogen.nightclub</groupId>
-            <artifactId>Minestom</artifactId>
-            <version>2.4</version>
-            <scope>compile</scope>
-        </dependency>
     </dependencies>
 </project>

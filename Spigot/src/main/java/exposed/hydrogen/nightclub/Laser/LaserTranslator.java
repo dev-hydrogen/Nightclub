@@ -1,4 +1,4 @@
-package exposed.hydrogen.nightclub.laser;
+package exposed.hydrogen.nightclub.Laser;
 
 import exposed.hydrogen.nightclub.NightclubSpigot;
 import exposed.hydrogen.nightclub.SpigotUtil;

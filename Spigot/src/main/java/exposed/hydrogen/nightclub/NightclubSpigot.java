@@ -1,11 +1,12 @@
 package exposed.hydrogen.nightclub;
 
 import co.aikar.commands.BukkitCommandManager;
+import co.aikar.commands.PaperCommandManager;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import dev.hypera.chameleon.core.exceptions.instantiation.ChameleonInstantiationException;
 import dev.hypera.chameleon.platforms.spigot.SpigotChameleon;
-import exposed.hydrogen.nightclub.laser.LaserTranslator;
+import exposed.hydrogen.nightclub.Laser.LaserTranslator;
 import exposed.hydrogen.nightclub.util.DebugMarker;
 import exposed.hydrogen.nightclub.wrapper.DebugMarkerFactory;
 import exposed.hydrogen.nightclub.wrapper.LaserFactory;
@@ -17,7 +18,7 @@ public class NightclubSpigot extends JavaPlugin {
     @Getter private static NightclubSpigot instance;
     @Getter private static ProtocolManager protocolManager;
     @Getter private static SpigotUtil util;
-    @Getter private static BukkitCommandManager commandManager;
+    @Getter private static PaperCommandManager commandManager;
     private SpigotChameleon chameleon;
 
     @Override
@@ -33,13 +34,13 @@ public class NightclubSpigot extends JavaPlugin {
         //register bstats
         Metrics metrics = new Metrics(this, 12300);
         try {
-            chameleon = new SpigotChameleon(Nightclub.class, this, Nightclub.getPluginData());
+            chameleon = new SpigotChameleon(Nightclub.class,this, Nightclub.getPluginData());
             chameleon.onEnable();
         } catch (ChameleonInstantiationException ex) {
             ex.printStackTrace();
         }
         // needs to be after chameleon
-        commandManager = new BukkitCommandManager(this);
+        commandManager = new PaperCommandManager(this);
         Nightclub.registerCommands(commandManager);
         Nightclub.registerCompletions(commandManager.getCommandCompletions());
     }

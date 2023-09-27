@@ -38,7 +38,7 @@ public class DebugMarker extends DebugMarkerWrapper {
         seen = new ArrayList<>();
         marker = new PacketContainer(PacketType.Play.Server.CUSTOM_PAYLOAD);
         data = new PacketDataSerializer(Unpooled.buffer());
-        data.a(new BlockPosition(location.getX(), location.getY(), location.getZ())); // location
+        data.a(new BlockPosition((int) location.getX(), (int) location.getY(), (int) location.getZ())); // location
         data.writeInt(color.getRGB()); // color
         data.a(name); // name
         data.writeInt(duration); // lifetime of marker
@@ -72,19 +72,11 @@ public class DebugMarker extends DebugMarkerWrapper {
             for (Player p : Bukkit.getOnlinePlayers()) {
                 if (isCloseEnough(SpigotUtil.getNightclubLocation(p.getLocation())) && !seen.contains(p)) {
                     setData(location, color, name, (int) (endTime - System.currentTimeMillis())); // make sure death time is the same for all players
-                    try {
-                        ProtocolLibrary.getProtocolManager().sendServerPacket(p, marker);
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
-                    }
+                    ProtocolLibrary.getProtocolManager().sendServerPacket(p, marker);
                     seen.add(p);
                 } else if (!isCloseEnough(SpigotUtil.getNightclubLocation(p.getLocation())) && seen.contains(p)) {
                     setData(location, new Color(0, 0, 0, 0), "", 0);
-                    try {
-                        ProtocolLibrary.getProtocolManager().sendServerPacket(p, marker);
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
-                    }
+                    ProtocolLibrary.getProtocolManager().sendServerPacket(p, marker);
                     seen.remove(p);
                 }
             }
@@ -96,11 +88,7 @@ public class DebugMarker extends DebugMarkerWrapper {
         setData(location, new Color(0, 0, 0, 0), "", 0);
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (distanceSquared == -1 || this.location.distanceSquared(SpigotUtil.getNightclubLocation(p.getLocation())) <= distanceSquared) {
-                try {
-                    ProtocolLibrary.getProtocolManager().sendServerPacket(p, marker);
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                }
+                ProtocolLibrary.getProtocolManager().sendServerPacket(p, marker);
             }
         }
         seen.clear();
@@ -112,22 +100,14 @@ public class DebugMarker extends DebugMarkerWrapper {
         // probably not the most efficient way of doing this
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (distanceSquared == -1 || this.location.distanceSquared(SpigotUtil.getNightclubLocation(p.getLocation())) <= distanceSquared) {
-                try {
-                    ProtocolLibrary.getProtocolManager().sendServerPacket(p, STOP_ALL_MARKERS);
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                }
+                ProtocolLibrary.getProtocolManager().sendServerPacket(p, STOP_ALL_MARKERS);
             }
         }
     }
 
     public void stopAll(List<CrossCompatPlayer> stopTo) {
         for (CrossCompatPlayer player : stopTo) {
-            try {
-                ProtocolLibrary.getProtocolManager().sendServerPacket((Player) player, STOP_ALL_MARKERS);
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            }
+            ProtocolLibrary.getProtocolManager().sendServerPacket((Player) player, STOP_ALL_MARKERS);
         }
     }
 
@@ -136,18 +116,14 @@ public class DebugMarker extends DebugMarkerWrapper {
         // probably not the most efficient way of doing this
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (distanceSquared == -1 || location.distanceSquared(SpigotUtil.getNightclubLocation(p.getLocation())) <= distanceSquared) {
-                try {
-                    ProtocolLibrary.getProtocolManager().sendServerPacket(p, STOP_ALL_MARKERS);
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                }
+                ProtocolLibrary.getProtocolManager().sendServerPacket(p, STOP_ALL_MARKERS);
             }
         }
     }
 
     public void setData(Location location, Color color, String name, int duration) {
         data = new PacketDataSerializer(Unpooled.buffer());
-        data.a(new BlockPosition(location.getX(), location.getY(), location.getZ()));
+        data.a(new BlockPosition((int) location.getX(), (int) location.getY(), (int) location.getZ()));
         data.writeInt(color.getRGB());
         data.a(name);
         data.writeInt(duration);

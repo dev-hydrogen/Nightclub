@@ -1,5 +1,23 @@
-package exposed.hydrogen.nightclub.laser;
+package exposed.hydrogen.nightclub.Laser;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -10,26 +28,14 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
-
 /**
  * A whole class to create Guardian Lasers and Ender Crystal Beams using packets and reflection.<br>
- * Inspired by the API <a href="https://www.spigotmc.org/resources/guardianbeamapi.18329">GuardianBeamAPI</a><br>
- * <b>1.9 -> 1.19</b>
+ * Inspired by the API
+ * <a href="https://www.spigotmc.org/resources/guardianbeamapi.18329">GuardianBeamAPI</a><br>
+ * <b>1.9 -> 1.20</b>
  *
  * @see <a href="https://github.com/SkytAsul/GuardianBeam">GitHub repository</a>
- * @version 2.3.0
+ * @version 2.3.3
  * @author SkytAsul
  */
 public abstract class Laser {
@@ -431,6 +437,10 @@ public abstract class Laser {
                 correctEnd.subtract(0, 0.5, 0);
 
                 Vector corrective = correctEnd.toVector().subtract(getCorrectStart().toVector()).normalize();
+                if (Double.isNaN(corrective.getX())) corrective.setX(0);
+                if (Double.isNaN(corrective.getY())) corrective.setY(0);
+                if (Double.isNaN(corrective.getZ())) corrective.setZ(0);
+                // coordinates can be NaN when start and end are stricly equals
                 correctEnd.subtract(corrective);
 
             }
@@ -667,6 +677,7 @@ public abstract class Laser {
         private static Method watcherSet;
         private static Method watcherRegister;
         private static Method watcherDirty;
+        private static Method watcherPack;
 
         private static Constructor<?> blockPositionConstructor;
 
@@ -756,14 +767,20 @@ public abstract class Laser {
                     watcherRegister = getMethod(dataWatcherClass, "register");
                 }
                 if (version >= 15) watcherDirty = getMethod(dataWatcherClass, "markDirty");
+                if (version > 19 || (version == 19 && versionMinor >= 3))
+                    watcherPack = dataWatcherClass.getDeclaredMethod("b");
                 packetSpawnNormal = getNMSClass("network.protocol.game", "PacketPlayOutSpawnEntity").getDeclaredConstructor(version < 17 ? new Class<?>[0] : new Class<?>[] { getNMSClass("world.entity", "Entity") });
                 packetSpawnLiving = version >= 19 ? packetSpawnNormal : getNMSClass("network.protocol.game", "PacketPlayOutSpawnEntityLiving").getDeclaredConstructor(version < 17 ? new Class<?>[0] : new Class<?>[] { getNMSClass("world.entity", "EntityLiving") });
                 packetRemove = getNMSClass("network.protocol.game", "PacketPlayOutEntityDestroy").getDeclaredConstructor(version == 17 && versionMinor == 0 ? int.class : int[].class);
-                packetMetadata = getNMSClass("network.protocol.game", "PacketPlayOutEntityMetadata").getDeclaredConstructor(int.class, dataWatcherClass, boolean.class);
+                packetMetadata = getNMSClass("network.protocol.game", "PacketPlayOutEntityMetadata")
+                        .getDeclaredConstructor(version < 19 || (version == 19 && versionMinor < 3)
+                                ? new Class<?>[] {int.class, dataWatcherClass, boolean.class}
+                                : new Class<?>[] {int.class, List.class});
                 packetTeleport = getNMSClass("network.protocol.game", "PacketPlayOutEntityTeleport").getDeclaredConstructor(version < 17 ? new Class<?>[0] : new Class<?>[] { entityClass });
                 packetTeam = getNMSClass("network.protocol.game", "PacketPlayOutScoreboardTeam");
 
-                blockPositionConstructor = getNMSClass("core", "BlockPosition").getConstructor(double.class, double.class, double.class);
+                blockPositionConstructor =
+                        getNMSClass("core", "BlockPosition").getConstructor(int.class, int.class, int.class);
 
                 nmsWorld = Class.forName(cpack + "CraftWorld").getDeclaredMethod("getHandle").invoke(Bukkit.getWorlds().get(0));
 
@@ -779,7 +796,8 @@ public abstract class Laser {
                 tryWatcherSet(fakeSquidWatcher, watcherObject1, (byte) 32);
 
                 getHandle = Class.forName(cpack + "entity.CraftPlayer").getDeclaredMethod("getHandle");
-                playerConnection = getNMSClass("server.level", "EntityPlayer").getDeclaredField(version < 17 ? "playerConnection" : "b");
+                playerConnection = getNMSClass("server.level", "EntityPlayer")
+                        .getDeclaredField(version < 17 ? "playerConnection" : (version < 20 ? "b" : "c"));
                 sendPacket = getNMSClass("server.network", "PlayerConnection").getMethod(version < 18 ? "sendPacket" : "a", getNMSClass("network.protocol", "Packet"));
 
                 if (version >= 17) {
@@ -890,7 +908,8 @@ public abstract class Laser {
         }
 
         public static void setCrystalWatcher(Object watcher, Location target) throws ReflectiveOperationException {
-            Object blockPosition = blockPositionConstructor.newInstance(target.getX(), target.getY(), target.getZ());
+            Object blockPosition =
+                    blockPositionConstructor.newInstance(target.getBlockX(), target.getBlockY(), target.getBlockZ());
             tryWatcherSet(watcher, watcherObject4, version < 13 ? com.google.common.base.Optional.of(blockPosition) : Optional.of(blockPosition));
             tryWatcherSet(watcher, watcherObject5, Boolean.FALSE);
         }
@@ -953,7 +972,11 @@ public abstract class Laser {
         }
 
         private static Object createPacketMetadata(int entityId, Object watcher) throws ReflectiveOperationException {
-            return packetMetadata.newInstance(entityId, watcher, false);
+            if (version < 19 || (version == 19 && versionMinor < 3)) {
+                return packetMetadata.newInstance(entityId, watcher, false);
+            } else {
+                return packetMetadata.newInstance(entityId, watcherPack.invoke(watcher));
+            }
         }
 
         private static void tryWatcherSet(Object watcher, Object watcherObject, Object watcherData) throws ReflectiveOperationException {
@@ -1015,7 +1038,38 @@ public abstract class Laser {
                     return Packets.versionMinor < 2 ? "aa" : "Z";
                 }
             },
-            V1_19(19, "Z", "b", "e", "c", "d", 89, 38, "N", "aM", "w", "a", "g"),
+            V1_19(19, null, "b", "e", "c", "d", 89, 38, null, null, "w", "a", "g") {
+                @Override
+                public String getWatcherFlags() {
+                    return versionMinor < 4 ? "Z" : "an";
+                }
+
+                @Override
+                public int getGuardianID() {
+                    return versionMinor < 3 ? 38 : 39;
+                }
+
+                @Override
+                public String getSquidTypeName() {
+                    if (versionMinor < 3)
+                        return "aM";
+                    else if (versionMinor == 3)
+                        return "aN";
+                    else
+                        return "aT";
+                }
+
+                @Override
+                public String getGuardianTypeName() {
+                    if (versionMinor < 3)
+                        return "N";
+                    else if (versionMinor == 3)
+                        return "O";
+                    else
+                        return "V";
+                }
+            },
+            V1_20(20, "an", "b", "e", "c", "d", 89, 38, "V", "aT", "B", "a", "g"),
             ;
 
             private final int major;
