@@ -45,7 +45,11 @@ public class LightCommand extends BaseCommand {
     @Subcommand("build")
     @Description("Build a new Light!")
     @CommandPermission("nightclub.light")
-    public static void onBuild(CommandIssuer sender) {
+    public static void onBuild(CommandIssuer sender, String[] args)  {
+        if (args.length < 1) {
+            sender.sendMessage("Missing args! Please provide a name");
+            return;
+        }
         LightUniverseManager manager = Nightclub.getLightUniverseManager();
         CrossCompatPlayer player = Nightclub.getCrossCompatUtil().getPlayer(sender);
 
@@ -68,7 +72,7 @@ public class LightCommand extends BaseCommand {
         UUID uuid = UUID.randomUUID();
         light = Light.builder()
                 .uuid(uuid)
-                .name("Unnamed-Light-" + uuid)
+                .name(args[0]+"-"+uuid)
                 .location(player.getLocation().add(0, 1, 0))
                 .type(LightType.GUARDIAN_BEAM)
                 .channel(LightChannel.CENTER_LIGHTS)
@@ -125,6 +129,7 @@ public class LightCommand extends BaseCommand {
     @CommandCompletion("@lights")
     @CommandPermission("nightclub.light")
     public static void onClone(CommandIssuer sender, String[] args) {
+
         LightUniverseManager manager = Nightclub.getLightUniverseManager();
         LightUniverse universe = manager.getLoadedUniverse();
         CrossCompatPlayer player = Nightclub.getCrossCompatUtil().getPlayer(sender);

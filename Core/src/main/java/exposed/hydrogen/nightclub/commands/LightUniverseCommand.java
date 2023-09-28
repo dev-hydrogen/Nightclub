@@ -51,6 +51,7 @@ public class LightUniverseCommand extends BaseCommand {
         if (manager.getLoadedUniverse() != null) {
             manager.getLoadedUniverse().unload();
         }
+        universe.setName(args[0]);
         manager.add(universe);
         manager.setLoadedUniverse(universe);
     }
