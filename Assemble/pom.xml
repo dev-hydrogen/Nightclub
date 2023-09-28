@@ -73,7 +73,7 @@
         <dependency>
             <groupId>exposed.hydrogen.nightclub</groupId>
             <artifactId>Spigot</artifactId>
-            <version>2.4</version>
+            <version>2.5</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
